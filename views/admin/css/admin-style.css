@@ -1,0 +1,23 @@
+.ppi-options-group {
+    padding: 10px;
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.ppi-options-group-title {
+    padding: 0 !important;
+    font-weight: 600 !important;
+    font-size: 1.3em !important;
+}
+
+.ppi-settings {
+    background-color: #e9e9e9;
+    border-radius: 0.25rem;
+    padding: 10px;
+    margin: 10px 10px 10px -10px;
+}
+
+.ppi-settings h3 {
+    margin-bottom: 2px;
+}
