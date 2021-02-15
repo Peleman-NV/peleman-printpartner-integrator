@@ -25,4 +25,4 @@ require(plugin_dir_path(__FILE__) . 'includes/admin-menu.php');
 require(plugin_dir_path(__FILE__) . 'includes/curl-functions.php');
 require(plugin_dir_path(__FILE__) . 'includes/add-custom-fields.php');
 require(plugin_dir_path(__FILE__) . 'includes/imaxel-product-page.php');
-require(plugin_dir_path(__FILE__) . 'includes/redirect-to-imaxel-editor.php');
+require(plugin_dir_path(__FILE__) . 'includes/upload-content.php');
