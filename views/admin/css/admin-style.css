@@ -18,6 +18,25 @@
     margin: 10px 10px 10px -10px;
 }
 
-.ppi-settings h3 {
-    margin-bottom: 2px;
+.ppi-settings h1 {
+    margin-bottom: 2px !important;
+}
+
+.ppi-settings h2 {
+    font-weight: 400 !important;
+}
+
+.ppi-settings .form-row {
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.ppi-settings .form-row label {
+    font-weight: 600;
+}
+
+.grid-medium-column {
+    flex: 0 0 auto;
+    width: 12%;
 }

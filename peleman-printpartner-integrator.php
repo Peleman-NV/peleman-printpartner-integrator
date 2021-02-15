@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Peleman printpartner integrator
  * Description: Allows Peleman printpartners using WordPress & Woocommerce to sell Peleman products in addition to their own.
- * Version: 0.3
+ * Version: 0.4 (15/02/2021)
  * Author: Noë Baeten, Jason Goossens, Chris Schippers
  * Author URI: https://www.peleman.com
  */
