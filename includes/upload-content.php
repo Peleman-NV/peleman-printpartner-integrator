@@ -1,28 +1,27 @@
 <?php
 
-// worth a try...
-// https://gist.github.com/ahmadawais/0ccb8a32ea795ffac4adfae84797c19a
 
-function upload_content_file($x)
+function upload_content_file()
 {
-    error_log(print_r($x, true), 3, __DIR__ . '/log.txt');
-    //check_ajax_referer('file_upload_nonce', '_ajax_nonce');
-    $response['method'] = $_SERVER['REQUEST_METHOD'];
-    $response['file'] = $_FILES['file']['name'];
-    $response['nonce'] = $_POST['_ajax_nonce'];
-    $response['custom'] = "Do something";
+    check_ajax_referer('file_upload_nonce', '_ajax_nonce');
+    $filename = $_FILES['file']['name'];
     $response['type'] = "success";
+    $response['action'] = "Uploaded " . $filename;
+    $pages = 73;
+    $format = "A4";
 
-    $response['string'] = "";
-    foreach ($_POST as $var) {
-        $response['string'] .= $var . ' ';
-    }
+    //$im = new Imagick($filename);
+    //$pages = $im->getNumberImages();
+    // $pdf->setSourceFile($filename);
+    // $pages = $pdf->AliasNbPages();
 
-    error_log(print_r($response, true), 3, __DIR__ . '/log.txt');
+    $response['file']['name'] = $filename;
+    $response['file']['pages'] = $pages;
+    $response['file']['format'] = $format;
 
-    $response = json_encode($response);
-    echo wp_send_json($response);
+    wp_send_json($response);
     wp_die();
+
 
     // if (isset($_FILES['file']['name'])) {
 

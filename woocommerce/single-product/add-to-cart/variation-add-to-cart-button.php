@@ -13,14 +13,19 @@ defined('ABSPATH') || exit;
 global $product;
 ?>
 
-
 <div class="woocommerce-variation-add-to-cart variations_button">
-	<?php do_action('woocommerce_before_add_to_cart_button'); ?>
-	<!-- <form id="file-upload-form" enctype="multipart/form-data">
-		<input id="file-upload" type="file" name="pdf_upload">
-	</form> -->
-	<div id="file-upload-validation">No file uploaded</div>
-	<?php
+
+	<?php $parent_wc_product = wc_get_product($product->get_id());
+	if ($parent_wc_product->is_type('variable')) {
+		$variants_array = $parent_wc_product->get_children();
+		$first_variant = wc_get_product($variants_array[0]);
+		if (wc_get_product($first_variant)->get_meta('pdf_upload') != "") {
+			ppi_add_form_to_page_hook();
+		}
+	}
+	do_action('woocommerce_before_add_to_cart_button');
+
+
 	do_action('woocommerce_before_add_to_cart_quantity');
 
 	woocommerce_quantity_input(
@@ -46,11 +51,4 @@ global $product;
 	<input type="hidden" name="add-to-cart" value="<?php echo absint($product->get_id()); ?>" />
 	<input type="hidden" name="product_id" value="<?php echo absint($product->get_id()); ?>" />
 	<input type="hidden" name="variation_id" class="variation_id" value="0" />
-</div>
-<div class="modal">
-	<form id="file-upload-form" method="POST" enctype="multipart/form-data">
-		<input id="file-upload" type="file" name="pdf_upload">
-		<input type="submit" name="subme" id="subme" value="go">
-	</form>
-	<div id="file-upload-validation">No file uploaded</div>
 </div>

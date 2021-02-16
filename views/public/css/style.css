@@ -4,3 +4,21 @@
     display: flex !important;
     align-items: center;
 }
+
+.ppi-upload-form {
+    border: 1px lightgrey solid;
+    text-align: center;
+    margin-bottom: 8px;
+    display: inline-block;
+    width: 65%;
+}
+
+.ppi-upload-form label {
+    padding: 5px;
+    margin-bottom: 0;
+    display: block;
+}
+
+#file-upload-validation {
+    margin-bottom: 8px;
+}

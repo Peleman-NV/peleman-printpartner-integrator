@@ -12,7 +12,7 @@
 function ppi_override_wc_templates($template, $template_name, $template_path)
 {
 
-    // I don't seem to need "variable" template - also, "variable" has some haru plugin custom code - better to not override it
+    // Don't seem to need "variable" template.  Also, "variable" template has some haru plugin custom code - better to not override it
     // if ('variable.php' === basename($template)) {
     //     $template = trailingslashit(plugin_dir_path(__FILE__)) . '../woocommerce/single-product/add-to-cart/variable.php';
     // }

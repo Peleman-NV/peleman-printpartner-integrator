@@ -22,7 +22,7 @@ if (!in_array('woocommerce/woocommerce.php', $active_plugins)) {
 
 require(plugin_dir_path(__FILE__) . 'includes/enqueue-styles-and-scripts.php');
 require(plugin_dir_path(__FILE__) . 'includes/admin-menu.php');
-require(plugin_dir_path(__FILE__) . 'includes/curl-functions.php');
 require(plugin_dir_path(__FILE__) . 'includes/add-custom-fields.php');
 require(plugin_dir_path(__FILE__) . 'includes/imaxel-product-page.php');
 require(plugin_dir_path(__FILE__) . 'includes/upload-content.php');
+require(plugin_dir_path(__FILE__) . 'includes/add-file-upload.php');

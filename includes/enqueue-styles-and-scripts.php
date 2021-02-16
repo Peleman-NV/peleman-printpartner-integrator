@@ -39,5 +39,14 @@ function enqueue_ajax()
             'nonce' => wp_create_nonce('file_upload_nonce')
         )
     );
+    wp_enqueue_script('ppi-redirect-to-imaxel-editor', plugins_url('../views/public/js/redirect-to-imaxel-editor.js', __FILE__), array('jquery'));
+    wp_localize_script(
+        'ppi-redirect-to-imaxel-editor',
+        'ppi_ajax_redirect',
+        array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('editor-redirect-nonce')
+        )
+    );
 }
 add_action('wp_enqueue_scripts', 'enqueue_ajax', 1);

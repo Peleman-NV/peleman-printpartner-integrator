@@ -11,7 +11,7 @@
             <div class="grid-medium-column">
                 <label for="ppi-imaxel-private-key">Imaxel private key</label>
             </div>
-            <div class="grid-medium-column">
+            <div class="grid-large-column">
                 <input type="text" id="ppi-imaxel-private-key" name="ppi-imaxel-private-key" value="<?= get_option('ppi-imaxel-private-key'); ?>" placeholder="Imaxel private key">
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="grid-medium-column">
                 <label for="ppi-imaxel-public-key">Imaxel public key</label>
             </div>
-            <div class="grid-medium-column">
+            <div class="grid-large-column">
                 <input type="text" id="ppi-imaxel-public-key" name="ppi-imaxel-public-key" value="<?= get_option('ppi-imaxel-public-key'); ?>" placeholder="Imaxel public key">
             </div>
         </div>

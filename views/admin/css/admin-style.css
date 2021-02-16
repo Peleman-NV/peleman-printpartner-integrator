@@ -36,7 +36,21 @@
     font-weight: 600;
 }
 
+.ppi-settings .form-row input[type='text'] {
+    width: 100%;
+}
+
 .grid-medium-column {
     flex: 0 0 auto;
     width: 12%;
+}
+
+.grid-large-column {
+    flex: 0 0 auto;
+    width: 25%;
+}
+
+.grid-extra-large-column {
+    flex: 0 0 auto;
+    width: 33%;
 }
