@@ -26,3 +26,4 @@ require(plugin_dir_path(__FILE__) . 'includes/add-custom-fields.php');
 require(plugin_dir_path(__FILE__) . 'includes/imaxel-product-page.php');
 require(plugin_dir_path(__FILE__) . 'includes/upload-content.php');
 require(plugin_dir_path(__FILE__) . 'includes/add-file-upload.php');
+require(plugin_dir_path(__FILE__) . 'includes/redirect-to-imaxel-editor.php');

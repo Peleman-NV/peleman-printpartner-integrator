@@ -15,7 +15,8 @@ global $product;
 
 <div class="woocommerce-variation-add-to-cart variations_button">
 
-	<?php $parent_wc_product = wc_get_product($product->get_id());
+	<?php
+	$parent_wc_product = wc_get_product($product->get_id());
 	if ($parent_wc_product->is_type('variable')) {
 		$variants_array = $parent_wc_product->get_children();
 		$first_variant = wc_get_product($variants_array[0]);
@@ -24,10 +25,7 @@ global $product;
 		}
 	}
 	do_action('woocommerce_before_add_to_cart_button');
-
-
 	do_action('woocommerce_before_add_to_cart_quantity');
-
 	woocommerce_quantity_input(
 		array(
 			'min_value'   => apply_filters('woocommerce_quantity_input_min', $product->get_min_purchase_quantity(), $product),
@@ -36,14 +34,12 @@ global $product;
 		)
 	);
 	do_action('woocommerce_after_add_to_cart_quantity');
-	?>
 
-	<?php
-	//$link = admin_url('admin-ajax.php?action=imaxel_editor&productCode=' . $SKU . '&productsID=' . $product->id . '&variation_id=' . $variationid[0] . '&nonce=' . $nonce);
-
-	// either go to the editor, or the PDF upload page
-	$link = "https://www.google.com";
-	echo '<a class="ppi-add-to-cart-button single_add_to_cart_button button alt" data-nonce="' . $nonce . '" data-productCode="' . $SKU . '" data-productsID="' . $product->id . '" data-variation_id="' . $variationid[0] . '" href="' . $link . '">' .  esc_html($product->single_add_to_cart_text()) . '</a>';
+	if (wc_get_product($first_variant)->get_meta('template_id') == "") {
+		echo '<button type="submit" class="single_add_to_cart_button button alt">' . esc_html($product->single_add_to_cart_text()) . '</button>';
+	} else {
+		echo '<a class="ppi-add-to-cart-button single_add_to_cart_button button alt">' .  esc_html($product->single_add_to_cart_text()) . '</a>';
+	}
 
 	do_action('woocommerce_after_add_to_cart_button');
 	?>

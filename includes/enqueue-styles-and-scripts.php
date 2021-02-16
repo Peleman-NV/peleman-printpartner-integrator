@@ -10,8 +10,6 @@ function enqueue_frontend_assets()
     wp_enqueue_style('ppi_style');
     wp_register_script('ppi_main_script', plugins_url('../views/public/js/main.js', __FILE__),  array('jquery')); // load main with jquery as a dependency
     wp_enqueue_script('ppi_main_script');
-    // wp_register_script('jquery_form_script', plugins_url('../views/public/js/jquery-form.js', __FILE__),  array('jquery')); // load jQuery-form with jquery as a dependency
-    // wp_enqueue_script('jquery_form_script');
 }
 add_action('wp_enqueue_scripts', 'enqueue_frontend_assets');
 

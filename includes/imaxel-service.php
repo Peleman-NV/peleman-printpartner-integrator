@@ -7,7 +7,7 @@ class Imaxel_Service
     private $base_imaxel_api_url = "https://services.imaxel.com:443/api/v3/";
 
 
-    public function _construct()
+    public function __construct()
     {
         $this->private_key =  get_option('ppi-imaxel-private-key');
         $this->public_key =  get_option('ppi-imaxel-public-key');
@@ -63,59 +63,40 @@ class Imaxel_Service
      */
     public function get_response($url, $request_type, $json_request = null)
     {
-        $curl = curl_init();
-
         if ($request_type === 'POST') {
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => $request_type,
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json'
-                ),
-                CURLOPT_POSTFIELDS => $json_request
-            ));
-        } else if ($request_type === 'GET') { {
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => $url,
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json'
-                    ),
-                    CURLOPT_CUSTOMREQUEST => $request_type
-                ));
-            }
-
-            $response = curl_exec($curl);
-            curl_close($curl);
-
-            return $response;
+            $response = wp_remote_post(
+                $url,
+                array(
+                    'headers' => array('Content-Type' => 'application/json; charset=utf-8'),
+                    'method' => 'POST',
+                    'body' => $json_request
+                )
+            );
+        } else if ($request_type === 'GET') {
+            $response = wp_safe_remote_get($url);
         }
+
+        return $response;
     }
 
     /**
      * Create imaxel project
      * 
-     * @param array $bookInfo 
+     * @param array $template_id
      * @return string
      */
-    public function create_project($bookInfo)
+    public function create_project($template_id)
     {
-        $url = $this->base_imaxel_api_url . 'projects/';
-        $template_id = 0; // product get template_id;
-        $context_array = array('contextArray' => $template_id);
+        $url = $this->base_imaxel_api_url . 'projects';
+        $template_id = $template_id;
+        $context_array = array('productCode' => $template_id);
         $base_64_encoded_policy_json = $this->generate_base64_encoded_policy($context_array);
         $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
         $create_project_json = json_encode(array(
             "productCode" => $template_id,
             "policy" => $base_64_encoded_policy_json,
             "signedPolicy" => $signed_policy
-        ));
-
+        ), JSON_UNESCAPED_SLASHES);
         return $this->get_response($url, 'POST', $create_project_json);
     }
 
