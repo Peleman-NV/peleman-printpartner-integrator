@@ -13,6 +13,7 @@ function redirect_to_imaxel_editor()
     $product_variation_array = explode(',', wc_get_product($variant_id)->get_meta('template_id'));
     $product_variation_data = array();
 
+    // TODO refactor when backend is responsive
     for ($i = 0; $i < count($product_variation_array); $i++) {
         if ($i == 0) {
             $product_variation_data['template_id'] = $product_variation_array[$i];
@@ -27,7 +28,9 @@ function redirect_to_imaxel_editor()
     $encoded_response = json_decode($create_project_response['body']);
     $new_project_id = $encoded_response->id;
 
-    // save to DB 'n stuff
+    $user_id = wp_get_current_user();
+    insert_project($user_id, $new_project_id, $variant_id);
+
     $editor_url = $imaxel->get_editor_url($new_project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
 
     $response['url'] = $editor_url;
@@ -57,3 +60,17 @@ function ppi_output_add_to_cart_url()
     return $url;
 }
 add_action('ppi_generate_add_to_cart_url', 'ppi_output_add_to_cart_url', 10);
+
+/**
+ * Inserts project into database
+ *
+ * @param Int $user_id
+ * @param Int $project_id
+ * @param Int $product_id
+ */
+function insert_project($user_id, $project_id, $product_id)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ppi_user_projects';
+    $wpdb->insert($table_name, array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id));
+}
