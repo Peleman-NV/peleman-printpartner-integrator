@@ -11,11 +11,6 @@
  */
 function ppi_override_wc_templates($template, $template_name, $template_path)
 {
-
-    // Don't seem to need "variable" template.  Also, "variable" template has some haru plugin custom code - better to not override it
-    // if ('variable.php' === basename($template)) {
-    //     $template = trailingslashit(plugin_dir_path(__FILE__)) . '../woocommerce/single-product/add-to-cart/variable.php';
-    // }
     if ('variation.php' === basename($template)) {
         $template = trailingslashit(plugin_dir_path(__FILE__)) . '../woocommerce/single-product/add-to-cart/variation.php';
     }
@@ -44,7 +39,6 @@ function ppi_change_add_to_cart_text_for_imaxel_products()
 
         if ($requires_pdf != "") {
             add_filter('woocommerce_product_single_add_to_cart_text', 'ppi_change_add_to_cart_text_for_imaxel_pdf_product', 10, 2);
-            //echo '<form action="upload-content.php" enctype="multipart/form-data"><input type="file" onchange="this.form.submit()" name="file-upload"/></form>';
         } else if ($is_imaxel_product != "") {
             add_filter('woocommerce_product_single_add_to_cart_text', 'ppi_change_add_to_cart_text_for_imaxel_product', 10, 2);
         }
@@ -68,23 +62,7 @@ function ppi_change_add_to_cart_text_for_imaxel_product()
     return __('Create project', 'woocommerce');
 }
 
-/**
- * UNUSED Adds a form with file input to the product page
- */
-function add_file_input($variation_data, $product, $variation)
-{
-    $variation_id = $variation_data['variation_id'];
-    $wc_product = wc_get_product($variation_id);
-    $requires_pdf = $wc_product->get_meta('pdf_upload');
-
-    if ($requires_pdf != '') {
-        $variation_data['availability_html'] .= '<form action="upload-content.php"><input type="file"></form>';
-    }
-    return $variation_data;
-}
-//add_filter('woocommerce_available_variation', 'add_file_input', 10, 3);
-
-
+// TO DO add  the add-to-cart validation that includes the uploaded content validation
 function my_custom_validation($true,  $product_id,  $quantity)
 {
     //     wc_add_notice(__('Please enter an amount greater than 1', 'cfwc'), 'error');
@@ -108,3 +86,5 @@ function enable_add_to_cart_button($is_purchasable, $product)
     return 0;
 }
 //add_filter('woocommerce_is_purchasable', 'enable_add_to_cart_button', 10, 2);
+
+// TODO button labels have to be better
