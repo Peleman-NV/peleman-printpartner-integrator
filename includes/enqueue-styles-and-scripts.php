@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Loads frontend javascript & css and bootstrap
+ * Loads frontend javascript & css and javascript
  * Boostrap conflicts with Pangja theme - do not load
  */
 function enqueue_frontend_assets()
@@ -14,12 +14,19 @@ function enqueue_frontend_assets()
 add_action('wp_enqueue_scripts', 'enqueue_frontend_assets');
 
 /**
- * Loads admin css and bootstrap
+ * Loads admin css and javascript
  */
 function enqueue_admin_assets()
 {
-    wp_register_style('ppi_admin_style', plugins_url('../views/admin/css/admin-style.css', __FILE__));
-    wp_enqueue_style('ppi_admin_style');
+    global $pagenow;
+    if ($_GET['page'] == "ppi-menu.php" || $pagenow == 'post.php') {
+        wp_register_style('ppi_admin_style', plugins_url('../views/admin/css/admin-style.css', __FILE__));
+        wp_enqueue_style('ppi_admin_style');
+    }
+    if ($pagenow == 'post.php') {
+        wp_register_script('ppi_admin_ui_helper', plugins_url('../views/admin/js/custom-fields-ui-helper.js', __FILE__), array('jquery'));
+        wp_enqueue_script('ppi_admin_ui_helper');
+    }
 }
 add_action('admin_enqueue_scripts', 'enqueue_admin_assets');
 

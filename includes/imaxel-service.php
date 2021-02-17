@@ -37,8 +37,6 @@ class Imaxel_Service
             ));
         }
 
-        error_log("Policy: " . print_r($policy_array, true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
-
         return base64_encode(json_encode($policy_array, JSON_UNESCAPED_SLASHES));
     }
     /**
@@ -102,8 +100,6 @@ class Imaxel_Service
             "signedPolicy" => $signed_policy
         ), JSON_UNESCAPED_SLASHES);
 
-        $now =  new DateTime('NOW');
-        error_log($now->format('c') . $create_project_json . PHP_EOL, 3, __DIR__ . '/Log.txt');
         return $this->get_response($url, 'POST', $create_project_json);
     }
 

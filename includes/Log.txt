@@ -1,0 +1,24 @@
+Policy: Array
+(
+    [productCode] => qsd
+    [variantsCodes] => Array
+        (
+            [0] => 
+        )
+
+    [defaultVariantCode] => 
+    [publicKey] => pmXNzFLR8hNG9hF52AfZxf
+    [expirationDate] => 2021-02-17T15:22:44+00:00
+)
+
+2021-02-17T15:12:44+00:00{"productCode":"qsd","variantsCodes":[null],"defaultVariantCode":null,"policy":"eyJwcm9kdWN0Q29kZSI6InFzZCIsInZhcmlhbnRzQ29kZXMiOltudWxsXSwiZGVmYXVsdFZhcmlhbnRDb2RlIjpudWxsLCJwdWJsaWNLZXkiOiJwbVhOekZMUjhoTkc5aEY1MkFmWnhmIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIxLTAyLTE3VDE1OjIyOjQ0KzAwOjAwIn0=","signedPolicy":"ZB8zV/b/1FXdQ2SPhTcPMqbS/VbCod2XD8ITg2a6ZVs="}
+Policy: Array
+(
+    [projectId] => 
+    [backURL] => https://devshop.peleman.com
+    [addToCartURL] => https://devshop.peleman.com/?add-to-cart=30
+    [redirect] => 1
+    [publicKey] => pmXNzFLR8hNG9hF52AfZxf
+    [expirationDate] => 2021-02-17T15:22:44+00:00
+)
+
