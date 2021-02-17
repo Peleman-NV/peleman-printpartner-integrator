@@ -27,3 +27,15 @@ require(plugin_dir_path(__FILE__) . 'includes/imaxel-product-page.php');
 require(plugin_dir_path(__FILE__) . 'includes/upload-content.php');
 require(plugin_dir_path(__FILE__) . 'includes/add-file-upload.php');
 require(plugin_dir_path(__FILE__) . 'includes/redirect-to-imaxel-editor.php');
+require(plugin_dir_path(__FILE__) . 'includes/init-database-table.php');
+
+register_activation_hook(__FILE__, 'init_database');
+
+/**
+ * Registere db table, if not done yet.
+ */
+global $wpdb;
+$table_name = $wpdb->prefix . "ppi_user_projects";
+if (!in_array($table_name, $wpdb->tables, true)) {
+    $wpdb->tables[] = $table_name;
+}
