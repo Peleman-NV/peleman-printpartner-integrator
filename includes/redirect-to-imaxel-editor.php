@@ -10,13 +10,23 @@ function redirect_to_imaxel_editor()
     check_ajax_referer('editor-redirect-nonce', '_ajax_nonce');
 
     $variant_id = $_POST['variant_id'];
-    $product_variation = wc_get_product($variant_id)->get_meta('template_id');
+    $product_variation_array = explode(',', wc_get_product($variant_id)->get_meta('template_id'));
+    $product_variation_data = array();
+
+    for ($i = 0; $i < count($product_variation_array); $i++) {
+        if ($i == 0) {
+            $product_variation_data['template_id'] = $product_variation_array[$i];
+            continue;
+        }
+        $product_variation_data['variant_' . $i] = $product_variation_array[$i];
+    }
 
     $imaxel = new Imaxel_Service();
-    $create_project_response = $imaxel->create_project($product_variation);
+    $create_project_response = $imaxel->create_project($product_variation_data['template_id'], $product_variation_data['variant_1']);
 
     $encoded_response = json_decode($create_project_response['body']);
     $new_project_id = $encoded_response->id;
+
     // save to DB 'n stuff
     $editor_url = $imaxel->get_editor_url($new_project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
 

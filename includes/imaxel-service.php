@@ -37,6 +37,8 @@ class Imaxel_Service
             ));
         }
 
+        error_log("Policy: " . print_r($policy_array, true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
+
         return base64_encode(json_encode($policy_array, JSON_UNESCAPED_SLASHES));
     }
     /**
@@ -85,18 +87,23 @@ class Imaxel_Service
      * @param array $template_id
      * @return string
      */
-    public function create_project($template_id)
+    public function create_project($template_id, $variant_code)
     {
         $url = $this->base_imaxel_api_url . 'projects';
         $template_id = $template_id;
-        $context_array = array('productCode' => $template_id);
+        $context_array = array('productCode' => $template_id, 'variantsCodes' => array($variant_code), 'defaultVariantCode' => $variant_code);
         $base_64_encoded_policy_json = $this->generate_base64_encoded_policy($context_array);
         $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
         $create_project_json = json_encode(array(
             "productCode" => $template_id,
+            "variantsCodes" => array($variant_code),
+            "defaultVariantCode" => $variant_code,
             "policy" => $base_64_encoded_policy_json,
             "signedPolicy" => $signed_policy
         ), JSON_UNESCAPED_SLASHES);
+
+        $now =  new DateTime('NOW');
+        error_log($now->format('c') . $create_project_json . PHP_EOL, 3, __DIR__ . '/Log.txt');
         return $this->get_response($url, 'POST', $create_project_json);
     }
 

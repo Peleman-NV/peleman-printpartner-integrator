@@ -1,5 +1,5 @@
 jQuery(document).ready(function () {
-    jQuery('.ppi-add-to-cart-button').on('click', (e) => {
+    jQuery('.ppi-add-to-cart-button').on('click', e => {
         e.preventDefault();
         if (jQuery('.ppi-add-to-cart-button').hasClass('disabled')) {
             return;
@@ -19,7 +19,7 @@ jQuery(document).ready(function () {
             dataType: 'json',
             success: function (response) {
                 if (response.type === 'success') {
-                    console.log(response);
+                    window.location.href = response.url;
                 } else {
                     console.error('Something went wrong: ' + response);
                 }
