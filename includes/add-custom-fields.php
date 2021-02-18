@@ -23,7 +23,7 @@ function ppi_add_custom_fields_to_variable_products($loop, $variation_data, $var
     ));
 
     woocommerce_wp_text_input(array(
-        'id' => 'variant_id[' . $loop . ']',
+        'id' => 'variant_code[' . $loop . ']',
         'placeholder' => 'Variant code',
         'class' => 'short',
         'label' => '<a href="https://services.imaxel.com/peleman/admin">Variant code</a>',
