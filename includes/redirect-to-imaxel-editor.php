@@ -10,25 +10,19 @@ function redirect_to_imaxel_editor()
     check_ajax_referer('editor-redirect-nonce', '_ajax_nonce');
 
     $variant_id = $_POST['variant_id'];
-    $product_variation_array = explode(',', wc_get_product($variant_id)->get_meta('template_id'));
-    $product_variation_data = array();
-
-    // TODO refactor when backend is responsive
-    for ($i = 0; $i < count($product_variation_array); $i++) {
-        if ($i == 0) {
-            $product_variation_data['template_id'] = $product_variation_array[$i];
-            continue;
-        }
-        $product_variation_data['variant_' . $i] = $product_variation_array[$i];
-    }
+    $template_id =  wc_get_product($variant_id)->get_meta('template_id');
+    $variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
     $imaxel = new Imaxel_Service();
-    $create_project_response = $imaxel->create_project($product_variation_data['template_id'], $product_variation_data['variant_1']);
+    $create_project_response = $imaxel->create_project($template_id, $variant_code);
 
     $encoded_response = json_decode($create_project_response['body']);
     $new_project_id = $encoded_response->id;
 
-    $user_id = wp_get_current_user();
+    $user_id = get_current_user_id();
+    // $now =  new DateTime('NOW');
+    // error_log($now->format('c') . wp_get_current_user() . PHP_EOL, 3, __DIR__ . '/Log.txt');
+
     insert_project($user_id, $new_project_id, $variant_id);
 
     $editor_url = $imaxel->get_editor_url($new_project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
