@@ -1,7 +1,15 @@
 <div class="ppi-settings">
     <h1>Peleman Printshop Integrator Settings</h1>
-    <h2>Enter your Imaxel keys here</h2>
     <hr>
+    <h2>PHP maximum uploaded file size</h2>
+    <p>
+        Some Peleman products require additional user content, that may exceed the default PHP maximum uploaded file size of 2MB.
+        <br>
+        This plugin allows uploads up to 100MB, so your PHP installation will need to be changed to allow this <strong>(without this, the plugin will not work correctly)</strong>.<br>
+        Please have your system administrator change your "php.ini" file. The lines containing "upload_max_filesize" and "post_max_size" must be changed to allow uploads up to 100MB.
+    </p>
+    <hr>
+    <h2>Enter your Imaxel keys here</h2>
     <form method="POST" action="options.php">
         <?php
         settings_fields('ppi_custom_settings');

@@ -22,3 +22,7 @@
 #file-upload-validation {
     margin-bottom: 8px;
 }
+
+.hidden {
+    display: none;
+}

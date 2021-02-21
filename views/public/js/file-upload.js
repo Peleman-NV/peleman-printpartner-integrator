@@ -1,5 +1,5 @@
 jQuery(document).ready(function () {
-    jQuery('#file-upload').on('change', e => {
+    jQuery('#file-upload').on('change', (e) => {
         jQuery('#file-upload').submit();
         e.preventDefault();
         jQuery('#file-upload-validation').html('Uploading . . .');
@@ -21,20 +21,24 @@ jQuery(document).ready(function () {
             cache: false,
             dataType: 'json',
             success: function (response) {
-                if (response.type === 'success') {
-                    const file = response.file;
-                    jQuery('#file-upload-validation').html(
-                        'Succesfully uploaded file ' +
-                            file.name +
-                            ' (' +
-                            file.format +
-                            ', ' +
-                            file.pages +
-                            ' pages).'
-                    );
-                } else {
-                    alert('file not uploaded');
-                }
+                console.log(response);
+                jQuery('#file-upload-validation').html(response.message);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log({ jqXHR });
+                jQuery('#file-upload-validation').html(
+                    'Something went wrong.  Please try again with a different file.'
+                );
+                console.error(
+                    'Something went wrong:\n' +
+                        jqXHR.status +
+                        ': ' +
+                        jqXHR.statusText +
+                        '\nTextstatus: ' +
+                        textStatus +
+                        '\nError thrown: ' +
+                        errorThrown
+                );
             },
         });
     });
