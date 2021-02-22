@@ -1,5 +1,5 @@
 jQuery(document).ready(function () {
-    jQuery('#file-upload').on('change', (e) => {
+    jQuery('#file-upload').on('change', e => {
         jQuery('#file-upload').submit();
         e.preventDefault();
         jQuery('#file-upload-validation').html('Uploading . . .');
@@ -41,5 +41,6 @@ jQuery(document).ready(function () {
                 );
             },
         });
+        jQuery('#file-upload').val('');
     });
 });
