@@ -1,6 +1,6 @@
 <?php
 
-require(plugin_dir_path(__FILE__) . '../lib/pdfparser/vendor/autoload.php');
+//require(plugin_dir_path(__FILE__) . '../lib/pdfparser/vendor/autoload.php');
 
 function upload_content_file()
 {
