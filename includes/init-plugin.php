@@ -1,5 +1,12 @@
 <?php
 
+
+function init_plugin()
+{
+  init_database();
+  init_upload_folder();
+}
+
 function init_database()
 {
   global $wpdb;
@@ -21,4 +28,12 @@ function init_database()
 
   require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
   dbDelta($sql);
+}
+function init_upload_folder()
+{
+  $uploadDirectory = wp_upload_dir()['basedir'] . '/ppi/content';
+
+  if (!is_dir($uploadDirectory)) {
+    mkdir($uploadDirectory, 0777, true);
+  }
 }
