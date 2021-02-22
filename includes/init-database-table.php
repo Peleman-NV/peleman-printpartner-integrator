@@ -2,12 +2,12 @@
 
 function init_database()
 {
-    global $wpdb;
-    $table_name = $wpdb->prefix . "ppi_user_projects";
+  global $wpdb;
+  $table_name = $wpdb->prefix . "ppi_user_projects";
 
-    $charset_collate =  $wpdb->get_charset_collate();
+  $charset_collate =  $wpdb->get_charset_collate();
 
-    $sql = "CREATE TABLE $table_name (
+  $sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         user_id int(11) NOT NULL,
         project_id int(11) NOT NULL,
@@ -19,7 +19,6 @@ function init_database()
         PRIMARY KEY  (id)
       ) $charset_collate;";
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
+  require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+  dbDelta($sql);
 }
-// register_activation_hook(plugins_url('peleman-printpartner-integrator/peleman-printpartner-integrator.php'), 'init_database');
