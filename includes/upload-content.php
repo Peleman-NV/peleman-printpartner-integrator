@@ -21,7 +21,14 @@ function upload_content_file()
     }
 
     $filename = $_FILES['file']['name'];
-    $uploadlocation = realpath(plugin_dir_path('peleman-printpartner-integrator.php') . '../wp-content/uploads/ppi/content-files/');
+
+    $uploadsDir = wp_upload_dir();
+    $uploadlocation = realpath($uploadsDir['basedir'] . '/ppi/content');
+    if (!is_dir($uploadlocation)) {
+        $response['message'] = "Upload directory not found.  Your file cannot be processed.";
+        return_response($response);
+    }
+
     $file_type = pathinfo($uploadlocation  . '\\' . $filename, PATHINFO_EXTENSION);
     $file_type = strtolower($file_type);
     if ($file_type != 'pdf') {
@@ -31,7 +38,7 @@ function upload_content_file()
     };
 
     // TODO pages and size validation
-    $pages = 73;
+    $pages =  rand(5, 80);
     $format = "A4";
     $response['file']['name'] = $filename;
     $response['file']['location'] = $uploadlocation  . '\\' . $filename;
@@ -41,14 +48,6 @@ function upload_content_file()
     move_uploaded_file($_FILES['file']['tmp_name'], $uploadlocation  . '\\' . $new_filename);
     $response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $format . ", " . $pages . " pages).";
 
-    $imagick = new Imagick();
-    $imagick->readImage($uploadlocation  . '\\' . $new_filename);
-    // $uploadlocation  . '\\' . $new_filename
-    //$image->getNumberImages();
-
-    // $parser = new \Smalot\PdfParser\Parser();
-    // $pdf = $parser->parseFile($uploadlocation  . '\\' . $new_filename);
-    // $pages = $pdf->getPages();
     $response['file']['pages'] = $pages;
 
     return_response($response);
