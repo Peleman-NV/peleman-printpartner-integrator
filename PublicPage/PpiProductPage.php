@@ -203,9 +203,8 @@ class PpiProductPage
 		$pages = 5;
 		$format = "A4";
 
-		$uploadlocation = realpath(plugin_dir_path('peleman-printpartner-integrator.php') . '../wp-content/uploads/ppi/content-files/');
 		$helper = new Helper();
-		$new_filename = $uploadlocation . '\\' . "project_id_" . $helper->generate_guid() . '.pdf';
+		$new_filename = PPI_UPLOAD_DIR . '\\' . "project_id_" . $helper->generate_guid() . '.pdf';
 		move_uploaded_file($_FILES['file']['tmp_name'], $new_filename);
 
 		$pdf = new Fpdi();
@@ -264,7 +263,7 @@ class PpiProductPage
 	private function insert_project($user_id, $project_id, $product_id)
 	{
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'ppi_user_projects';
+		$table_name = PPI_USER_PROJECTS_TABLE;
 		$wpdb->insert($table_name, array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id));
 	}
 }
