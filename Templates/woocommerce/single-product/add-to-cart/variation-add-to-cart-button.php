@@ -20,7 +20,7 @@ global $product;
 	if ($parent_wc_product->is_type('variable')) {
 		$variants_array = $parent_wc_product->get_children();
 		$first_variant = wc_get_product($variants_array[0]);
-		if (wc_get_product($first_variant)->get_meta('pdf_upload') != "") {
+		if (wc_get_product($first_variant)->get_meta('pdf_upload_required') == "yes") {
 			do_action('ppi_file_upload_output_form');
 		}
 	}

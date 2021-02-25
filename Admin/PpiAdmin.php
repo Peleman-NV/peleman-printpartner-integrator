@@ -131,7 +131,7 @@ class PpiAdmin
 		woocommerce_wp_checkbox(array(
 			'id' => 'pdf_upload_required[' . $loop . ']',
 			'label'       => __('PDF content required?', 'woocommerce'),
-			'description' => __('Select to require a PDF upload', 'woocommerce'),
+			'description' => __('Check to require a PDF upload', 'woocommerce'),
 			'desc_tip'    => true,
 			'value' => $pdf_upload_required,
 		));
@@ -192,7 +192,6 @@ class PpiAdmin
 	{
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
-		//$pdf_upload_required = $_POST['pdf_upload_required'][$i];
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 
 		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
