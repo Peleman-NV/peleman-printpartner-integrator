@@ -21,7 +21,7 @@ global $product;
 		$variants_array = $parent_wc_product->get_children();
 		$first_variant = wc_get_product($variants_array[0]);
 		if (wc_get_product($first_variant)->get_meta('pdf_upload') != "") {
-			ppi_add_form_to_page_hook();
+			do_action('ppi_file_upload_output_form');
 		}
 	}
 	do_action('woocommerce_before_add_to_cart_button');

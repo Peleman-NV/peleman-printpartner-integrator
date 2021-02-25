@@ -1,6 +1,11 @@
 <?php
 
-class Imaxel_Service
+namespace PelemanPrintpartnerIntegrator\Services;
+
+use DateTime;
+use DateInterval;
+
+class ImaxelService
 {
     private $private_key;
     private $public_key;

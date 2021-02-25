@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "PelemanPrintpartnerIntegrator\\": ""
+        }
+    },
+    "require": {
+        "setasign/fpdf": "1.8.*",
+        "setasign/fpdi": "^2.0"
+    }
+}
