@@ -204,7 +204,7 @@ class PpiProductPage
 		$format = "A4";
 
 		$helper = new Helper();
-		$new_filename = PPI_UPLOAD_DIR . '\\' . "project_id_" . $helper->generate_guid() . '.pdf';
+		$new_filename = PPI_UPLOAD_DIR . '/project_id_' . $helper->generate_guid() . '.pdf';
 		move_uploaded_file($_FILES['file']['tmp_name'], $new_filename);
 
 		$pdf = new Fpdi();
@@ -214,7 +214,7 @@ class PpiProductPage
 		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
-		$response['file']['location'] = $$new_filename;
+		$response['file']['location'] = $new_filename;
 		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $format . ", " . $pages . " pages).";
 
 		$this->return_response($response);

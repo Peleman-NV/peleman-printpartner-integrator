@@ -31,7 +31,7 @@ if (!defined('WPINC')) {
 
 // Constants definition
 define('PELEMAN_PRINTPARTNER_INTEGRATOR_VERSION', '1.0.0');
-!defined('PPI_UPLOAD_DIR') ? define('PPI_UPLOAD_DIR', realpath(ABSPATH . 'wp-content\uploads\ppi\content')) : "";
+!defined('PPI_UPLOAD_DIR') ? define('PPI_UPLOAD_DIR', realpath(ABSPATH . 'wp-content/uploads/ppi/content')) : "";
 !defined('PPI_USER_PROJECTS_TABLE') ? define('PPI_USER_PROJECTS_TABLE', $wpdb->prefix . 'ppi_user_projects') : "";
 
 /**
