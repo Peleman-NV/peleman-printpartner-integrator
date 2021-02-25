@@ -31,6 +31,7 @@ class PpiActivator
 	public static function activate()
 	{
 		PpiActivator::init_database();
+		PpiActivator::init_upload_folder();
 	}
 
 	/**
@@ -59,5 +60,17 @@ class PpiActivator
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta($sql);
+	}
+
+	/**
+	 * Create upload folder
+	 */
+	public static function init_upload_folder()
+	{
+		$uploadDirectory = wp_upload_dir()['basedir'] . '/ppi/content';
+
+		if (!is_dir($uploadDirectory)) {
+			mkdir($uploadDirectory, 0777, true);
+		}
 	}
 }

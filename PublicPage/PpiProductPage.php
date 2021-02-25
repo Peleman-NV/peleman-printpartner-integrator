@@ -125,10 +125,10 @@ class PpiProductPage
 	public function ppi_override_wc_templates($template, $template_name, $template_path)
 	{
 		if ('variation.php' === basename($template)) {
-			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../woocommerce/single-product/add-to-cart/variation.php';
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation.php';
 		}
 		if ('variation-add-to-cart-button.php' === basename($template)) {
-			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../woocommerce/single-product/add-to-cart/variation-add-to-cart-button.php';
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation-add-to-cart-button.php';
 		}
 
 		return $template;
