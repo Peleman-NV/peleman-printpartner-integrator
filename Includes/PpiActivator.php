@@ -3,30 +3,12 @@
 namespace PelemanPrintpartnerIntegrator\Includes;
 
 /**
- * Fired during plugin activation
- *
- * @package    Peleman_Printpartner_Integrator
- * @subpackage Peleman_Printpartner_Integrator/includes
- */
-
-/**
- * Fired during plugin activation.
- *
  * This class defines all code necessary to run during the plugin's activation.
- *
- * @package    Peleman_Printpartner_Integrator
- * @subpackage Peleman_Printpartner_Integrator/includes
- * @author     Noë Baeten, Jason Goossens, Chris Schippers
  */
 class PpiActivator
 {
-
 	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
+	 * Runs during plugin activation
 	 */
 	public static function activate()
 	{

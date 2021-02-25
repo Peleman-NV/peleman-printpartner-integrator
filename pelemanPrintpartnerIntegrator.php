@@ -6,6 +6,10 @@ use PelemanPrintpartnerIntegrator\Includes\PpiActivator;
 use PelemanPrintpartnerIntegrator\Includes\PpiDeactivator;
 use PelemanPrintpartnerIntegrator\Includes\Plugin;
 
+require 'vendor/autoload.php';
+require_once plugin_dir_path(__FILE__) . '/Includes/PpiActivator.php';
+require_once plugin_dir_path(__FILE__) . '/Includes/PpiDeactivator.php';
+
 /**
  * @since             1.0.0
  * @package           Peleman_Printpartner_Integrator
@@ -30,36 +34,31 @@ define('PELEMAN_PRINTPARTNER_INTEGRATOR_VERSION', '1.0.0');
 /**
  * The code that runs during plugin activation.
  */
-function activate_peleman_printpartner_integrator()
+function activate_pelemanPrintpartnerIntegrator()
 {
-	require_once plugin_dir_path(__FILE__) . 'includes/peleman-printpartner-integrator-activator.php';
 	PpiActivator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
  */
-function deactivate_peleman_printpartner_integrator()
+function deactivate_pelemanPrintpartnerIntegrator()
 {
-	require_once plugin_dir_path(__FILE__) . 'includes/peleman-printpartner-integrator-deactivator.php';
 	PpiDeactivator::deactivate();
 }
-
-register_activation_hook(__FILE__, 'activate_peleman_printpartner_integrator');
-register_deactivation_hook(__FILE__, 'deactivate_peleman_printpartner_integrator');
+register_activation_hook(__FILE__, __NAMESPACE__ . '\activate_pelemanPrintpartnerIntegrator');
+register_deactivation_hook(__FILE__, __NAMESPACE__ . '\deactivate_pelemanPrintpartnerIntegrator');
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path(__FILE__) . 'includes/plugin.php';
 
 /**
  * Begins execution of the plugin.
  */
 function run_peleman_printpartner_integrator()
 {
-	require 'vendor/autoload.php';
 	$plugin = new Plugin();
 	$plugin->run();
 }
