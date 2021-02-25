@@ -95,8 +95,10 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
-		// grey out until a variant is chosen
-		// once it's chosen, show the params div
+		// TODO grey out until a variant is chosen - once it's chosen, show the params div
+		// this is a woocommerce JS event
+		// TODO style this
+		// TODO adda preview thumbnail for the PDF's first page
 		$form = '
         <div class="ppi-upload-form">
             <label for="file-upload">Click here to upload your PDF file</label>
