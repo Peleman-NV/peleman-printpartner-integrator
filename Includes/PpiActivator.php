@@ -24,7 +24,7 @@ class PpiActivator
 	public static function init_database()
 	{
 		global $wpdb;
-		$table_name = $wpdb->prefix . "ppi_user_projects";
+		$table_name = $wpdb->prefix . PPI_USER_PROJECTS_TABLE;
 
 		$charset_collate =  $wpdb->get_charset_collate();
 
@@ -49,7 +49,7 @@ class PpiActivator
 	 */
 	public static function init_upload_folder()
 	{
-		$uploadDirectory = wp_upload_dir()['basedir'] . '/ppi/content';
+		$uploadDirectory = PPI_UPLOAD_DIR;
 
 		if (!is_dir($uploadDirectory)) {
 			mkdir($uploadDirectory, 0777, true);
