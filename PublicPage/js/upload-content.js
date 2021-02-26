@@ -56,7 +56,11 @@
                 success: function (response) {
                     console.log(response);
                     $('#file-upload-validation').html(response.message);
-                    $('.single_add_to_cart_button').removeClass('ppi-disabled');
+                    if (response.status === 'success') {
+                        $('.single_add_to_cart_button').removeClass(
+                            'ppi-disabled'
+                        );
+                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log({ jqXHR });

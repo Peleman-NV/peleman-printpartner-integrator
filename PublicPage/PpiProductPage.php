@@ -111,7 +111,7 @@ class PpiProductPage
 	public function ppi_output_file_params($variant)
 	{
 		$paramsDiv = '
-			<div class="ppi-upload-parameters hidden">
+			<div class="ppi-upload-parameters">
 				<div class="param-line">
 					<div class="param-name">
 						Maximum file upload size
@@ -221,24 +221,27 @@ class PpiProductPage
 		check_ajax_referer('file_upload_nonce', '_ajax_nonce');
 
 		if ($_FILES['file']['error']) {
-			$response['error'] = $_FILES['file']['error'];
+			$response['status'] = 'error';
 			$response['message'] = "Error encountered while uploading your file.  Please try again with a different one.";
+			$response['error'] = $_FILES['file']['error'];
 			$this->return_response($response);
 		}
 
 		$max_file_upload_size = (int)(ini_get('upload_max_filesize')) * 1024 * 1024;
 		if ($_FILES['file']['size'] >= $max_file_upload_size) {
+			$response['status'] = 'error';
+			$response['message'] = "Your file is too large, Please upload a file smaller than 100MB.";
 			$response['size'] = $_FILES['file']['size'];
 			$response['max_size'] = $max_file_upload_size;
-			$response['message'] = "Your file is too large, Please upload a file smaller than 100MB.";
 			$this->return_response($response);
 		}
 
 		$filename = $_FILES['file']['name'];
 		$file_type = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 		if ($file_type != 'pdf') {
-			$response['type'] = $file_type;
+			$response['status'] = 'error';
 			$response['message'] = "Please upload a PDF file.";
+			$response['type'] = $file_type;
 			$this->return_response($response);
 		};
 
@@ -251,14 +254,28 @@ class PpiProductPage
 		move_uploaded_file($_FILES['file']['tmp_name'], $new_filename);
 
 		$pdf = new Fpdi();
-		$pages = $pdf->setSourceFile($new_filename);
+		try {
+			$pages = $pdf->setSourceFile($new_filename);
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to check it.<br>Please use a different PDF file.";
+			$response['file']['name'] = $filename;
+			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
+			$response['file']['location'] = $new_filename;
+			$response['size'] = $_FILES['file']['size'];
+			unlink($new_filename);
 
+			$this->return_response($response);
+		}
+
+		$response['status'] = 'success';
+		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
 		$response['file']['name'] = $filename;
 		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
+		$response['file']['location'] = $new_filename;
+		$response['file']['size'] = $_FILES['file']['size'];
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
-		$response['file']['location'] = $new_filename;
-		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $format . ", " . $pages . " pages).";
 
 		$this->return_response($response);
 	}
