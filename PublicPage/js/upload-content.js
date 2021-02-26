@@ -24,7 +24,9 @@
             $('.upload-label').removeClass('upload-disabled');
             $('.upload-parameters').removeClass('hidden');
 
-            $('.single_add_to_cart_button').addClass('ppi-disabled');
+            if ($('.ppi-upload-form')[0] !== undefined) {
+                $('.single_add_to_cart_button').addClass('ppi-disabled');
+            }
         });
 
         $('.variations_form').on('hide_variation', e => {
