@@ -95,9 +95,6 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
-		// TODO grey out until a variant is chosen - once it's chosen, show the params div
-		// this is a woocommerce JS event
-		// TODO style this
 		// TODO adda preview thumbnail for the PDF's first page
 		$form = '
         <div class="ppi-upload-form">
@@ -266,7 +263,10 @@ class PpiProductPage
 		$this->return_response($response);
 	}
 
-
+	/**
+	 * send a JSON response - used for AJAX calls
+	 * 
+	 */
 	private function return_response($response)
 	{
 		wp_send_json($response);
