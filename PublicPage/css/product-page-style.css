@@ -1,3 +1,7 @@
+:root {
+    --params-width: 70%;
+}
+
 .ppi-add-to-cart-button {
     text-transform: capitalize !important;
     font-weight: 700 !important;
@@ -9,7 +13,7 @@
     text-align: center;
     margin-bottom: 8px;
     display: inline-block;
-    width: 65%;
+    width: var(--params-width);
 }
 
 .upload-disabled {
@@ -21,6 +25,7 @@
 .upload-disabled:active {
     pointer-events: none;
 }
+
 .ppi-upload-form .upload-label {
     border: 1px black solid;
     color: black;
@@ -35,10 +40,18 @@
     margin-bottom: 8px;
 }
 
+.ppi-disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+}
+
+.ppi-disabled:active {
+    pointer-events: none;
+}
+
 .ppi-upload-parameters {
     border-top: 1px solid darkgrey;
-    margin: 5px 0;
-    width: 70%;
+    width: var(--params-width);
 }
 
 .ppi-upload-parameters .param-line {

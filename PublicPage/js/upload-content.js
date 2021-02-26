@@ -22,8 +22,9 @@
     $(function () {
         $('.variations_form').on('show_variation', e => {
             $('.upload-label').removeClass('upload-disabled');
-            $('.ppi-add-to-cart-button').addClass('disabled');
             $('.upload-parameters').removeClass('hidden');
+
+            $('.single_add_to_cart_button').addClass('ppi-disabled');
         });
 
         $('.variations_form').on('hide_variation', e => {
@@ -55,6 +56,7 @@
                 success: function (response) {
                     console.log(response);
                     $('#file-upload-validation').html(response.message);
+                    $('.single_add_to_cart_button').removeClass('ppi-disabled');
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log({ jqXHR });
