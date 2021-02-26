@@ -101,18 +101,62 @@ class PpiProductPage
 		// TODO adda preview thumbnail for the PDF's first page
 		$form = '
         <div class="ppi-upload-form">
-            <label for="file-upload">Click here to upload your PDF file</label>
+            <label class="upload-label upload-disabled" for="file-upload">Click here to upload your PDF file</label>
             <input id="file-upload" type="file" accept="application/pdf" name="pdf_upload" style="display: none;">
-        </div>
-        <div class="upload-parameters hidden">
-            <p>Maximum file upload size: 100MB</p>
-            <p>PDF page height: 297mm</p>
-            <p>PDF page width: 210mm</p>
-            <p>Minumum nr of pages: 3</p>
-            <p>Maximum nr of pages: 400</p>
         </div>
         <div id="file-upload-validation"></div>';
 		echo $form;
+	}
+
+	/**
+	 * Outputs the params div
+	 */
+	public function ppi_output_file_params($variant)
+	{
+		$paramsDiv = '
+			<div class="ppi-upload-parameters hidden">
+				<div class="param-line">
+					<div class="param-name">
+						Maximum file upload size
+					</div>
+					<div class="param-value">
+						100MB
+					</div>
+				</div>
+				<div class="param-line">
+					<div class="param-name">
+						PDF page height
+					</div>
+					<div class="param-value">
+						297mm
+					</div>
+				</div>
+				<div class="param-line">
+					<div class="param-name">
+						PDF page width
+					</div>
+					<div class="param-value">
+						210mm
+					</div>
+				</div>
+				<div class="param-line">
+					<div class="param-name">
+						Maximum nr of pages
+					</div>
+					<div class="param-value">
+						400
+					</div>
+				</div>
+				<div class="param-line">
+					<div class="param-name">
+						Minimum nr of pages
+					</div>
+					<div class="param-value">
+						3
+					</div>
+				</div>
+			</div>';
+		echo $paramsDiv;
 	}
 
 	/**

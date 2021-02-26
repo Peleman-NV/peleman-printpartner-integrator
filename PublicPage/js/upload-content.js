@@ -20,7 +20,18 @@
      * practising this, we should strive to set a better example in our own work.
      */
     $(function () {
-        $('#file-upload').on('change', (e) => {
+        $('.variations_form').on('show_variation', e => {
+            $('.upload-label').removeClass('upload-disabled');
+            $('.ppi-add-to-cart-button').addClass('disabled');
+            $('.upload-parameters').removeClass('hidden');
+        });
+
+        $('.variations_form').on('hide_variation', e => {
+            $('.upload-label').addClass('upload-disabled');
+            $('.upload-parameters').addClass('hidden');
+        });
+
+        $('#file-upload').on('change', e => {
             $('#file-upload').submit();
             e.preventDefault();
             $('#file-upload-validation').html('Uploading . . .');

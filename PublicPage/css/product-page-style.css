@@ -6,14 +6,26 @@
 }
 
 .ppi-upload-form {
-    border: 1px lightgrey solid;
     text-align: center;
     margin-bottom: 8px;
     display: inline-block;
     width: 65%;
 }
 
-.ppi-upload-form label {
+.upload-disabled {
+    border: 1px darkgrey solid !important;
+    color: darkgrey !important;
+    cursor: not-allowed !important;
+}
+
+.upload-disabled:active {
+    pointer-events: none;
+}
+.ppi-upload-form .upload-label {
+    border: 1px black solid;
+    color: black;
+    cursor: pointer;
+    user-select: none;
     padding: 5px;
     margin-bottom: 0;
     display: block;
@@ -23,6 +35,25 @@
     margin-bottom: 8px;
 }
 
+.ppi-upload-parameters {
+    border-top: 1px solid darkgrey;
+    margin: 5px 0;
+    width: 70%;
+}
+
+.ppi-upload-parameters .param-line {
+    color: rgb(82, 82, 82);
+    cursor: default;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    font-size: 90%;
+    padding: 0 5px;
+    background-color: lightgrey;
+    border-bottom: 1px solid darkgrey;
+}
 .hidden {
-    display: none;
+    overflow: hidden;
+    height: 20%;
+    /* display: none; */
 }
