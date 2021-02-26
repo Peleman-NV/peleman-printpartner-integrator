@@ -78,16 +78,6 @@ class PpiProductPage
 				'nonce' => wp_create_nonce('file_upload_nonce')
 			)
 		);
-
-		wp_enqueue_script('ppi-redirect-to-imaxel-editor', plugins_url('js/redirect-to-editor.js', __FILE__), array('jquery'));
-		wp_localize_script(
-			'ppi-redirect-to-imaxel-editor',
-			'ppi_ajax_redirect',
-			array(
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('editor-redirect-nonce')
-			)
-		);
 	}
 
 	/**
@@ -245,17 +235,23 @@ class PpiProductPage
 			$this->return_response($response);
 		};
 
+		$variant_id = $_POST['variant_id'];
+
+		$imaxel_response = $this->getImaxelData($variant_id);
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
+
 		// TODO pages and size validation
 		$pages = 5;
 		$format = "A4";
 
 		$helper = new Helper();
-		$new_filename = PPI_UPLOAD_DIR . '/project_id_' . $helper->generate_guid() . '.pdf';
-		move_uploaded_file($_FILES['file']['tmp_name'], $new_filename);
+		$new_filename = $project_id . '_' . $helper->generate_guid() . '.pdf';
+		move_uploaded_file($_FILES['file']['tmp_name'], PPI_UPLOAD_DIR . '/' . $new_filename);
 
 		$pdf = new Fpdi();
 		try {
-			$pages = $pdf->setSourceFile($new_filename);
+			$pages = $pdf->setSourceFile(PPI_UPLOAD_DIR . '/' . $new_filename);
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to check it.<br>Please use a different PDF file.";
@@ -277,6 +273,9 @@ class PpiProductPage
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
 
+		$user_id = get_current_user_id();
+		$this->insert_project($user_id, $project_id, $variant_id, $new_filename);
+
 		$this->return_response($response);
 	}
 
@@ -290,30 +289,28 @@ class PpiProductPage
 		wp_die();
 	}
 
-	function redirect_to_imaxel_editor()
+	/**
+	 * Generate a project ID and Imaxel URL
+	 */
+	private function getImaxelData($variant_id)
 	{
-		check_ajax_referer('editor-redirect-nonce', '_ajax_nonce');
-
 		$variant_id = $_POST['variant_id'];
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
+
+		$response['template'] = $template_id;
+		$response['variant'] = $variant_code;
 
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
 
 		$encoded_response = json_decode($create_project_response['body']);
-		$new_project_id = $encoded_response->id;
+		$project_id = $encoded_response->id;
 
-		$user_id = get_current_user_id();
-
-		$this->insert_project($user_id, $new_project_id, $variant_id);
-
-		$editor_url = $imaxel->get_editor_url($new_project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
-
-		$response['url'] = $editor_url;
-		$response['type'] = 'success';
-
-		$this->return_response($response);
+		return array(
+			'project_id' => $project_id,
+			'url' => $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id)
+		);
 	}
 
 	/**
@@ -323,10 +320,10 @@ class PpiProductPage
 	 * @param Int $project_id
 	 * @param Int $product_id
 	 */
-	private function insert_project($user_id, $project_id, $product_id)
+	private function insert_project($user_id, $project_id, $product_id, $content_filename)
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-		$wpdb->insert($table_name, array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id));
+		$wpdb->insert($table_name, array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename));
 	}
 }

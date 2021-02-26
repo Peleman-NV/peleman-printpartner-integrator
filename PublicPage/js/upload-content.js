@@ -42,6 +42,7 @@
             var formData = new FormData();
             formData.append('action', 'upload_content_file');
             formData.append('file', file);
+            formData.append('variant_id', $("[name='variation_id']").val());
             formData.append('_ajax_nonce', ppi_ajax_object.nonce);
 
             $.ajax({
@@ -59,6 +60,10 @@
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
+                        );
+                        $('.single_add_to_cart_button').prop(
+                            'href',
+                            response.url
                         );
                     }
                 },

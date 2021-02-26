@@ -141,8 +141,6 @@ class Plugin
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
 		$this->loader->add_action('wp_ajax_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_nopriv_upload_content_file', $product_page, 'upload_content_file');
-		$this->loader->add_action('wp_ajax_redirect_to_imaxel_editor', $product_page, 'redirect_to_imaxel_editor', 1);
-		$this->loader->add_action('wp_ajax_nopriv_redirect_to_imaxel_editor', $product_page, 'redirect_to_imaxel_editor', 1);
 	}
 
 	/**
