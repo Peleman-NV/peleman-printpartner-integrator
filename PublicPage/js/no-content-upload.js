@@ -10,9 +10,8 @@
                     variant_id: $("[name='variation_id']").val(),
                     _ajax_nonce: ppi_url_object.nonce,
                 };
-                console.log('here2');
 
-                // keep button disabled until result is in
+                // TODO keep button disabled until result is in
                 getImaxelUrl(data);
             }
         });

@@ -299,6 +299,7 @@ class PpiProductPage
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
 
+		// TODO error handling
 		$user_id = get_current_user_id();
 		$this->insert_project($user_id, $project_id, $variant_id, $new_filename);
 
@@ -330,12 +331,14 @@ class PpiProductPage
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
 
+		// TODO error handling in the responses
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
+		$editorUrl = $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
 
 		return array(
 			'project_id' => $project_id,
-			'url' => $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id)
+			'url' => $editorUrl
 		);
 	}
 
@@ -355,6 +358,7 @@ class PpiProductPage
 		} else {
 			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
 		}
+
 		$wpdb->insert($table_name, $query);
 	}
 }
