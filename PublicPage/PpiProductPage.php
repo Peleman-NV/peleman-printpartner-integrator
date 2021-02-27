@@ -69,13 +69,22 @@ class PpiProductPage
 	 */
 	public function enqueue_ajax()
 	{
-		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'));
+		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/content-upload.js', __FILE__), array('jquery'));
 		wp_localize_script(
 			'ppi-ajax-upload',
-			'ppi_ajax_object',
+			'ppi_content_upload_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
 				'nonce' => wp_create_nonce('file_upload_nonce')
+			)
+		);
+		wp_enqueue_script('ppi-imaxel-url', plugins_url('js/no-content-upload.js', __FILE__), array('jquery'));
+		wp_localize_script(
+			'ppi-imaxel-url',
+			'ppi_url_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('imaxel_url_nonce')
 			)
 		);
 	}
@@ -206,6 +215,23 @@ class PpiProductPage
 		return __('Create project', 'woocommerce');
 	}
 
+	public function get_imaxel_url()
+	{
+		check_ajax_referer('imaxel_url_nonce', '_ajax_nonce');
+
+		$variant_id = $_POST['variant_id'];
+
+		$imaxel_response = $this->getImaxelData($variant_id);
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
+
+		$user_id = get_current_user_id();
+		$this->insert_project($user_id, $project_id, $variant_id);
+
+		$response['status'] = 'success';
+		$this->return_response($response);
+	}
+
 	public function upload_content_file()
 	{
 		check_ajax_referer('file_upload_nonce', '_ajax_nonce');
@@ -320,10 +346,15 @@ class PpiProductPage
 	 * @param Int $project_id
 	 * @param Int $product_id
 	 */
-	private function insert_project($user_id, $project_id, $product_id, $content_filename)
+	private function insert_project($user_id, $project_id, $product_id, $content_filename = NULL)
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-		$wpdb->insert($table_name, array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename));
+		if ($content_filename != null) {
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename);
+		} else {
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
+		}
+		$wpdb->insert($table_name, $query);
 	}
 }
