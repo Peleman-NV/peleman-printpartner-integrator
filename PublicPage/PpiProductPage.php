@@ -121,45 +121,50 @@ class PpiProductPage
 	{
 		$paramsDiv = '
 			<div class="ppi-upload-parameters">
-				<div class="param-line">
-					<div class="param-name">
-						Maximum file upload size
+				<div class="params-container">
+					<div class="param-line">
+						<div class="param-name">
+							Maximum file upload size
+						</div>
+						<div class="param-value">
+							100MB
+						</div>
 					</div>
-					<div class="param-value">
-						100MB
+					<div class="param-line">
+						<div class="param-name">
+							PDF page height
+						</div>
+						<div class="param-value">
+							297mm
+						</div>
+					</div>
+					<div class="param-line">
+						<div class="param-name">
+							PDF page width
+						</div>
+						<div class="param-value">
+							210mm
+						</div>
+					</div>
+					<div class="param-line">
+						<div class="param-name">
+							Maximum nr of pages
+						</div>
+						<div class="param-value">
+							400
+						</div>
+					</div>
+					<div class="param-line">
+						<div class="param-name">
+							Minimum nr of pages
+						</div>
+						<div class="param-value">
+							3
+						</div>
 					</div>
 				</div>
-				<div class="param-line">
-					<div class="param-name">
-						PDF page height
-					</div>
-					<div class="param-value">
-						297mm
-					</div>
-				</div>
-				<div class="param-line">
-					<div class="param-name">
-						PDF page width
-					</div>
-					<div class="param-value">
-						210mm
-					</div>
-				</div>
-				<div class="param-line">
-					<div class="param-name">
-						Maximum nr of pages
-					</div>
-					<div class="param-value">
-						400
-					</div>
-				</div>
-				<div class="param-line">
-					<div class="param-name">
-						Minimum nr of pages
-					</div>
-					<div class="param-value">
-						3
-					</div>
+				<div class="thumbnail-container">
+					Thumbnail
 				</div>
 			</div>';
 		echo $paramsDiv;
@@ -290,6 +295,7 @@ class PpiProductPage
 
 		$helper = new Helper();
 		$new_filename = $project_id . '_' . $helper->generate_guid() . '.pdf';
+		// TODO try using PHP streams to increase speed
 		move_uploaded_file($_FILES['file']['tmp_name'], PPI_UPLOAD_DIR . '/' . $new_filename);
 
 		$pdf = new Fpdi();
