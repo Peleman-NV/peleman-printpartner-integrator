@@ -99,9 +99,18 @@ class PpiProductPage
         <div class="ppi-upload-form">
             <label class="upload-label upload-disabled" for="file-upload">Click here to upload your PDF file</label>
             <input id="file-upload" type="file" accept="application/pdf" name="pdf_upload" style="display: none;">
-        </div>
-        <div id="file-upload-validation"></div>';
+        </div>';
 		echo $form;
+	}
+
+
+	/**
+	 * Outputs a div with variant information
+	 */
+	public function ppi_variant_information($variant)
+	{
+		$informationDiv = '<div id="variation-info"></div>';
+		echo $informationDiv;
 	}
 
 	/**
@@ -222,6 +231,13 @@ class PpiProductPage
 		$variant_id = $_POST['variant_id'];
 
 		$imaxel_response = $this->getImaxelData($variant_id);
+
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+			$this->return_response($response);
+		}
+
 		$project_id = $imaxel_response['project_id'];
 		$response['url'] = $imaxel_response['url'];
 
@@ -299,7 +315,6 @@ class PpiProductPage
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
 
-		// TODO error handling
 		$user_id = get_current_user_id();
 		$this->insert_project($user_id, $project_id, $variant_id, $new_filename);
 
@@ -331,12 +346,18 @@ class PpiProductPage
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
 
-		// TODO error handling in the responses
+		if ($create_project_response['response']['code'] == 200) {
+			$status = 'success';
+		} else {
+			$status = 'error';
+		}
+
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
 		$editorUrl = $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
 
 		return array(
+			'status' => $status,
 			'project_id' => $project_id,
 			'url' => $editorUrl
 		);

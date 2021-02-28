@@ -16,9 +16,13 @@
         });
 
         $('#file-upload').on('change', (e) => {
+            $('#variation-info').html('');
+            $('#variation-info').removeClass();
+
             $('#file-upload').submit();
             e.preventDefault();
-            $('#file-upload-validation').html('Uploading . . .');
+            $('#variation-info').html('Uploading . . .');
+
             var fileInput = document.getElementById('file-upload');
             var file = fileInput.files[0];
 
@@ -38,7 +42,7 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
-                    $('#file-upload-validation').html(response.message);
+                    $('#variation-info').html(response.message);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
@@ -47,11 +51,14 @@
                             'href',
                             response.url
                         );
+                    } else {
+                        $('#variation-info').html(response.message);
+                        $('#variation-info').addClass('response-error');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log({ jqXHR });
-                    $('#file-upload-validation').html(
+                    $('#variation-info').html(
                         'Something went wrong.  Please try again with a different file.'
                     );
                     console.error(

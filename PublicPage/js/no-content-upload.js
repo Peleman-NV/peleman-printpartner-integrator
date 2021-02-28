@@ -11,6 +11,8 @@
                     _ajax_nonce: ppi_url_object.nonce,
                 };
 
+                $('#variation-info').html('');
+                $('#variation-info').removeClass();
                 // TODO keep button disabled until result is in
                 getImaxelUrl(data);
             }
@@ -24,6 +26,7 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
+                    console.log(response);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
@@ -32,6 +35,9 @@
                             'href',
                             response.url
                         );
+                    } else {
+                        $('#variation-info').html(response.message);
+                        $('#variation-info').addClass('response-error');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {

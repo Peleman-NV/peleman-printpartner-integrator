@@ -23,6 +23,7 @@ global $product;
 		if (wc_get_product($first_variant)->get_meta('pdf_upload_required') == "yes") {
 			do_action('ppi_file_upload_output_form');
 		}
+		do_action('ppi_variant_information_div');
 	}
 	do_action('woocommerce_before_add_to_cart_button');
 	do_action('woocommerce_before_add_to_cart_quantity');

@@ -66,3 +66,7 @@
     background-color: lightgrey;
     border-bottom: 1px solid darkgrey;
 }
+
+.response-error {
+    color: red;
+}

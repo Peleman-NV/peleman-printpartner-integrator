@@ -123,6 +123,7 @@ class Plugin
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts');
 
 		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
+		$this->loader->add_action('ppi_variant_information_div', $product_page, 'ppi_variant_information', 7, 1);
 		$this->loader->add_action('ppi_file_upload_params_div', $product_page, 'ppi_output_file_params', 7, 1);
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
