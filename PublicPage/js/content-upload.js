@@ -61,6 +61,7 @@
                     $('#variation-info').html(
                         'Something went wrong.  Please try again with a different file.'
                     );
+                    $('#variation-info').addClass('response-error');
                     console.error(
                         'Something went wrong:\n' +
                             jqXHR.status +
