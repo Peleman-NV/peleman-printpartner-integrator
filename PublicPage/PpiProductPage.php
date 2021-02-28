@@ -5,6 +5,7 @@ namespace PelemanPrintpartnerIntegrator\PublicPage;
 use PelemanPrintpartnerIntegrator\Services\ImaxelService;
 use PelemanPrintpartnerIntegrator\Utils\Helper;
 use setasign\Fpdi\Fpdi;
+use \Imagick;
 
 /**
  * The public-facing functionality of the plugin.
@@ -303,7 +304,7 @@ class PpiProductPage
 			$pages = $pdf->setSourceFile(PPI_UPLOAD_DIR . '/' . $new_filename);
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
-			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to check it.<br>Please use a different PDF file.";
+			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['location'] = $new_filename;
@@ -321,6 +322,14 @@ class PpiProductPage
 		$response['file']['size'] = $_FILES['file']['size'];
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
+
+		try {
+			$imagick = new Imagick(PPI_UPLOAD_DIR . '/' . $new_filename);
+			//$imagick->getImageCompression();
+			$response['file']['thumbnail'] = 'location';
+		} catch (\Throwable $th) {
+			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
+		}
 
 		$user_id = get_current_user_id();
 		$this->insert_project($user_id, $project_id, $variant_id, $new_filename);
