@@ -13,7 +13,7 @@ class PpiActivator
 	public static function activate()
 	{
 		PpiActivator::init_database();
-		PpiActivator::init_upload_folder();
+		PpiActivator::init_plugin_folders();
 	}
 
 	/**
@@ -32,7 +32,7 @@ class PpiActivator
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         user_id int(11) NOT NULL,
         project_id int(11) NOT NULL,
-        name tinytext NULL,
+        name tinytext DEFAULT NULL,
         product_id int(11)  NOT NULL,
         content_filename tinytext DEFAULT NULL,
         created datetime DEFAULT CURRENT_TIMESTAMP,
