@@ -67,6 +67,21 @@
     border-bottom: 1px solid darkgrey;
 }
 
-.response-error {
+.ppi-response-error {
     color: red;
+}
+
+#ppi-loading {
+    margin-right: 10px;
+    animation: rotate 1.5s linear infinite;
+}
+
+.ppi-hidden {
+    display: none !important;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
 }

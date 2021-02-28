@@ -18,10 +18,10 @@
         $('#file-upload').on('change', (e) => {
             $('#variation-info').html('');
             $('#variation-info').removeClass();
+            $('#ppi-loading').removeClass('ppi-hidden');
 
             $('#file-upload').submit();
             e.preventDefault();
-            $('#variation-info').html('Uploading . . .');
 
             var fileInput = document.getElementById('file-upload');
             var file = fileInput.files[0];
@@ -51,9 +51,11 @@
                             'href',
                             response.url
                         );
+                        $('#ppi-loading').addClass('ppi-hidden');
                     } else {
                         $('#variation-info').html(response.message);
-                        $('#variation-info').addClass('response-error');
+                        $('#variation-info').addClass('ppi-response-error');
+                        $('#ppi-loading').addClass('ppi-hidden');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -62,6 +64,7 @@
                         'Something went wrong.  Please try again with a different file.'
                     );
                     $('#variation-info').addClass('response-error');
+                    $('#ppi-loading').addClass('ppi-hidden');
                     console.error(
                         'Something went wrong:\n' +
                             jqXHR.status +

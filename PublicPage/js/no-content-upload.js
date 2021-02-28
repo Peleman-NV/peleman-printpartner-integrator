@@ -11,9 +11,10 @@
                     _ajax_nonce: ppi_url_object.nonce,
                 };
 
+                $('#ppi-loading').removeClass('ppi-hidden');
                 $('#variation-info').html('');
                 $('#variation-info').removeClass();
-                // TODO keep button disabled until result is in
+
                 getImaxelUrl(data);
             }
         });
@@ -35,9 +36,11 @@
                             'href',
                             response.url
                         );
+                        $('#ppi-loading').addClass('ppi-hidden');
                     } else {
                         $('#variation-info').html(response.message);
-                        $('#variation-info').addClass('response-error');
+                        $('#variation-info').addClass('ppi-response-error');
+                        $('#ppi-loading').addClass('ppi-hidden');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
