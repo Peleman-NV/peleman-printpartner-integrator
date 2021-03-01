@@ -49,16 +49,25 @@ class PpiActivator
 	 */
 	public static function init_plugin_folders()
 	{
-		$uploadDirectory = PPI_UPLOAD_DIR;
+		$uploadDirectory = ABSPATH . 'wp-content/uploads/ppi/content';
 
 		if (!is_dir($uploadDirectory)) {
 			mkdir($uploadDirectory, 0777, true);
 		}
+		define('PPI_UPLOAD_DIR', realpath($uploadDirectory));
 
-		$thumbnailDirectory = PPI_THUMBNAIL_DIR;
+		$thumbnailDirectory = ABSPATH . 'wp-content/uploads/ppi/thumbnails';
 
 		if (!is_dir($thumbnailDirectory)) {
 			mkdir($thumbnailDirectory, 0777, true);
 		}
+		define('PPI_THUMBNAIL_DIR', realpath($thumbnailDirectory));
+
+		$logDirectory = ABSPATH . 'wp-content/uploads/ppi/logs';
+
+		if (!is_dir($logDirectory)) {
+			mkdir($logDirectory, 0777, true);
+		}
+		define('PPI_LOG_DIR', realpath($logDirectory));
 	}
 }
