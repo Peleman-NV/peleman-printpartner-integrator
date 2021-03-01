@@ -19,12 +19,12 @@ global $product;
 	<div class="woocommerce-variation-price">{{{ data.variation.price_html }}}</div>
 	<div class="woocommerce-variation-availability">{{{ data.variation.availability_html }}}</div>
 	<?php
-	$parent_wc_product = wc_get_product($product->get_id());
-	if ($parent_wc_product->is_type('variable')) {
-		$variants_array = $parent_wc_product->get_children();
-		$first_variant = wc_get_product($variants_array[0]);
-		if (wc_get_product($first_variant)->get_meta('pdf_upload_required') == "yes") {
-			do_action('ppi_file_upload_params_div');
+	if ($product != null) {
+		$parent_wc_product = wc_get_product($product->get_id());
+		if ($parent_wc_product->is_type('variable')) {
+			$variants_array = $parent_wc_product->get_children();
+			$first_variant = wc_get_product($variants_array[0]);
+			if (wc_get_product($first_variant)->get_meta('pdf_upload_required') == "yes") do_action('ppi_file_upload_params_div');
 		}
 	}
 	?>
