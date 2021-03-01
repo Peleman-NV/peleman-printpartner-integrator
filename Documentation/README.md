@@ -6,6 +6,7 @@
     -   upload_max_filesize=100MB
     -   post_max_size=120MB
     -   memory_limit=120MB
+-   PHP ImageMagick extension (called Imagick) must be installed and enabled
 -   [Composer](https://getcomposer.org/) must be installed on your system
 
 ## Installation:

@@ -51,7 +51,6 @@
                             'alt',
                             response.file.name
                         );
-
                         $('#ppi-loading').addClass('ppi-hidden');
                     } else {
                         $('#variation-info').html(response.message);
