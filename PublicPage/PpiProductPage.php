@@ -105,12 +105,11 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
-		// TODO adda preview thumbnail for the PDF's first page
-		$form = '
-        <div class="ppi-upload-form">
-            <label class="upload-label upload-disabled" for="file-upload">Click here to upload your PDF file</label>
-            <input id="file-upload" type="file" accept="application/pdf" name="pdf_upload" style="display: none;">
-        </div>';
+		$form = "
+        <div class='ppi-upload-form'>
+            <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
+            <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
+        </div>";
 		echo $form;
 	}
 
@@ -120,7 +119,7 @@ class PpiProductPage
 	 */
 	public function ppi_variant_information($variant)
 	{
-		$informationDiv = '<div id="variation-info"></div>';
+		$informationDiv = "<div id='variation-info'></div>";
 		echo $informationDiv;
 	}
 
@@ -337,12 +336,12 @@ class PpiProductPage
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
 
 		// Test which is faster!!
-		move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
-		// $source = fopen($_FILES['file']['tmp_name'], 'r');
-		// $destination = fopen($filenameWithPath, 'w');
-		// stream_copy_to_stream($source, $destination);
-		// fclose($destination);
-		// fclose($source);
+		//move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
+		$source = fopen($_FILES['file']['tmp_name'], 'r');
+		$destination = fopen($newFilenameWithPath, 'w');
+		stream_copy_to_stream($source, $destination);
+		fclose($destination);
+		fclose($source);
 
 		$pdf = new Fpdi();
 		try {
@@ -369,13 +368,21 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		try {
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick = new Imagick($newFilenameWithPath);
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick->setImageIndex(0);
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick->setImageFormat('jpg');
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick->writeImage($thumbnailWithPath);
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 		} catch (\Throwable $th) {
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 		}
 
