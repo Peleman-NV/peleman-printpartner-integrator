@@ -320,6 +320,11 @@ class PpiProductPage
 		$variant_id = $_POST['variant_id'];
 
 		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+			$this->return_response($response);
+		}
 		$project_id = $imaxel_response['project_id'];
 		$response['url'] = $imaxel_response['url'];
 
@@ -329,16 +334,16 @@ class PpiProductPage
 
 		$helper = new Helper();
 		$newFilename = $project_id . '_' . $helper->generate_guid();
-		$newFilenameWithExtension = $project_id . '_' . $helper->generate_guid() . '.pdf';
+		$newFilenameWithExtension = $newFilename . '.pdf';
 		$filenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
 
 		// Test which is faster!!
-		//move_uploaded_file($_FILES['file']['tmp_name'], $filenameWithPath);
-		$source = fopen($_FILES['file']['tmp_name'], 'r');
-		$destination = fopen($filenameWithPath, 'w');
-		stream_copy_to_stream($source, $destination);
-		fclose($destination);
-		fclose($source);
+		move_uploaded_file($_FILES['file']['tmp_name'], $filenameWithPath);
+		// $source = fopen($_FILES['file']['tmp_name'], 'r');
+		// $destination = fopen($filenameWithPath, 'w');
+		// stream_copy_to_stream($source, $destination);
+		// fclose($destination);
+		// fclose($source);
 
 		$pdf = new Fpdi();
 		try {
@@ -367,7 +372,7 @@ class PpiProductPage
 		try {
 			$imagick = new Imagick($filenameWithPath);
 			$imagick->setImageIndex(0);
-			$imagick->setImageFormat('.jpg');
+			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->writeImage($thumbnailWithPath);
 			$response['file']['thumbnail'] = $thumbnailWithPath;
