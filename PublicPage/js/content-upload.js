@@ -42,6 +42,10 @@
                             'href',
                             response.url
                         );
+                        $('#ppi-thumbnail').prop(
+                            'src',
+                            response.file.thumbnail
+                        );
                         $('#ppi-loading').addClass('ppi-hidden');
                     } else {
                         $('#variation-info').html(response.message);

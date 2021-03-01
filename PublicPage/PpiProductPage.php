@@ -171,7 +171,7 @@ class PpiProductPage
 					</div>
 				</div>
 				<div class='thumbnail-container'>
-					Thumbnail
+					<img id='ppi-thumbnail' />
 				</div>
 			</div>";
 		echo $paramsDiv;
@@ -329,16 +329,15 @@ class PpiProductPage
 		$response['url'] = $imaxel_response['url'];
 
 		// TODO pages and size validation
-		$pages = 5;
-		$format = "A4";
+		$dimensions = "A4";
 
 		$helper = new Helper();
 		$newFilename = $project_id . '_' . $helper->generate_guid();
 		$newFilenameWithExtension = $newFilename . '.pdf';
-		$filenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
+		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
 
 		// Test which is faster!!
-		move_uploaded_file($_FILES['file']['tmp_name'], $filenameWithPath);
+		move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
 		// $source = fopen($_FILES['file']['tmp_name'], 'r');
 		// $destination = fopen($filenameWithPath, 'w');
 		// stream_copy_to_stream($source, $destination);
@@ -347,15 +346,15 @@ class PpiProductPage
 
 		$pdf = new Fpdi();
 		try {
-			$pages = $pdf->setSourceFile($filenameWithPath);
+			$pages = $pdf->setSourceFile($newFilenameWithPath);
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-			$response['file']['location'] = $filenameWithPath;
+			$response['file']['location'] = $newFilenameWithPath;
 			$response['size'] = $_FILES['file']['size'];
-			unlink($filenameWithPath);
+			unlink($newFilenameWithPath);
 
 			$this->return_response($response);
 		}
@@ -364,18 +363,18 @@ class PpiProductPage
 		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
 		$response['file']['name'] = $filename;
 		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-		$response['file']['location'] = $filenameWithPath;
+		$response['file']['location'] = $newFilenameWithPath;
 		$response['file']['size'] = $_FILES['file']['size'];
-		$response['file']['format'] = $format;
+		$response['file']['format'] = $dimensions;
 		$response['file']['pages'] = $pages;
 
 		try {
-			$imagick = new Imagick($filenameWithPath);
+			$imagick = new Imagick($newFilenameWithPath);
 			$imagick->setImageIndex(0);
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = $thumbnailWithPath;
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
 		} catch (\Throwable $th) {
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 		}
