@@ -54,20 +54,17 @@ class PpiActivator
 		if (!is_dir($uploadDirectory)) {
 			mkdir($uploadDirectory, 0777, true);
 		}
-		define('PPI_UPLOAD_DIR', realpath($uploadDirectory));
 
 		$thumbnailDirectory = ABSPATH . 'wp-content/uploads/ppi/thumbnails';
 
 		if (!is_dir($thumbnailDirectory)) {
 			mkdir($thumbnailDirectory, 0777, true);
 		}
-		define('PPI_THUMBNAIL_DIR', realpath($thumbnailDirectory));
 
 		$logDirectory = ABSPATH . 'wp-content/uploads/ppi/logs';
 
 		if (!is_dir($logDirectory)) {
 			mkdir($logDirectory, 0777, true);
 		}
-		define('PPI_LOG_DIR', realpath($logDirectory));
 	}
 }
