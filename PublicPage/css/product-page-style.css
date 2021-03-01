@@ -62,8 +62,10 @@
 }
 
 .ppi-upload-parameters .thumbnail-container {
-    border: 1px solid lightgrey;
     width: var(--thumbnail-width);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
 }
 
 .ppi-upload-parameters .param-line {

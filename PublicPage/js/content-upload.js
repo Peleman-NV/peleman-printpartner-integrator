@@ -43,9 +43,9 @@
                             'href',
                             response.url
                         );
-                        $('#ppi-thumbnail').prop(
-                            'src',
-                            response.file.thumbnail
+                        $('.thumbnail-container').css(
+                            'background-image',
+                            'url("' + response.file.thumbnail + '")'
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
                     } else {
