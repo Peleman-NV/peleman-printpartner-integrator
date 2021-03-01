@@ -328,10 +328,17 @@ class PpiProductPage
 		$format = "A4";
 
 		$helper = new Helper();
-		$new_filename = $project_id . '_' . $helper->generate_guid() . '.pdf';
-		$filenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $new_filename;
-		// TODO try using PHP streams to increase speed
-		move_uploaded_file($_FILES['file']['tmp_name'], $filenameWithPath);
+		$newFilename = $project_id . '_' . $helper->generate_guid();
+		$newFilenameWithExtension = $project_id . '_' . $helper->generate_guid() . '.pdf';
+		$filenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
+
+		// Test which is faster!!
+		//move_uploaded_file($_FILES['file']['tmp_name'], $filenameWithPath);
+		$source = fopen($_FILES['file']['tmp_name'], 'r');
+		$destination = fopen($filenameWithPath, 'w');
+		stream_copy_to_stream($source, $destination);
+		fclose($destination);
+		fclose($source);
 
 		$pdf = new Fpdi();
 		try {
@@ -343,7 +350,7 @@ class PpiProductPage
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['location'] = $filenameWithPath;
 			$response['size'] = $_FILES['file']['size'];
-			unlink($new_filename);
+			unlink($filenameWithPath);
 
 			$this->return_response($response);
 		}
@@ -358,15 +365,14 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		try {
-			$imagick = new Imagick(PPI_UPLOAD_DIR . '/' . $new_filename);
-			//$imagick->getImageCompression();
+			$imagick = new Imagick($filenameWithPath);
 			$response['file']['thumbnail'] = 'location';
 		} catch (\Throwable $th) {
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 		}
 
 		$user_id = get_current_user_id();
-		$this->insert_project($user_id, $project_id, $variant_id, $new_filename);
+		$this->insert_project($user_id, $project_id, $variant_id, $newFilenameWithExtension);
 
 		$this->return_response($response);
 	}

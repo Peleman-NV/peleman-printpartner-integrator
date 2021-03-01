@@ -11,17 +11,16 @@
             $('#variation-info').removeClass();
             $('#ppi-loading').removeClass('ppi-hidden');
 
-            $('#file-upload').submit();
-            e.preventDefault();
-
-            var fileInput = document.getElementById('file-upload');
-            var file = fileInput.files[0];
-
-            var formData = new FormData();
+            const fileInput = document.getElementById('file-upload');
+            const file = fileInput.files[0];
+            const formData = new FormData();
             formData.append('action', 'upload_content_file');
             formData.append('file', file);
             formData.append('variant_id', variationId);
             formData.append('_ajax_nonce', ppi_content_upload_object.nonce);
+
+            $('#file-upload').submit();
+            e.preventDefault();
 
             $.ajax({
                 url: ppi_content_upload_object.ajax_url,
@@ -33,7 +32,7 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
-                    console.log({ response });
+                    console.log(response);
                     $('#variation-info').html(response.message);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
@@ -51,7 +50,7 @@
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    console.log({ jqXHR });
+                    console.log(jqXHR);
                     $('#variation-info').html(
                         'Something went wrong.  Please try again with a different file.'
                     );

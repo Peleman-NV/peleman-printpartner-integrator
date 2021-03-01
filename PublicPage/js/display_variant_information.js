@@ -4,7 +4,6 @@
         $('.variations_form').on('show_variation', e => {
             const variationId = $("[name='variation_id']").val();
             $('.upload-label').removeClass('upload-disabled');
-            // pass variationId to PHP
             getVariantDetails(variationId);
             $('.upload-parameters').removeClass('hidden');
 
@@ -32,7 +31,6 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
-                    console.log(response);
                     if (response.status === 'success') {
                         $('#content-height').html(
                             response.height != '' ? response.height + 'mm' : '-'
