@@ -366,7 +366,11 @@ class PpiProductPage
 
 		try {
 			$imagick = new Imagick($filenameWithPath);
-			$response['file']['thumbnail'] = 'location';
+			$imagick->setImageIndex(0);
+			$imagick->setImageFormat('.jpg');
+			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
+			$imagick->writeImage($thumbnailWithPath);
+			$response['file']['thumbnail'] = $thumbnailWithPath;
 		} catch (\Throwable $th) {
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 		}
