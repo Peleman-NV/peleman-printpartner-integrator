@@ -1,21 +1,8 @@
 (function ($) {
     'use strict';
     $(function () {
-        $('.variations_form').on('show_variation', (e) => {
-            $('.upload-label').removeClass('upload-disabled');
-            $('.upload-parameters').removeClass('hidden');
-
-            if ($('.ppi-upload-form')[0] !== undefined) {
-                $('.single_add_to_cart_button').addClass('ppi-disabled');
-            }
-        });
-
-        $('.variations_form').on('hide_variation', (e) => {
-            $('.upload-label').addClass('upload-disabled');
-            $('.upload-parameters').addClass('hidden');
-        });
-
-        $('#file-upload').on('change', (e) => {
+        $('#file-upload').on('change', e => {
+            const variationId = $("[name='variation_id']").val();
             $('#variation-info').html('');
             $('#variation-info').removeClass();
             $('#ppi-loading').removeClass('ppi-hidden');
@@ -29,7 +16,7 @@
             var formData = new FormData();
             formData.append('action', 'upload_content_file');
             formData.append('file', file);
-            formData.append('variant_id', $("[name='variation_id']").val());
+            formData.append('variant_id', variationId);
             formData.append('_ajax_nonce', ppi_content_upload_object.nonce);
 
             $.ajax({
@@ -42,6 +29,7 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
+                    console.log({ response });
                     $('#variation-info').html(response.message);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(

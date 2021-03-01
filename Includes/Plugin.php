@@ -131,6 +131,8 @@ class Plugin
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
 		$this->loader->add_action('wp_ajax_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_nopriv_upload_content_file', $product_page, 'upload_content_file');
+		$this->loader->add_action('wp_ajax_display_variant_info', $product_page, 'display_variant_info');
+		$this->loader->add_action('wp_ajax_nopriv_display_variant_info', $product_page, 'display_variant_info');
 		$this->loader->add_action('wp_ajax_get_imaxel_url', $product_page, 'get_imaxel_url');
 		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_url', $product_page, 'get_imaxel_url');
 	}

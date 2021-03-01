@@ -80,6 +80,15 @@ class PpiProductPage
 				'nonce' => wp_create_nonce('file_upload_nonce')
 			)
 		);
+		wp_enqueue_script('ppi-variant-info', plugins_url('js/display_variant_information.js', __FILE__), array('jquery'));
+		wp_localize_script(
+			'ppi-variant-info',
+			'ppi_variant_information_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('variant_info_nonce')
+			)
+		);
 		wp_enqueue_script('ppi-imaxel-url', plugins_url('js/no-content-upload.js', __FILE__), array('jquery'));
 		wp_localize_script(
 			'ppi-imaxel-url',
@@ -120,57 +129,81 @@ class PpiProductPage
 	 */
 	public function ppi_output_file_params($variant)
 	{
-		$paramsDiv = '
-			<div class="ppi-upload-parameters">
-				<div class="params-container">
-					<div class="param-line">
-						<div class="param-name">
+		$maxUploadFileSize = "100MB";
+		$paramsDiv = "
+			<div class='ppi-upload-parameters'>
+				<div class='params-container'>
+					<div class='param-line'>
+						<div class='param-name'>
 							Maximum file upload size
 						</div>
-						<div class="param-value">
-							100MB
+						<div class='param-value'>
+							{$maxUploadFileSize}
 						</div>
 					</div>
-					<div class="param-line">
-						<div class="param-name">
+					<div class='param-line'>
+						<div class='param-name'>
 							PDF page height
 						</div>
-						<div class="param-value">
-							297mm
+						<div class='param-value' id='content-height'>
 						</div>
 					</div>
-					<div class="param-line">
-						<div class="param-name">
+					<div class='param-line'>
+						<div class='param-name'>
 							PDF page width
 						</div>
-						<div class="param-value">
-							210mm
+						<div class='param-value' id='content-width'>
 						</div>
 					</div>
-					<div class="param-line">
-						<div class="param-name">
-							Maximum nr of pages
-						</div>
-						<div class="param-value">
-							400
-						</div>
-					</div>
-					<div class="param-line">
-						<div class="param-name">
+					<div class='param-line'>
+						<div class='param-name'>
 							Minimum nr of pages
 						</div>
-						<div class="param-value">
-							3
+						<div class='param-value' id='content-min-pages'>
+						</div>
+					</div>					
+					<div class='param-line'>
+						<div class='param-name'>
+							Maximum nr of pages
+						</div>
+						<div class='param-value' id='content-max-pages'>
 						</div>
 					</div>
 				</div>
-				<div class="thumbnail-container">
+				<div class='thumbnail-container'>
 					Thumbnail
 				</div>
-			</div>';
+			</div>";
 		echo $paramsDiv;
 	}
 
+	/**
+	 * Returns content parameters for a chosen variant
+	 */
+	private function getVariantContentParameters($variant_id)
+	{
+		return array(
+			'variant' => $variant_id,
+			'width' => get_post_meta($variant_id, 'pdf_width_mm', true),
+			'height' => get_post_meta($variant_id, 'pdf_height_mm', true),
+			'min_pages' => get_post_meta($variant_id, 'pdf_min_pages', true),
+			'max_pages' => get_post_meta($variant_id, 'pdf_max_pages', true)
+		);
+	}
+
+	/**
+	 * Returns content parameters for a chosen variant to frontend
+	 */
+	public function display_variant_info()
+	{
+		check_ajax_referer('variant_info_nonce', '_ajax_nonce');
+
+		$variant_id = $_GET['variant'];
+		$response =	$this->getVariantContentParameters($variant_id);
+		$response['status'] = "success";
+
+		$this->return_response($response);
+	}
 	/**
 	 * Override the Woocommerce templates with the plugin templates
 	 *
@@ -296,18 +329,19 @@ class PpiProductPage
 
 		$helper = new Helper();
 		$new_filename = $project_id . '_' . $helper->generate_guid() . '.pdf';
+		$filenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $new_filename;
 		// TODO try using PHP streams to increase speed
-		move_uploaded_file($_FILES['file']['tmp_name'], PPI_UPLOAD_DIR . '/' . $new_filename);
+		move_uploaded_file($_FILES['file']['tmp_name'], $filenameWithPath);
 
 		$pdf = new Fpdi();
 		try {
-			$pages = $pdf->setSourceFile(PPI_UPLOAD_DIR . '/' . $new_filename);
+			$pages = $pdf->setSourceFile($filenameWithPath);
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-			$response['file']['location'] = $new_filename;
+			$response['file']['location'] = $filenameWithPath;
 			$response['size'] = $_FILES['file']['size'];
 			unlink($new_filename);
 
@@ -318,7 +352,7 @@ class PpiProductPage
 		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
 		$response['file']['name'] = $filename;
 		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-		$response['file']['location'] = $new_filename;
+		$response['file']['location'] = $filenameWithPath;
 		$response['file']['size'] = $_FILES['file']['size'];
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
