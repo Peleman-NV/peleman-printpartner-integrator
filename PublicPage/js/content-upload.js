@@ -7,6 +7,7 @@
 
         $('#file-upload').on('change', e => {
             const variationId = $("[name='variation_id']").val();
+            $('.single_add_to_cart_button').addClass('ppi-disabled');
             $('#variation-info').html('');
             $('#variation-info').removeClass();
             $('#ppi-loading').removeClass('ppi-hidden');
