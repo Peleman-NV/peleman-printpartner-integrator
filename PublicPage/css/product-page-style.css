@@ -1,5 +1,6 @@
 :root {
-    --params-width: 70%;
+    --params-width: 65%;
+    --thumbnail-width: calc(100% - 2% - var(--params-width));
 }
 
 .ppi-add-to-cart-button {
@@ -50,9 +51,19 @@
 }
 
 .ppi-upload-parameters {
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ppi-upload-parameters .params-container {
     border-top: 1px solid darkgrey;
     width: var(--params-width);
-    margin-bottom: 2px;
+}
+
+.ppi-upload-parameters .thumbnail-container {
+    border: 1px solid lightgrey;
+    width: var(--thumbnail-width);
 }
 
 .ppi-upload-parameters .param-line {
@@ -65,4 +76,23 @@
     padding: 0 5px;
     background-color: lightgrey;
     border-bottom: 1px solid darkgrey;
+}
+
+.ppi-response-error {
+    color: red;
+}
+
+#ppi-loading {
+    margin-right: 10px;
+    animation: rotate 1.5s linear infinite;
+}
+
+.ppi-hidden {
+    display: none !important;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
 }

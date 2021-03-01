@@ -5,6 +5,7 @@ namespace PelemanPrintpartnerIntegrator\PublicPage;
 use PelemanPrintpartnerIntegrator\Services\ImaxelService;
 use PelemanPrintpartnerIntegrator\Utils\Helper;
 use setasign\Fpdi\Fpdi;
+use \Imagick;
 
 /**
  * The public-facing functionality of the plugin.
@@ -54,6 +55,7 @@ class PpiProductPage
 	public function enqueue_styles()
 	{
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $this->version, 'all');
+		wp_enqueue_style('dashicons');
 	}
 
 	/**
@@ -69,13 +71,22 @@ class PpiProductPage
 	 */
 	public function enqueue_ajax()
 	{
-		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'));
+		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/content-upload.js', __FILE__), array('jquery'));
 		wp_localize_script(
 			'ppi-ajax-upload',
-			'ppi_ajax_object',
+			'ppi_content_upload_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
 				'nonce' => wp_create_nonce('file_upload_nonce')
+			)
+		);
+		wp_enqueue_script('ppi-imaxel-url', plugins_url('js/no-content-upload.js', __FILE__), array('jquery'));
+		wp_localize_script(
+			'ppi-imaxel-url',
+			'ppi_url_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('imaxel_url_nonce')
 			)
 		);
 	}
@@ -90,9 +101,18 @@ class PpiProductPage
         <div class="ppi-upload-form">
             <label class="upload-label upload-disabled" for="file-upload">Click here to upload your PDF file</label>
             <input id="file-upload" type="file" accept="application/pdf" name="pdf_upload" style="display: none;">
-        </div>
-        <div id="file-upload-validation"></div>';
+        </div>';
 		echo $form;
+	}
+
+
+	/**
+	 * Outputs a div with variant information
+	 */
+	public function ppi_variant_information($variant)
+	{
+		$informationDiv = '<div id="variation-info"></div>';
+		echo $informationDiv;
 	}
 
 	/**
@@ -102,45 +122,50 @@ class PpiProductPage
 	{
 		$paramsDiv = '
 			<div class="ppi-upload-parameters">
-				<div class="param-line">
-					<div class="param-name">
-						Maximum file upload size
+				<div class="params-container">
+					<div class="param-line">
+						<div class="param-name">
+							Maximum file upload size
+						</div>
+						<div class="param-value">
+							100MB
+						</div>
 					</div>
-					<div class="param-value">
-						100MB
+					<div class="param-line">
+						<div class="param-name">
+							PDF page height
+						</div>
+						<div class="param-value">
+							297mm
+						</div>
+					</div>
+					<div class="param-line">
+						<div class="param-name">
+							PDF page width
+						</div>
+						<div class="param-value">
+							210mm
+						</div>
+					</div>
+					<div class="param-line">
+						<div class="param-name">
+							Maximum nr of pages
+						</div>
+						<div class="param-value">
+							400
+						</div>
+					</div>
+					<div class="param-line">
+						<div class="param-name">
+							Minimum nr of pages
+						</div>
+						<div class="param-value">
+							3
+						</div>
 					</div>
 				</div>
-				<div class="param-line">
-					<div class="param-name">
-						PDF page height
-					</div>
-					<div class="param-value">
-						297mm
-					</div>
-				</div>
-				<div class="param-line">
-					<div class="param-name">
-						PDF page width
-					</div>
-					<div class="param-value">
-						210mm
-					</div>
-				</div>
-				<div class="param-line">
-					<div class="param-name">
-						Maximum nr of pages
-					</div>
-					<div class="param-value">
-						400
-					</div>
-				</div>
-				<div class="param-line">
-					<div class="param-name">
-						Minimum nr of pages
-					</div>
-					<div class="param-value">
-						3
-					</div>
+				<div class="thumbnail-container">
+					Thumbnail
 				</div>
 			</div>';
 		echo $paramsDiv;
@@ -206,6 +231,30 @@ class PpiProductPage
 		return __('Create project', 'woocommerce');
 	}
 
+	public function get_imaxel_url()
+	{
+		check_ajax_referer('imaxel_url_nonce', '_ajax_nonce');
+
+		$variant_id = $_POST['variant_id'];
+
+		$imaxel_response = $this->getImaxelData($variant_id);
+
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+			$this->return_response($response);
+		}
+
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
+
+		$user_id = get_current_user_id();
+		$this->insert_project($user_id, $project_id, $variant_id);
+
+		$response['status'] = 'success';
+		$this->return_response($response);
+	}
+
 	public function upload_content_file()
 	{
 		check_ajax_referer('file_upload_nonce', '_ajax_nonce');
@@ -247,6 +296,7 @@ class PpiProductPage
 
 		$helper = new Helper();
 		$new_filename = $project_id . '_' . $helper->generate_guid() . '.pdf';
+		// TODO try using PHP streams to increase speed
 		move_uploaded_file($_FILES['file']['tmp_name'], PPI_UPLOAD_DIR . '/' . $new_filename);
 
 		$pdf = new Fpdi();
@@ -254,7 +304,7 @@ class PpiProductPage
 			$pages = $pdf->setSourceFile(PPI_UPLOAD_DIR . '/' . $new_filename);
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
-			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to check it.<br>Please use a different PDF file.";
+			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['location'] = $new_filename;
@@ -272,6 +322,14 @@ class PpiProductPage
 		$response['file']['size'] = $_FILES['file']['size'];
 		$response['file']['format'] = $format;
 		$response['file']['pages'] = $pages;
+
+		try {
+			$imagick = new Imagick(PPI_UPLOAD_DIR . '/' . $new_filename);
+			//$imagick->getImageCompression();
+			$response['file']['thumbnail'] = 'location';
+		} catch (\Throwable $th) {
+			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
+		}
 
 		$user_id = get_current_user_id();
 		$this->insert_project($user_id, $project_id, $variant_id, $new_filename);
@@ -304,12 +362,20 @@ class PpiProductPage
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
 
+		if ($create_project_response['response']['code'] == 200) {
+			$status = 'success';
+		} else {
+			$status = 'error';
+		}
+
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
+		$editorUrl = $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
 
 		return array(
+			'status' => $status,
 			'project_id' => $project_id,
-			'url' => $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id)
+			'url' => $editorUrl
 		);
 	}
 
@@ -320,10 +386,16 @@ class PpiProductPage
 	 * @param Int $project_id
 	 * @param Int $product_id
 	 */
-	private function insert_project($user_id, $project_id, $product_id, $content_filename)
+	private function insert_project($user_id, $project_id, $product_id, $content_filename = NULL)
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-		$wpdb->insert($table_name, array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename));
+		if ($content_filename != null) {
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename);
+		} else {
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
+		}
+
+		$wpdb->insert($table_name, $query);
 	}
 }

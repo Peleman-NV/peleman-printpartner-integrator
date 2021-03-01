@@ -60,7 +60,8 @@ class Plugin
 		}
 		$this->plugin_name = 'peleman-printpartner-integrator';
 
-		$this->load_dependencies();
+		//$this->load_dependencies();
+		$this->loader = new PpiLoader();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
@@ -68,11 +69,6 @@ class Plugin
 
 	/**
 	 * Load the required dependencies for this plugin.
-	 * 
-	 * - Peleman_Printpartner_Integrator_Loader. Orchestrates the hooks of the plugin.
-	 * - Peleman_Printpartner_Integrator_i18n. Defines internationalization functionality.
-	 * - Peleman_Printpartner_Integrator_Admin. Defines all hooks for the admin area.
-	 * - Peleman_Printpartner_Integrator_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -82,13 +78,6 @@ class Plugin
 	 */
 	private function load_dependencies()
 	{
-		//require_once plugin_dir_path(dirname(__FILE__)) . 'includes/ppi-loader.php';
-		//require_once plugin_dir_path(dirname(__FILE__)) . 'includes/ppi-i18n.php';
-		//require_once plugin_dir_path(dirname(__FILE__)) . 'admin/ppi-admin.php';
-		//require_once plugin_dir_path(dirname(__FILE__)) . 'public/ppi-product-page.php';
-		//require_once plugin_dir_path(dirname(__FILE__)) . 'services/imaxel-service.php';
-		//require_once plugin_dir_path(dirname(__FILE__)) . 'services/helpers.php';
-
 		$this->loader = new PpiLoader();
 	}
 
@@ -134,6 +123,7 @@ class Plugin
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts');
 
 		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
+		$this->loader->add_action('ppi_variant_information_div', $product_page, 'ppi_variant_information', 7, 1);
 		$this->loader->add_action('ppi_file_upload_params_div', $product_page, 'ppi_output_file_params', 7, 1);
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
@@ -141,6 +131,8 @@ class Plugin
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
 		$this->loader->add_action('wp_ajax_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_nopriv_upload_content_file', $product_page, 'upload_content_file');
+		$this->loader->add_action('wp_ajax_get_imaxel_url', $product_page, 'get_imaxel_url');
+		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_url', $product_page, 'get_imaxel_url');
 	}
 
 	/**
