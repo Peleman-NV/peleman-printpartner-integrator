@@ -1,6 +1,10 @@
 (function ($) {
     'use strict';
     $(function () {
+        $('.variations_form').on('show_variation', e => {
+            $('#variation-info').html('');
+        });
+
         $('#file-upload').on('change', e => {
             const variationId = $("[name='variation_id']").val();
             $('#variation-info').html('');
