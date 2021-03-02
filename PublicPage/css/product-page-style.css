@@ -63,6 +63,7 @@
 
 .ppi-upload-parameters .thumbnail-container {
     width: var(--thumbnail-width);
+    background-color: whitesmoke;
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;

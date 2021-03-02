@@ -368,21 +368,14 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		try {
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick = new Imagick($newFilenameWithPath);
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick->setImageIndex(0);
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick->setImageFormat('jpg');
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
+			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->writeImage($thumbnailWithPath);
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 		} catch (\Throwable $th) {
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('hi', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 		}
 
