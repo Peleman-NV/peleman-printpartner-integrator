@@ -347,13 +347,15 @@ class PpiProductPage
 		try {
 			$pages = $pdf->setSourceFile($newFilenameWithPath);
 		} catch (\Throwable $th) {
+			unlink($newFilenameWithPath);
+
 			$response['status'] = 'error';
+			$response['error'] = $th->getMessage();
 			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['location'] = $newFilenameWithPath;
 			$response['size'] = $_FILES['file']['size'];
-			unlink($newFilenameWithPath);
 
 			$this->return_response($response);
 		}
@@ -369,7 +371,7 @@ class PpiProductPage
 
 		try {
 			$imagick = new Imagick($newFilenameWithPath);
-			$imagick->setImageIndex(0);
+			$imagick->setIteratorIndex(0);  // is deprecated in newer version - use $imagick->setIteratorIndex(0);
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
@@ -377,6 +379,7 @@ class PpiProductPage
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
 		} catch (\Throwable $th) {
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
+			$response['error'] = $th->getMessage();
 		}
 
 		$user_id = get_current_user_id();
