@@ -6,6 +6,7 @@ use PelemanPrintpartnerIntegrator\Services\ImaxelService;
 use PelemanPrintpartnerIntegrator\Utils\Helper;
 use setasign\Fpdi\Fpdi;
 use \Imagick;
+use DateTime;
 
 /**
  * The public-facing functionality of the plugin.
@@ -280,6 +281,9 @@ class PpiProductPage
 
 	public function upload_content_file()
 	{
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ' ' . print_r("Start upload function") . PHP_EOL, 3, __DIR__ . '/Log.txt');
+
 		check_ajax_referer('file_upload_nonce', '_ajax_nonce');
 
 		if ($_FILES['file']['error']) {
@@ -348,15 +352,22 @@ class PpiProductPage
 		// fclose($destination);
 		// fclose($source);
 
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ' ' . print_r("Moved to uploads dir") . PHP_EOL, 3, __DIR__ . '/Log.txt');
+
 		$newFilenameWithPath = realpath($newFilenameWithPath);
 
 		try {
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ' ' . print_r("Start thumbnail gen") . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->writeImage($thumbnailWithPath);
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ' ' . print_r("End thumbnail gen") . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
