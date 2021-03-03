@@ -341,7 +341,7 @@ class PpiProductPage
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['error'] = $th->getMessage();
-			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
+			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it (possibly due to encryption).<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['size'] = $_FILES['file']['size'];
@@ -359,15 +359,6 @@ class PpiProductPage
 
 		$newFilenameWithPath = realpath($newFilenameWithPath);
 
-		$response['status'] = 'success';
-		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
-		$response['file']['name'] = $filename;
-		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-		$response['file']['location'] = $newFilenameWithPath;
-		$response['file']['size'] = $_FILES['file']['size'];
-		$response['file']['format'] = $dimensions;
-		$response['file']['pages'] = $pages;
-
 		try {
 			$imagick = new Imagick($newFilenameWithPath);
 			$imagick->setIteratorIndex(0);
@@ -376,10 +367,19 @@ class PpiProductPage
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->writeImage($thumbnailWithPath);
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
+			$response['status'] = 'success';
+			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
 		} catch (\Throwable $th) {
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 			$response['error'] = $th->getMessage();
 		}
+
+		$response['file']['name'] = $filename;
+		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
+		$response['file']['location'] = $newFilenameWithPath;
+		$response['file']['size'] = $_FILES['file']['size'];
+		$response['file']['format'] = $dimensions;
+		$response['file']['pages'] = $pages;
 
 		$user_id = get_current_user_id();
 		$this->insert_project($user_id, $project_id, $variant_id, $newFilenameWithExtension);
