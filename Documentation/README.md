@@ -24,3 +24,8 @@ Imaxel data
     Imaxel sandboxes:
 -   [Create project (POST)](https://services.imaxel.com/peleman/apisandbox/#/api/create_project)
 -   [Edit project (GET)](https://services.imaxel.com/peleman/apisandbox/#/api/edit_project)
+
+Setasign PDFParser
+
+-   U: online@createmybooks.com
+-   P: SaScsmb2015
