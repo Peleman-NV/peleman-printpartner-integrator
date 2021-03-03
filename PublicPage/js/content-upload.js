@@ -2,14 +2,14 @@
     'use strict';
     $(function () {
         $('.variations_form').on('show_variation', e => {
-            $('#variation-info').html('');
+            $('#upload-info').html('');
         });
 
         $('#file-upload').on('change', e => {
             const variationId = $("[name='variation_id']").val();
             $('.single_add_to_cart_button').addClass('ppi-disabled');
-            $('#variation-info').html('');
-            $('#variation-info').removeClass();
+            $('#upload-info').html('');
+            $('#upload-info').removeClass();
             $('#ppi-loading').removeClass('ppi-hidden');
             $('.thumbnail-container').css('background-image', '');
             $('.thumbnail-container').prop('alt', '');
@@ -36,7 +36,7 @@
                 dataType: 'json',
                 success: function (response) {
                     console.log(response);
-                    $('#variation-info').html(response.message);
+                    $('#upload-info').html(response.message);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
@@ -55,17 +55,17 @@
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
                     } else {
-                        $('#variation-info').html(response.message);
-                        $('#variation-info').addClass('ppi-response-error');
+                        $('#upload-info').html(response.message);
+                        $('#upload-info').addClass('ppi-response-error');
                         $('#ppi-loading').addClass('ppi-hidden');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR);
-                    $('#variation-info').html(
+                    $('#upload-info').html(
                         'Something went wrong.  Please try again with a different file.'
                     );
-                    $('#variation-info').addClass('response-error');
+                    $('#upload-info').addClass('response-error');
                     $('#ppi-loading').addClass('ppi-hidden');
                     console.error(
                         'Something went wrong:\n' +

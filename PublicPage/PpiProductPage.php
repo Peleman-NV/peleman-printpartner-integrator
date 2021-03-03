@@ -105,22 +105,13 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
-		$form = "
+		$uploadDiv = "
         <div class='ppi-upload-form'>
             <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
-        </div>";
-		echo $form;
-	}
-
-
-	/**
-	 * Outputs a div with variant information
-	 */
-	public function ppi_variant_information($variant)
-	{
-		$informationDiv = "<div id='variation-info'></div>";
-		echo $informationDiv;
+        </div>
+		<div id='upload-info'></div>";
+		echo $uploadDiv;
 	}
 
 	/**
