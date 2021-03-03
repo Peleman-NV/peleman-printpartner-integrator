@@ -282,8 +282,8 @@ class PpiProductPage
 	public function upload_content_file()
 	{
 		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ' ' . print_r("Start upload function") . PHP_EOL, 3, __DIR__ . '/Log.txt');
-
+		error_log($now->format('c') . ' Start upload function' . PHP_EOL, 3, __DIR__ . '/Log.txt');
+		$time_start = microtime(true);
 		check_ajax_referer('file_upload_nonce', '_ajax_nonce');
 
 		if ($_FILES['file']['error']) {
@@ -352,22 +352,27 @@ class PpiProductPage
 		// fclose($destination);
 		// fclose($source);
 
+		$time_end = microtime(true);
+		$execution_time = ($time_end - $time_start) / 60;
+
 		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ' ' . print_r("Moved to uploads dir") . PHP_EOL, 3, __DIR__ . '/Log.txt');
+		error_log($now->format('c') . ' Moved to uploads dir.  Sec: ' . $execution_time . PHP_EOL, 3, __DIR__ . '/Log.txt');
 
 		$newFilenameWithPath = realpath($newFilenameWithPath);
 
 		try {
 			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ' ' . print_r("Start thumbnail gen") . PHP_EOL, 3, __DIR__ . '/Log.txt');
+			error_log($now->format('c') . ' Start thumbnail gen' . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->writeImage($thumbnailWithPath);
+			$thumb_end = microtime(true);
+			$execution_time = ($thumb_end - $time_start) / 60;
 			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ' ' . print_r("End thumbnail gen") . PHP_EOL, 3, __DIR__ . '/Log.txt');
+			error_log($now->format('c') . ' End thumbnail gen. Sec: ' . $execution_time . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
