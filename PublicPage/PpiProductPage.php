@@ -335,30 +335,29 @@ class PpiProductPage
 		$newFilenameWithExtension = $newFilename . '.pdf';
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
 
-		// Test which is faster!!
-		//move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
-		$source = fopen($_FILES['file']['tmp_name'], 'r');
-		$destination = fopen($newFilenameWithPath, 'w');
-		stream_copy_to_stream($source, $destination);
-		fclose($destination);
-		fclose($source);
-
 		$pdf = new Fpdi();
 		try {
-			$pages = $pdf->setSourceFile($newFilenameWithPath);
+			$pages = $pdf->setSourceFile($_FILES['file']['tmp_name']);
 		} catch (\Throwable $th) {
-			unlink($newFilenameWithPath);
-
 			$response['status'] = 'error';
 			$response['error'] = $th->getMessage();
 			$response['message'] = "File \"" . $filename . "\" uploaded, but we weren't able to process it.<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-			$response['file']['location'] = $newFilenameWithPath;
 			$response['size'] = $_FILES['file']['size'];
 
 			$this->return_response($response);
 		}
+
+		// Test which is faster!!
+		move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
+		// $source = fopen($_FILES['file']['tmp_name'], 'r');
+		// $destination = fopen($newFilenameWithPath, 'w');
+		// stream_copy_to_stream($source, $destination);
+		// fclose($destination);
+		// fclose($source);
+
+		$newFilenameWithPath = realpath($newFilenameWithPath);
 
 		$response['status'] = 'success';
 		$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
@@ -371,7 +370,7 @@ class PpiProductPage
 
 		try {
 			$imagick = new Imagick($newFilenameWithPath);
-			$imagick->setIteratorIndex(0);  // is deprecated in newer version - use $imagick->setIteratorIndex(0);
+			$imagick->setIteratorIndex(0);
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
