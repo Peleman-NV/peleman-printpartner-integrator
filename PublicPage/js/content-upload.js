@@ -6,8 +6,8 @@
         });
 
         $('#file-upload').on('change', e => {
-            const timeStart = performance.now();
-            console.time('Process duration');
+            // const timeStart = performance.now();
+            // console.time('Process duration');
 
             const variationId = $("[name='variation_id']").val();
             $('.single_add_to_cart_button').addClass('ppi-disabled');
@@ -57,12 +57,18 @@
                             response.file.name
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
-                        const timeEnd = performance.now();
-                        const duration = ((timeEnd - timeStart) / 1000).toFixed(
-                            4
-                        );
-                        console.log('It took ' + duration + ' seconds.');
-                        console.timeEnd('Process duration');
+                        // const timeEnd = performance.now();
+                        // const duration = ((timeEnd - timeStart) / 1000).toFixed(
+                        //     4
+                        // );
+                        // console.log(
+                        //     'It took ' +
+                        //         duration +
+                        //         ' seconds to upload ' +
+                        //         (response.file.size / 1024 / 1024).toFixed(2) +
+                        //         ' MB.'
+                        // );
+                        // console.timeEnd('Process duration');
                     } else {
                         $('#upload-info').html(response.message);
                         $('#upload-info').addClass('ppi-response-error');
