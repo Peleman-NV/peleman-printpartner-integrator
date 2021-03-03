@@ -11,6 +11,8 @@
             $('#variation-info').html('');
             $('#variation-info').removeClass();
             $('#ppi-loading').removeClass('ppi-hidden');
+            $('.thumbnail-container').css('background-image', '');
+            $('.thumbnail-container').prop('alt', '');
 
             const fileInput = document.getElementById('file-upload');
             const file = fileInput.files[0];
