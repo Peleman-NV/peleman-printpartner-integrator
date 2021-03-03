@@ -4,8 +4,15 @@
             "PelemanPrintpartnerIntegrator\\": ""
         }
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://www.setasign.com/downloads/"
+        }
+    ],
     "require": {
         "setasign/fpdf": "1.8.*",
-        "setasign/fpdi": "^2.0"
+        "setasign/fpdi": "^2.0",
+        "setasign/fpdi_pdf-parser": "2.0.4"
     }
 }
