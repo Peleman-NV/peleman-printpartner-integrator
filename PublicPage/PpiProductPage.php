@@ -351,8 +351,8 @@ class PpiProductPage
 		$newFilenameWithPath = realpath($newFilenameWithPath);
 
 		try {
-			$imagick = new Imagick($newFilenameWithPath);
-			$imagick->setIteratorIndex(0);
+			$imagick = new Imagick();
+			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
