@@ -4,7 +4,7 @@ namespace PelemanPrintpartnerIntegrator\Utils;
 
 class Helper
 {
-    public function generate_guid()
+    public function generateGuid()
     {
         mt_srand((float)microtime() * 10000); //optional for php 4.2.0 and up.
         $charid = md5(uniqid(rand(), true));
