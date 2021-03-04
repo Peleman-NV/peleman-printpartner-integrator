@@ -134,16 +134,16 @@ class PpiProductPage
 					</div>
 					<div class='param-line'>
 						<div class='param-name'>
-							PDF page height
+							PDF page width
 						</div>
-						<div class='param-value' id='content-height'>
+						<div class='param-value' id='content-width'>
 						</div>
 					</div>
 					<div class='param-line'>
 						<div class='param-name'>
-							PDF page width
+							PDF page height
 						</div>
-						<div class='param-value' id='content-width'>
+						<div class='param-value' id='content-height'>
 						</div>
 					</div>
 					<div class='param-line'>
@@ -193,7 +193,7 @@ class PpiProductPage
 		$response =	$this->getVariantContentParameters($variant_id);
 		$response['status'] = "success";
 
-		$this->return_response($response);
+		$this->returnResponse($response);
 	}
 	/**
 	 * Override the Woocommerce templates with the plugin templates
@@ -266,17 +266,17 @@ class PpiProductPage
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
 			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
-			$this->return_response($response);
+			$this->returnResponse($response);
 		}
 
 		$project_id = $imaxel_response['project_id'];
 		$response['url'] = $imaxel_response['url'];
 
 		$user_id = get_current_user_id();
-		$this->insert_project($user_id, $project_id, $variant_id);
+		$this->insertProject($user_id, $project_id, $variant_id);
 
 		$response['status'] = 'success';
-		$this->return_response($response);
+		$this->returnResponse($response);
 	}
 
 	public function upload_content_file()
@@ -287,16 +287,14 @@ class PpiProductPage
 			$response['status'] = 'error';
 			$response['message'] = "Error encountered while uploading your file.  Please try again with a different one.";
 			$response['error'] = $_FILES['file']['error'];
-			$this->return_response($response);
 		}
 
 		$max_file_upload_size = (int)(ini_get('upload_max_filesize')) * 1024 * 1024;
-		if ($_FILES['file']['size'] >= $max_file_upload_size) {
+		if ($_FILES['file']['dimensions'] >= $max_file_upload_size) {
 			$response['status'] = 'error';
 			$response['message'] = "Your file is too large, Please upload a file smaller than 100MB.";
-			$response['size'] = $_FILES['file']['size'];
+			$response['dimensions'] = $_FILES['file']['dimensions'];
 			$response['max_size'] = $max_file_upload_size;
-			$this->return_response($response);
 		}
 
 		$filename = $_FILES['file']['name'];
@@ -305,7 +303,6 @@ class PpiProductPage
 			$response['status'] = 'error';
 			$response['message'] = "Please upload a PDF file.";
 			$response['type'] = $file_type;
-			$this->return_response($response);
 		};
 
 		$variant_id = $_POST['variant_id'];
@@ -314,31 +311,63 @@ class PpiProductPage
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
 			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
-			$this->return_response($response);
 		}
 		$project_id = $imaxel_response['project_id'];
 		$response['url'] = $imaxel_response['url'];
 
-		// TODO pages and size validation
+		// TODO pages and dimensions validation
 		$dimensions = "A4";
 
 		$helper = new Helper();
-		$newFilename = $project_id . '_' . $helper->generate_guid();
+		$newFilename = $project_id . '_' . $helper->generateGuid();
 		$newFilenameWithExtension = $newFilename . '.pdf';
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
 
-		$pdf = new Fpdi();
 		try {
+			$pdf = new Fpdi();
 			$pages = $pdf->setSourceFile($_FILES['file']['tmp_name']);
+			$importedPage = $pdf->importPage(1);
+			$dimensions = $pdf->getTemplateSize($importedPage);
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['error'] = $th->getMessage();
 			$response['message'] = "We couldn't process \"" . $filename . "\"<br>(possibly due to encryption).<br>Please use a different PDF file.";
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-			$response['size'] = $_FILES['file']['size'];
+			$response['file']['filesize'] = $_FILES['file']['size'];
 
-			$this->return_response($response);
+			$this->returnResponse($response);
+		}
+
+		// page & dimension validation
+		$variant = $this->getVariantContentParameters($variant_id);
+		if ($variant['min_pages'] != "" && $pages < $variant['min_pages']) {
+			$response['status'] = 'error';
+			$response['file']['pages'] = $pages;
+			$response['message'] = "\"{$filename}\" has too few pages ({$pages}).  Please upload a file with at least {$variant['min_pages']} pages.";
+		}
+		if ($variant['max_pages'] != "" && $pages > $variant['max_pages']) {
+			$response['status'] = 'error';
+			$response['file']['pages'] = $pages;
+			$response['message'] = "\"{$filename}\" has too many pages ({$pages}).  Please upload a file with no more than {$variant['max_pages']} pages.";
+		}
+		// precision of 1mm
+
+		$precision = 0.5;
+		if (($variant['width'] != "" && !$this->roundedNumberInRange($dimensions['width'], $variant['width'], $precision))
+			|| ($variant['height'] != "" && !$this->roundedNumberInRange($dimensions['height'], $variant['height'], $precision))
+		) {
+			$response['status'] = 'error';
+			$response['file']['width'] = $dimensions['width'];
+			$response['file']['height'] = $dimensions['height'];
+			$displayWidth = round($dimensions['width'], 1);
+			$displayHeight = round($dimensions['height'], 1);
+			$response['message'] = "\"{$filename}\" dimensions are {$displayWidth}mm x {$displayHeight}mm and doesn't match the required dimensions.  Please upload a file with a width x height of {$variant['width']}mm x {$variant['height']}mm.";
+		}
+
+		// send response
+		if ($response['status'] == 'error') {
+			$this->returnResponse($response);
 		}
 
 		// Test which is faster!!
@@ -357,6 +386,8 @@ class PpiProductPage
 			$imagick->setImageFormat('jpg');
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+			$imagick->setCompressionQuality(25);
+			$imagick->scaleImage(150, 0);
 			$imagick->writeImage($thumbnailWithPath);
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
 			$response['status'] = 'success';
@@ -364,26 +395,29 @@ class PpiProductPage
 		} catch (\Throwable $th) {
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
 			$response['error'] = $th->getMessage();
+
+			$this->returnResponse($response);
 		}
 
 		$response['file']['name'] = $filename;
 		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 		$response['file']['location'] = $newFilenameWithPath;
-		$response['file']['size'] = $_FILES['file']['size'];
-		$response['file']['format'] = $dimensions;
+		$response['file']['filesize'] = $_FILES['file']['size'];
+		$response['file']['width'] = $dimensions['width'];
+		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
 
 		$user_id = get_current_user_id();
-		$this->insert_project($user_id, $project_id, $variant_id, $newFilenameWithExtension);
+		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithExtension);
 
-		$this->return_response($response);
+		$this->returnResponse($response);
 	}
 
 	/**
 	 * send a JSON response - used for AJAX calls
 	 * 
 	 */
-	private function return_response($response)
+	private function returnResponse($response)
 	{
 		wp_send_json($response);
 		wp_die();
@@ -428,7 +462,7 @@ class PpiProductPage
 	 * @param Int $project_id
 	 * @param Int $product_id
 	 */
-	private function insert_project($user_id, $project_id, $product_id, $content_filename = NULL)
+	private function insertProject($user_id, $project_id, $product_id, $content_filename = NULL)
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
@@ -439,5 +473,14 @@ class PpiProductPage
 		}
 
 		$wpdb->insert($table_name, $query);
+	}
+
+	private function roundedNumberInRange($number, $baseRange, $precision)
+	{
+		if (round(floatval($number), 2) >= floatval($baseRange) - floatval($precision) && round(floatval($number), 2) <= floatval($baseRange) + floatval($precision)) {
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('within range', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
+			return true;
+		}
+		return false;
 	}
 }
