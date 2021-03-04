@@ -61,7 +61,7 @@
                             4
                         );
                         const fileSize =
-                            (response.file.size / 1024 / 1024).toFixed(2) +
+                            (response.file.filesize / 1024 / 1024).toFixed(2) +
                             ' MB.';
                         console.log(
                             'It took ' +
