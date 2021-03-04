@@ -14,7 +14,7 @@ This plugin allows a WordPress/WooCommerce webshop to show and sell Peleman prod
     -   max_input_time=300.
 -   PHP ImageMagick extension (called Imagick) must be installed and enabled, to extract information from PDF files, and create thumbnails.
 -   [Composer](https://getcomposer.org/) package manager must be installed on your system, to install the various vendor packages.
--   [Setasign FDPI PDFParser license](https://www.setasign.com/products/fpdi-pdf-parser/details/) is necessary to handle PDF v1.5 files and higher. Please contact Setasign to purchase a license.
+-   [Setasign FDPI PDFParser license](https://www.setasign.com/products/fpdi-pdf-parser/details/) is necessary to handle PDF files version 1.5 and higher. Please contact Setasign to purchase a license.
 
 ## Installation:
 
