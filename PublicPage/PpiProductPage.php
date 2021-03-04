@@ -358,7 +358,7 @@ class PpiProductPage
 			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = realpath(plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/') . $newFilename . '.jpg';
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
 		} catch (\Throwable $th) {
