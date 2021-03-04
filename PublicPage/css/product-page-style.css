@@ -59,26 +59,6 @@
 .ppi-upload-parameters .params-container {
     border-top: 1px solid darkgrey;
     width: var(--params-width);
-    position: relative;
-}
-
-.ppi-upload-parameters .params-container #ppi-loading-params {
-    z-index: 10;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.ppi-upload-parameters
-    .params-container
-    #ppi-loading-params
-    .ppi-params-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 4rem !important;
-    animation: rotate 1.5s linear infinite;
 }
 
 .ppi-upload-parameters .thumbnail-container {

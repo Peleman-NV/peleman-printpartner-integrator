@@ -124,9 +124,6 @@ class PpiProductPage
 		$paramsDiv = "
 			<div class='ppi-upload-parameters'>
 				<div class='params-container'>
-					<div id='ppi-loading-params'>
-						<span class='ppi-params-loading dashicons dashicons-update rotate ppi-hidden'></span>
-					</div>
 					<div class='param-line'>
 						<div class='param-name'>
 							Maximum file upload size
@@ -478,7 +475,6 @@ class PpiProductPage
 	private function roundedNumberInRange($number, $baseRange, $precision)
 	{
 		if (round(floatval($number), 2) >= floatval($baseRange) - floatval($precision) && round(floatval($number), 2) <= floatval($baseRange) + floatval($precision)) {
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r('within range', true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 			return true;
 		}
 		return false;
