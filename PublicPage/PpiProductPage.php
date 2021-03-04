@@ -124,6 +124,9 @@ class PpiProductPage
 		$paramsDiv = "
 			<div class='ppi-upload-parameters'>
 				<div class='params-container'>
+					<div id='ppi-loading-params'>
+						<span class='ppi-params-loading dashicons dashicons-update rotate ppi-hidden'></span>
+					</div>
 					<div class='param-line'>
 						<div class='param-name'>
 							Maximum file upload size
@@ -290,10 +293,10 @@ class PpiProductPage
 		}
 
 		$max_file_upload_size = (int)(ini_get('upload_max_filesize')) * 1024 * 1024;
-		if ($_FILES['file']['dimensions'] >= $max_file_upload_size) {
+		if ($_FILES['file']['size'] >= $max_file_upload_size) {
 			$response['status'] = 'error';
 			$response['message'] = "Your file is too large, Please upload a file smaller than 100MB.";
-			$response['dimensions'] = $_FILES['file']['dimensions'];
+			$response['filesize'] = $_FILES['file']['size'];
 			$response['max_size'] = $max_file_upload_size;
 		}
 
@@ -314,9 +317,6 @@ class PpiProductPage
 		}
 		$project_id = $imaxel_response['project_id'];
 		$response['url'] = $imaxel_response['url'];
-
-		// TODO pages and dimensions validation
-		$dimensions = "A4";
 
 		$helper = new Helper();
 		$newFilename = $project_id . '_' . $helper->generateGuid();
