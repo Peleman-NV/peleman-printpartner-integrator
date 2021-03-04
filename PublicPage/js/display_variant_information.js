@@ -4,6 +4,7 @@
         $('.variations_form').on('show_variation', e => {
             const variationId = $("[name='variation_id']").val();
             $('.upload-label').removeClass('upload-disabled');
+            $('.ppi-params-loading').removeClass('ppi-hidden');
             getVariantDetails(variationId);
             $('.upload-parameters').removeClass('hidden');
 
@@ -45,6 +46,7 @@
                             response.max_pages != '' ? response.max_pages : '-'
                         );
                     }
+                    $('.ppi-params-loading').addClass('ppi-hidden');
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log({ jqXHR });

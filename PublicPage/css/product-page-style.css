@@ -59,6 +59,26 @@
 .ppi-upload-parameters .params-container {
     border-top: 1px solid darkgrey;
     width: var(--params-width);
+    position: relative;
+}
+
+.ppi-upload-parameters .params-container #ppi-loading-params {
+    z-index: 10;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ppi-upload-parameters
+    .params-container
+    #ppi-loading-params
+    .ppi-params-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem !important;
+    animation: rotate 1.5s linear infinite;
 }
 
 .ppi-upload-parameters .thumbnail-container {
@@ -89,14 +109,14 @@
     margin-right: 10px;
     opacity: 1;
     color: white;
-    animation: rotate 1.5s linear infinite;
+    animation: rotate-with-color 1.5s linear infinite;
 }
 
 .ppi-hidden {
     display: none !important;
 }
 
-@keyframes rotate {
+@keyframes rotate-with-color {
     25% {
         color: rgb(24, 53, 94);
         transform: rotate(90deg);
@@ -111,6 +131,11 @@
     }
     100% {
         color: white;
+        transform: rotate(360deg);
+    }
+}
+@keyframes rotate {
+    to {
         transform: rotate(360deg);
     }
 }
