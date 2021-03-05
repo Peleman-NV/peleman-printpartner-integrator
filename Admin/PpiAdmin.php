@@ -125,17 +125,6 @@ class PpiAdmin
 			'value' => get_post_meta($variation->ID, 'variant_code', true)
 		));
 
-		woocommerce_wp_text_input(array(
-			'id' => 'custom_add_to_cart_label[' . $loop . ']',
-			'placeholder' => 'Design project',
-			'class' => 'short',
-			'label' => 'Custom Add to cart label',
-			'type' => 'text',
-			'desc_tip'    => true,
-			'description' => __('Define a custom Add to cart label', 'woocommerce'),
-			'value' => get_post_meta($variation->ID, 'custom_add_to_cart_label', true)
-		));
-
 		$pdf_upload_required = get_post_meta($variation->ID, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
 
@@ -203,17 +192,14 @@ class PpiAdmin
 	{
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
-		$add_to_cart_label = $_POST['custom_add_to_cart_label'][$i];
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
 		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
 		$pdf_min_pages = $_POST['pdf_min_pages'][$i];
 		$pdf_max_pages = $_POST['pdf_max_pages'][$i];
 
-		error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($add_to_cart_label, true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
-		if (isset($add_to_cart_label)) update_post_meta($variation_id, 'custom_add_to_cart_label', esc_attr($add_to_cart_label));
 		if (isset($pdf_upload_required)) update_post_meta($variation_id, 'pdf_upload_required', $pdf_upload_required);
 		if (isset($pdf_width_mm)) update_post_meta($variation_id, 'pdf_width_mm', esc_attr($pdf_width_mm));
 		if (isset($pdf_height_mm)) update_post_meta($variation_id, 'pdf_height_mm', esc_attr($pdf_height_mm));
@@ -227,17 +213,54 @@ class PpiAdmin
 	 * 
 	 * @return Array   $variations An array of the product variation data
 	 */
-	function ppi_add_custom_field_variation_data_to_front_end($variations)
-	{
-		$variations['template_id'] = get_post_meta($variations['variation_id'], 'template_id', true);
-		$variations['variant_code'] = get_post_meta($variations['variation_id'], 'variant_code', true);
-		$variations['custom_add_to_cart_label'] = get_post_meta($variations['variation_id'], 'custom_add_to_cart_label', true);
-		$variations['pdf_upload_required'] = get_post_meta($variations['variation_id'], 'pdf_upload_required', true);
-		$variations['pdf_width_mm'] = get_post_meta($variations['variation_id'], 'pdf_width_mm', true);
-		$variations['pdf_height_mm'] = get_post_meta($variations['variation_id'], 'pdf_height_mm', true);
-		$variations['pdf_min_pages'] = get_post_meta($variations['variation_id'], 'pdf_min_pages', true);
-		$variations['pdf_max_pages'] = get_post_meta($variations['variation_id'], 'pdf_max_pages', true);
+	// function ppi_add_custom_field_variation_data_to_front_end($variations)
+	// {
+	// 	$variations['template_id'] = get_post_meta($variations['variation_id'], 'template_id', true);
+	// 	$variations['variant_code'] = get_post_meta($variations['variation_id'], 'variant_code', true);
+	// 	$variations['custom_add_to_cart_label'] = get_post_meta($variations['variation_id'], 'custom_add_to_cart_label', true);
+	// 	$variations['pdf_upload_required'] = get_post_meta($variations['variation_id'], 'pdf_upload_required', true);
+	// 	$variations['pdf_width_mm'] = get_post_meta($variations['variation_id'], 'pdf_width_mm', true);
+	// 	$variations['pdf_height_mm'] = get_post_meta($variations['variation_id'], 'pdf_height_mm', true);
+	// 	$variations['pdf_min_pages'] = get_post_meta($variations['variation_id'], 'pdf_min_pages', true);
+	// 	$variations['pdf_max_pages'] = get_post_meta($variations['variation_id'], 'pdf_max_pages', true);
 
-		return $variations;
+	// 	return $variations;
+	// }
+
+	/**
+	 * Adds text inputs for the general product attributes
+	 */
+	function ppi_add_custom_fields_to_parent_products()
+	{
+		$product_id = $_GET['post'];
+		$parent_wc_product = wc_get_product($product_id);
+		if ($parent_wc_product->is_type('variable')) {
+			$variants_array = $parent_wc_product->get_children();
+			$first_variant = wc_get_product($variants_array[0]);
+			$is_imaxel_product = wc_get_product($first_variant)->get_meta('template_id');
+
+			if ($is_imaxel_product != '') {
+
+				woocommerce_wp_text_input(array(
+					'id' => 'custom_add_to_cart_label',
+					'placeholder' => 'eg: Design project',
+					'class' => 'short',
+					'label' => 'Custom Add to cart label',
+					'type' => 'text',
+					'desc_tip'    => true,
+					'description' => __('Define a custom Add to cart label', 'woocommerce'),
+					'value' => get_post_meta($product_id, 'custom_add_to_cart_label', true)
+				));
+			}
+		}
+	}
+
+	/**
+	 * Persists custom input fields on parent product
+	 */
+	function ppi_persist_custom_parent_attributes($post_id)
+	{
+		$custom_add_to_cart_label = $_POST['custom_add_to_cart_label'];
+		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
 	}
 }

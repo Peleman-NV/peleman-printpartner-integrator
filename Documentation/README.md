@@ -22,6 +22,10 @@ This plugin allows a WordPress/WooCommerce webshop to show and sell Peleman prod
 -   In the admin backend, enter your public & private keys from Imaxel
 -   Run `composer install` to download the vendor packages. You will need Setasign credentials to download the FPDI PDFParser package.
 
+## Product configuration:
+
+-   Products can have a custom Add To Cart text ("Design thesis"). This is defined per product, on the General tab (this tab may not be visible if taxes are not enabled - go to WooCommerce > Settings > General options and check "Enable taxes").
+
 ---
 
 ## Delete when live
