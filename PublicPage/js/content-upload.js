@@ -14,6 +14,7 @@
             $('#upload-info').removeClass();
             $('#ppi-loading').removeClass('ppi-hidden');
             $('.thumbnail-container').css('background-image', '');
+            $('.thumbnail-container').removeClass('ppi-min-height');
             $('.thumbnail-container').prop('alt', '');
 
             const fileInput = document.getElementById('file-upload');
@@ -47,6 +48,8 @@
                             'href',
                             response.url
                         );
+                        $('.ppi-upload-parameters').removeClass('ppi-hidden');
+                        $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
                             'background-image',
                             'url("' + response.file.thumbnail + '")'

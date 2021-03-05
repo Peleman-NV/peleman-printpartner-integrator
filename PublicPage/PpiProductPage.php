@@ -102,20 +102,6 @@ class PpiProductPage
 	}
 
 	/**
-	 * Outputs a form with a file upload
-	 */
-	public function ppi_output_form($variant)
-	{
-		$uploadDiv = "
-        <div class='ppi-upload-form'>
-            <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
-            <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
-        </div>
-		<div id='upload-info'></div>";
-		echo $uploadDiv;
-	}
-
-	/**
 	 * Outputs the params div
 	 */
 	public function ppi_output_file_params()
@@ -124,7 +110,7 @@ class PpiProductPage
 		$paramsDiv = "
 			<div class='ppi-upload-parameters'>
 				<div class='params-container'>
-					<div class='param-line'>
+					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
 							Maximum file upload size
 						</div>
@@ -132,28 +118,28 @@ class PpiProductPage
 							{$maxUploadFileSize}
 						</div>
 					</div>
-					<div class='param-line'>
+					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
 							PDF page width
 						</div>
 						<div class='param-value' id='content-width'>
 						</div>
 					</div>
-					<div class='param-line'>
+					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
 							PDF page height
 						</div>
 						<div class='param-value' id='content-height'>
 						</div>
 					</div>
-					<div class='param-line'>
+					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
 							Minimum nr of pages
 						</div>
 						<div class='param-value' id='content-min-pages'>
 						</div>
 					</div>					
-					<div class='param-line'>
+					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
 							Maximum nr of pages
 						</div>
@@ -166,6 +152,20 @@ class PpiProductPage
 				</div>
 			</div>";
 		echo $paramsDiv;
+	}
+
+	/**
+	 * Outputs a form with a file upload
+	 */
+	public function ppi_output_form($variant)
+	{
+		$uploadDiv = "
+        <div class='ppi-upload-form'>
+            <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
+            <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
+        </div>
+		<div id='upload-info'></div>";
+		echo $uploadDiv;
 	}
 
 	/**

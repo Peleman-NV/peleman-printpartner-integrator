@@ -57,7 +57,6 @@
 }
 
 .ppi-upload-parameters .params-container {
-    border-top: 1px solid darkgrey;
     width: var(--params-width);
 }
 
@@ -67,6 +66,10 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+}
+
+.ppi-min-height {
+    min-height: 7em;
 }
 
 .ppi-upload-parameters .param-line {
