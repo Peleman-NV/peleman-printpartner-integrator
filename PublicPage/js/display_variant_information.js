@@ -34,8 +34,8 @@
                 dataType: 'json',
                 success: function (response) {
                     if (response.status === 'success') {
+                        $('#max-upload-size').removeClass('ppi-hidden');
                         if (response.height != '') {
-                            $('#max-upload-size').removeClass('ppi-hidden');
                             $('#content-height').html(response.height + 'mm');
                             $('#content-height')
                                 .parent()
