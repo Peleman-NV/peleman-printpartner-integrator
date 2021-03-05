@@ -226,8 +226,20 @@ class PpiProductPage
 		$product_id = $product->get_id();
 		$parent_wc_product = wc_get_product($product_id);
 
-		if ($parent_wc_product->is_type('variable') && $parent_wc_product->get_meta('custom_add_to_cart_label') != '') {
-			add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_peleman_product'), 10, 2);
+		if ($parent_wc_product->is_type('variable')) {
+			$variants_array = $parent_wc_product->get_children();
+			$first_variant = wc_get_product($variants_array[0]);
+			$requires_pdf = wc_get_product($first_variant)->get_meta('pdf_upload');
+			$is_imaxel_product = wc_get_product($first_variant)->get_meta('template_id');
+
+			if ($is_imaxel_product != '') {
+				add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_peleman_product'), 10, 2);
+			}
+			// if ($parent_wc_product->get_meta('custom_add_to_cart_label') != '') {
+			// }
+			// if ($is_imaxel_product) {
+
+			// }
 		}
 	}
 
@@ -239,8 +251,11 @@ class PpiProductPage
 		$product_id = $product->get_id();
 		$parent_wc_product = wc_get_product($product_id);
 
-		$customText = $parent_wc_product->get_meta('custom_add_to_cart_label');
-		return __($customText, 'woocommerce');
+		if ($parent_wc_product->get_meta('custom_add_to_cart_label') != '') {
+			$customText = $parent_wc_product->get_meta('custom_add_to_cart_label');
+			return __($customText, 'woocommerce');
+		}
+		return __("Design product", 'woocommerce');
 	}
 
 	public function get_imaxel_url()
