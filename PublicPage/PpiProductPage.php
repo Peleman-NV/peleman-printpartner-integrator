@@ -109,6 +109,9 @@ class PpiProductPage
 		$maxUploadFileSize = "100MB";
 		$paramsDiv = "
 			<div class='ppi-upload-parameters'>
+				<div class='thumbnail-container'>
+					<img id='ppi-thumbnail' />
+				</div>
 				<div class='params-container'>
 					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
@@ -146,9 +149,6 @@ class PpiProductPage
 						<div class='param-value' id='content-max-pages'>
 						</div>
 					</div>
-				</div>
-				<div class='thumbnail-container'>
-					<img id='ppi-thumbnail' />
 				</div>
 			</div>";
 		echo $paramsDiv;
