@@ -118,7 +118,7 @@ class PpiProductPage
 	/**
 	 * Outputs the params div
 	 */
-	public function ppi_output_file_params($variant)
+	public function ppi_output_file_params()
 	{
 		$maxUploadFileSize = "100MB";
 		$paramsDiv = "
