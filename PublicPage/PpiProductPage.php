@@ -225,34 +225,22 @@ class PpiProductPage
 
 		$product_id = $product->get_id();
 		$parent_wc_product = wc_get_product($product_id);
-		if ($parent_wc_product->is_type('variable')) {
-			$variants_array = $parent_wc_product->get_children();
-			$first_variant = wc_get_product($variants_array[0]);
-			$requires_pdf = wc_get_product($first_variant)->get_meta('pdf_upload');
-			$is_imaxel_product = wc_get_product($first_variant)->get_meta('template_id');
 
-			if ($requires_pdf != "") {
-				add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_imaxel_pdf_product'), 10);
-			} else if ($is_imaxel_product != "") {
-				add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_imaxel_product'), 10);
-			}
+		if ($parent_wc_product->is_type('variable') && $parent_wc_product->get_meta('custom_add_to_cart_label') != '') {
+			add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_peleman_product'), 10, 2);
 		}
 	}
 
 	/**
 	 * Changes Add to cart button text for Imaxel products requiring a PDF content file
 	 */
-	public function ppi_change_add_to_cart_text_for_imaxel_pdf_product()
+	public function ppi_change_add_to_cart_text_for_peleman_product($defaultText, $product)
 	{
-		return __('Upload PDF and create project', 'woocommerce');
-	}
+		$product_id = $product->get_id();
+		$parent_wc_product = wc_get_product($product_id);
 
-	/**
-	 * Changes Add to cart button text for Imaxel products
-	 */
-	public function ppi_change_add_to_cart_text_for_imaxel_product()
-	{
-		return __('Create project', 'woocommerce');
+		$customText = $parent_wc_product->get_meta('custom_add_to_cart_label');
+		return __($customText, 'woocommerce');
 	}
 
 	public function get_imaxel_url()
