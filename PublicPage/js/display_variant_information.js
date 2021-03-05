@@ -4,6 +4,7 @@
         $('.variations_form').on('show_variation', e => {
             const variationId = $("[name='variation_id']").val();
             $('.upload-label').removeClass('upload-disabled');
+            $('#max-upload-size').addClass('ppi-hidden');
             $('.ppi-upload-parameters').addClass('ppi-hidden');
             getVariantDetails(variationId);
             $('.upload-parameters').removeClass('ppi-hidden');
@@ -32,9 +33,9 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
-                    console.log(response);
                     if (response.status === 'success') {
                         if (response.height != '') {
+                            $('#max-upload-size').removeClass('ppi-hidden');
                             $('#content-height').html(response.height + 'mm');
                             $('#content-height')
                                 .parent()
@@ -72,17 +73,7 @@
                                 .parent()
                                 .addClass('ppi-hidden');
                         }
-                        if (
-                            response.height != '' ||
-                            response.width != '' ||
-                            response.min_pages != '' ||
-                            response.max_pages != ''
-                        ) {
-                            console.log('at least one filled in');
-                            $('.ppi-upload-parameters').removeClass(
-                                'ppi-hidden'
-                            );
-                        }
+                        $('.ppi-upload-parameters').removeClass('ppi-hidden');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {

@@ -113,7 +113,7 @@ class PpiProductPage
 					<img id='ppi-thumbnail' />
 				</div>
 				<div class='params-container'>
-					<div class='param-line ppi-hidden'>
+					<div class='param-line ppi-hidden' id='max-upload-size'>
 						<div class='param-name'>
 							Maximum file upload size
 						</div>

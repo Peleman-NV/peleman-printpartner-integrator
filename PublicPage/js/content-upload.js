@@ -49,6 +49,7 @@
                             response.url
                         );
                         $('.ppi-upload-parameters').removeClass('ppi-hidden');
+                        $('#max-upload-size').removeClass('ppi-hidden');
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
                             'background-image',

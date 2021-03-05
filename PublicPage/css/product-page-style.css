@@ -57,6 +57,7 @@
 }
 
 .ppi-upload-parameters .params-container {
+    border-top: 1px solid darkgrey;
     width: var(--params-width);
 }
 
