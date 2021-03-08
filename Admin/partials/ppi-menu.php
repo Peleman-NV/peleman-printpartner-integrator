@@ -15,9 +15,9 @@
         <li>"max_execution_time": 300;</li>
         <li>"max_input_time": 300.</li>
     </ul>
-    <hr>
-    <h2>Enter your Imaxel keys here</h2>
     <form method="POST" action="options.php">
+        <hr>
+        <h2>Enter your Imaxel keys here</h2>
         <?php
         settings_fields('ppi_custom_settings');
         do_settings_sections('ppi_custom_settings');
@@ -36,6 +36,16 @@
             </div>
             <div class="grid-large-column">
                 <input type="text" id="ppi-imaxel-public-key" name="ppi-imaxel-public-key" value="<?= get_option('ppi-imaxel-public-key'); ?>" placeholder="Imaxel public key">
+            </div>
+        </div>
+        <hr>
+        <h2>Default Add to cart label</h2>
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="ppi-custom-add-to-cart-label">Label</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="text" id="ppi-custom-add-to-cart-label" name="ppi-custom-add-to-cart-label" value="<?= get_option('ppi-custom-add-to-cart-label'); ?>" placeholder="Default Add to cart label">
             </div>
         </div>
         <button type="submit" class="button button-primary">Save changes</button>
