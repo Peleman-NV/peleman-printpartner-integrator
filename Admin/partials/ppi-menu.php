@@ -6,8 +6,15 @@
         Some Peleman products require additional user content, that may exceed the default PHP maximum uploaded file size of 2MB.
         <br>
         This plugin allows uploads up to 100MB, so your PHP installation will need to be changed to allow this <strong>(without this, the plugin will not work correctly)</strong>.<br>
-        Please have your system administrator change your "php.ini" file. The lines containing "upload_max_filesize" and "post_max_size" must be changed to allow uploads up to 100MB.
+        Please have your system administrator change your "php.ini" file. The following lines need to be changed:
     </p>
+    <ul>
+        <li>"upload_max_filesize": 100MB;</li>
+        <li>"post_max_size": 120MB;</li>
+        <li>"memory_limit": 120MB;</li>
+        <li>"max_execution_time": 300;</li>
+        <li>"max_input_time": 300.</li>
+    </ul>
     <hr>
     <h2>Enter your Imaxel keys here</h2>
     <form method="POST" action="options.php">
