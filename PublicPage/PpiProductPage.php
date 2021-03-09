@@ -482,4 +482,8 @@ class PpiProductPage
 		}
 		return false;
 	}
+
+	public function add_custom_data_to_cart_items($args)
+	{
+	}
 }
