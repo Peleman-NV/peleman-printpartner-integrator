@@ -444,9 +444,10 @@ class PpiProductPage
 			$status = 'error';
 		}
 
+		$siteUrl = get_site_url();
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
-		$editorUrl = $imaxel->get_editor_url($project_id, 'https://devshop.peleman.com', 'https://devshop.peleman.com/?add-to-cart=' . $variant_id);
+		$editorUrl = $imaxel->get_editor_url($project_id, $siteUrl, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id);
 
 		return array(
 			'status' => $status,
