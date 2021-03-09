@@ -483,7 +483,26 @@ class PpiProductPage
 		return false;
 	}
 
-	public function add_custom_data_to_cart_items($args)
+	/**
+	 * Add project ID to cart data
+	 */
+	public function add_custom_data_to_cart_items($cart_item_data, $product_id)
 	{
+		if (!isset($_GET['project'])) return $cart_item_data;
+
+		$projectId = esc_attr($_GET['project']);
+		$cart_item_data["ppi_imaxel_project_id"] = $projectId;
+
+		return $cart_item_data;
+	}
+
+	/**
+	 * Add project ID to order line item 
+	 */
+	public function add_project_to_order_line_item($item, $cart_item_key, $values, $order)
+	{
+		if (isset($values['ppi_imaxel_project_id'])) {
+			$item->add_meta_data('ppi_imaxel_project_id', $values['ppi_imaxel_project_id'], true);
+		}
 	}
 }

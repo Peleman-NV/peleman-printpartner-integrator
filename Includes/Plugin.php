@@ -136,7 +136,9 @@ class Plugin
 		$this->loader->add_action('wp_ajax_nopriv_display_variant_info', $product_page, 'display_variant_info');
 		$this->loader->add_action('wp_ajax_get_imaxel_url', $product_page, 'get_imaxel_url');
 		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_url', $product_page, 'get_imaxel_url');
-		$this->loader->add_action('woocommerce_add_to_cart', $product_page, 'add_custom_data_to_cart_items');
+
+		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 2);
+		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_project_to_order_line_item', 10, 4);
 	}
 
 	/**
