@@ -169,6 +169,16 @@ class PpiProductPage
 	}
 
 	/**
+	 * Outputs a div with information pertaining to the variant,
+	 * more specifically API errors in getting the Imaxel URL
+	 */
+	public function ppi_output_variant_info()
+	{
+		$variantInfoDiv = "<div id='variant-info'></div>";
+		echo $variantInfoDiv;
+	}
+
+	/**
 	 * Returns content parameters for a chosen variant
 	 */
 	private function getVariantContentParameters($variant_id)
@@ -235,11 +245,6 @@ class PpiProductPage
 			if ($is_imaxel_product != '') {
 				add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_peleman_product'), 10, 2);
 			}
-			// if ($parent_wc_product->get_meta('custom_add_to_cart_label') != '') {
-			// }
-			// if ($is_imaxel_product) {
-
-			// }
 		}
 	}
 

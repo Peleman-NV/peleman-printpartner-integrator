@@ -14,6 +14,7 @@ global $product;
 			$variants_array = $parent_wc_product->get_children();
 			$first_variant = wc_get_product($variants_array[0]);
 			if (wc_get_product($first_variant)->get_meta('pdf_upload_required') == "yes") do_action('ppi_file_upload_params_div');
+			do_action('ppi_variant_info_div');
 		}
 	}
 	?>

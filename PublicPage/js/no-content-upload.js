@@ -1,7 +1,7 @@
 (function ($) {
     'use strict';
     $(function () {
-        $('.variations_form').on('show_variation', (e) => {
+        $('.variations_form').on('show_variation', e => {
             $('.single_add_to_cart_button').addClass('ppi-disabled');
 
             if ($('.ppi-upload-form')[0] === undefined) {
@@ -27,7 +27,6 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
-                    console.log(response);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
@@ -38,8 +37,8 @@
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
                     } else {
-                        $('#variation-info').html(response.message);
-                        $('#variation-info').addClass('ppi-response-error');
+                        $('#variant-info').html(response.message);
+                        $('#variant-info').addClass('ppi-response-error');
                         $('#ppi-loading').addClass('ppi-hidden');
                     }
                 },
