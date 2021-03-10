@@ -8,7 +8,7 @@ global $product;
 <div class="woocommerce-variation-add-to-cart variations_button">
 
 	<?php
-
+	//TO DO: move pdf required to general tab - it's a quality of the parent product, not the variant
 	$parent_wc_product = wc_get_product($product->get_id());
 	if ($parent_wc_product->is_type('variable')) {
 		$variants_array = $parent_wc_product->get_children();
