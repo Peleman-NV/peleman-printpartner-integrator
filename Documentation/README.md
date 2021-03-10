@@ -24,6 +24,7 @@ This plugin allows a WordPress/WooCommerce webshop to show and sell Peleman prod
 
 ## Product configuration:
 
+-   To allow products to use the editor, these must be set as "Customizable prodcuts". This is defined per product, on the General tab.
 -   Products can have a custom Add To Cart text ("Design thesis"). This is defined per product, on the General tab (this tab may not be visible if taxes are not enabled - go to WooCommerce > Settings > General options and check "Enable taxes").
 
 ---

@@ -232,27 +232,27 @@ class PpiAdmin
 	 */
 	function ppi_add_custom_fields_to_parent_products()
 	{
-		$product_id = $_GET['post'];
-		$parent_wc_product = wc_get_product($product_id);
-		if ($parent_wc_product->is_type('variable')) {
-			$variants_array = $parent_wc_product->get_children();
-			$first_variant = wc_get_product($variants_array[0]);
-			$is_imaxel_product = wc_get_product($first_variant)->get_meta('template_id');
+		$product_id = (isset($_GET['post']) && $_GET['post'] != '') ? $_GET['post'] : '';
+		$customizable_product = get_post_meta($product_id, 'customizable_product', true);
 
-			if ($is_imaxel_product != '') {
+		woocommerce_wp_checkbox(array(
+			'id' => 'customizable_product',
+			'label'       => __('Customizable product?', 'woocommerce'),
+			'description' => __('Check if this product can be personalized with the editor', 'woocommerce'),
+			'desc_tip'    => true,
+			'value' => $customizable_product,
+		));
 
-				woocommerce_wp_text_input(array(
-					'id' => 'custom_add_to_cart_label',
-					'placeholder' => 'eg: Design project',
-					'class' => 'short',
-					'label' => 'Custom Add to cart label',
-					'type' => 'text',
-					'desc_tip'    => true,
-					'description' => __('Define a custom Add to cart label', 'woocommerce'),
-					'value' => get_post_meta($product_id, 'custom_add_to_cart_label', true)
-				));
-			}
-		}
+		woocommerce_wp_text_input(array(
+			'id' => 'custom_add_to_cart_label',
+			'placeholder' => 'eg: Design project',
+			'class' => 'short',
+			'label' => 'Custom Add to cart label',
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('Define a custom Add to cart label', 'woocommerce'),
+			'value' => $product_id != null ? get_post_meta($product_id, 'custom_add_to_cart_label', true) : ""
+		));
 	}
 
 	/**
@@ -261,6 +261,8 @@ class PpiAdmin
 	function ppi_persist_custom_parent_attributes($post_id)
 	{
 		$custom_add_to_cart_label = $_POST['custom_add_to_cart_label'];
+		$customizable_product = isset($_POST['customizable_product']) ? 'yes' : 'no';
 		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
+		if (isset($customizable_product)) update_post_meta($post_id, 'customizable_product', $customizable_product);
 	}
 }
