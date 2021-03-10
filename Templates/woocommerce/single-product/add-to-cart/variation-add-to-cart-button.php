@@ -8,12 +8,10 @@ global $product;
 <div class="woocommerce-variation-add-to-cart variations_button">
 
 	<?php
-	//TO DO: move pdf required to general tab - it's a quality of the parent product, not the variant
+	//TO DO: move pdf required to general tab - it's a quality of the
 	$parent_wc_product = wc_get_product($product->get_id());
 	if ($parent_wc_product->is_type('variable')) {
-		$variants_array = $parent_wc_product->get_children();
-		$first_variant = wc_get_product($variants_array[0]);
-		if (wc_get_product($first_variant)->get_meta('pdf_upload_required') == "yes") {
+		if ($parent_wc_product->get_meta('pdf_upload_required') == "yes") {
 			do_action('ppi_file_upload_output_form');
 			do_action('ppi_upload_information_div');
 		}
