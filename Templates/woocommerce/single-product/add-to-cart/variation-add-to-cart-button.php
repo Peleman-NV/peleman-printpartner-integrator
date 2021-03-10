@@ -8,6 +8,7 @@ global $product;
 <div class="woocommerce-variation-add-to-cart variations_button">
 
 	<?php
+
 	$parent_wc_product = wc_get_product($product->get_id());
 	if ($parent_wc_product->is_type('variable')) {
 		$variants_array = $parent_wc_product->get_children();
@@ -17,6 +18,7 @@ global $product;
 			do_action('ppi_upload_information_div');
 		}
 	}
+
 	do_action('woocommerce_before_add_to_cart_button');
 	do_action('woocommerce_before_add_to_cart_quantity');
 	woocommerce_quantity_input(
@@ -28,7 +30,7 @@ global $product;
 	);
 	do_action('woocommerce_after_add_to_cart_quantity');
 
-	if (wc_get_product($first_variant)->get_meta('template_id') == "") {
+	if ($parent_wc_product->get_meta('customizable_product') == 'no') {
 		echo '<button type="submit" class="single_add_to_cart_button button alt">' . esc_html($product->single_add_to_cart_text()) . '</button>';
 	} else {
 		echo '<a class="ppi-add-to-cart-button single_add_to_cart_button button alt"><span id="ppi-loading" class="ppi-hidden dashicons dashicons-update rotate"></span>' .  esc_html($product->single_add_to_cart_text()) . '</a>';
