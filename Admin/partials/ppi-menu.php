@@ -3,7 +3,7 @@
     <hr>
     <h2>PHP maximum uploaded file size</h2>
     <p>
-        Some Peleman products require additional user content, that may exceed the default PHP maximum uploaded file size of 2MB.
+        Some Peleman products require additional user content, in the form of a PDF upload. This may exceed the default PHP maximum uploaded file size of 2MB.
         <br>
         This plugin allows uploads up to 100MB, so your PHP installation will need to be changed to allow this <strong>(without this, the plugin will not work correctly)</strong>.<br>
         Please have your system administrator change your "php.ini" file. The following lines need to be changed:
