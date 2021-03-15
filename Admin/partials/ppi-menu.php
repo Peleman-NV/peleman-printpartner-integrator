@@ -39,13 +39,14 @@
             </div>
         </div>
         <hr>
-        <h2>Default Add to cart label</h2>
+        <h2>Custom Add to cart label (default label is "Design Product")</h2>
+        <p>Here you define the custom label for all products. Each product can have its own custom label as well.</p>
         <div class="form-row">
             <div class="grid-medium-column">
                 <label for="ppi-custom-add-to-cart-label">Label</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-custom-add-to-cart-label" name="ppi-custom-add-to-cart-label" value="<?= get_option('ppi-custom-add-to-cart-label'); ?>" placeholder="Default Add to cart label">
+                <input type="text" id="ppi-custom-add-to-cart-label" name="ppi-custom-add-to-cart-label" value="<?= get_option('ppi-custom-add-to-cart-label'); ?>" placeholder="Eg: Personalise Your Product">
             </div>
         </div>
         <button type="submit" class="button button-primary">Save changes</button>
