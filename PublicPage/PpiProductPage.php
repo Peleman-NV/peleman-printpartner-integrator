@@ -262,6 +262,15 @@ class PpiProductPage
 
 		$variant_id = $_POST['variant_id'];
 
+		$wc_product = wc_get_product($variant_id);
+		$template_id =  $wc_product->get_meta('template_id');
+
+		if ($template_id == '') {
+			$response['status'] = 'success';
+			$response['url'] = "?add-to-cart=" . $variant_id;
+			$this->returnResponse($response);
+		}
+
 		$imaxel_response = $this->getImaxelData($variant_id);
 
 		if ($imaxel_response['status'] == "error") {
