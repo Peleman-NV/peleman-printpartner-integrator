@@ -10,7 +10,7 @@
                     variant_id: $("[name='variation_id']").val(),
                     _ajax_nonce: ppi_url_object.nonce,
                 };
-
+                console.log(data);
                 $('#ppi-loading').removeClass('ppi-hidden');
                 $('#variation-info').html('');
                 $('#variation-info').removeClass();
@@ -27,15 +27,23 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
+                    console.log(response);
+                    $('.single_add_to_cart_button').remove();
                     if (response.status === 'success') {
-                        $('.single_add_to_cart_button').removeClass(
-                            'ppi-disabled'
-                        );
-                        $('.single_add_to_cart_button').prop(
-                            'href',
-                            response.url
-                        );
-                        $('#ppi-loading').addClass('ppi-hidden');
+                        if (response.showButton) {
+                            $('.quantity').after(
+                                "<button type='submit' class='single_add_to_cart_button button alt'>Add To Cart</button>"
+                            );
+                        } else {
+                            $('.quantity').after(
+                                "<a href='" +
+                                    response.url +
+                                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='ppi-hidden dashicons dashicons-update rotate'></span>" +
+                                    response.buttonText +
+                                    '</a>'
+                            );
+                            $('#ppi-loading').addClass('ppi-hidden');
+                        }
                     } else {
                         $('#variant-info').html(response.message);
                         $('#variant-info').addClass('ppi-response-error');

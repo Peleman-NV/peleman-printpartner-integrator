@@ -200,6 +200,12 @@ class PpiProductPage
 		check_ajax_referer('variant_info_nonce', '_ajax_nonce');
 
 		$variant_id = $_GET['variant'];
+		$wc_product = wc_get_product($variant_id);
+		// not a customizable product
+		if ($wc_product->get_meta('customizable_product') != 'yes') {
+			$response['status'] = 'success';
+		}
+
 		$response =	$this->getVariantContentParameters($variant_id);
 		$response['status'] = "success";
 
@@ -261,13 +267,15 @@ class PpiProductPage
 		check_ajax_referer('imaxel_url_nonce', '_ajax_nonce');
 
 		$variant_id = $_POST['variant_id'];
-
+		$response['variant'] = $variant_id;
 		$wc_product = wc_get_product($variant_id);
-		$template_id =  $wc_product->get_meta('template_id');
 
-		if ($template_id == '') {
+		$parent_product = wc_get_product($wc_product->get_parent_id());
+		// parent product is not customizable or has no Imaxel template ID
+		$isCustomizable = $parent_product->get_meta('customizable_product');
+		if ($isCustomizable != 'yes' || $wc_product->get_meta('template_id') == '') {
 			$response['status'] = 'success';
-			$response['url'] = "?add-to-cart=" . $variant_id;
+			$response['showButton'] = true;
 			$this->returnResponse($response);
 		}
 
@@ -280,8 +288,17 @@ class PpiProductPage
 		}
 
 		$project_id = $imaxel_response['project_id'];
+		$response['isImaxelProduct'] = true;
+		if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
+			$addToCartLabel = $parent_product->get_meta('custom_add_to_cart_label');
+		} else if (get_option('ppi-custom-add-to-cart-label') != '') {
+			$addToCartLabel = get_option('ppi-custom-add-to-cart-label');
+		} else {
+			$addToCartLabel = "Design Product";
+		}
+		$response['buttonText'] = $addToCartLabel;
 		$response['url'] = $imaxel_response['url'];
-
+		// TODO add current quantity to url as well
 		$user_id = get_current_user_id();
 		$this->insertProject($user_id, $project_id, $variant_id);
 
