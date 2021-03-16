@@ -33,6 +33,7 @@
                 cache: false,
                 dataType: 'json',
                 success: function (response) {
+                    console.log(response);
                     if (response.status === 'success') {
                         $('#max-upload-size').removeClass('ppi-hidden');
                         if (response.height != '') {
