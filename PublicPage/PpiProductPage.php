@@ -283,6 +283,7 @@ class PpiProductPage
 
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
 			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
 			$this->returnResponse($response);
 		}
@@ -337,6 +338,7 @@ class PpiProductPage
 		$imaxel_response = $this->getImaxelData($variant_id);
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
 			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
 		}
 		$project_id = $imaxel_response['project_id'];
@@ -456,9 +458,6 @@ class PpiProductPage
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
-		$response['template'] = $template_id;
-		$response['variant'] = $variant_code;
-
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
 
@@ -466,6 +465,7 @@ class PpiProductPage
 			$status = 'success';
 		} else {
 			$status = 'error';
+			$information = $create_project_response['body'];
 		}
 
 		$siteUrl = get_site_url();
@@ -476,6 +476,7 @@ class PpiProductPage
 		return array(
 			'status' => $status,
 			'project_id' => $project_id,
+			'information' => $information ?? '',
 			'url' => $editorUrl
 		);
 	}
