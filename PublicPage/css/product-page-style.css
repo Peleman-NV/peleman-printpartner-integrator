@@ -4,7 +4,7 @@
 }
 
 .ppi-add-to-cart-button {
-    text-transform: capitalize !important;
+    text-transform: none !important;
     font-weight: 700 !important;
     display: flex !important;
     align-items: center;
