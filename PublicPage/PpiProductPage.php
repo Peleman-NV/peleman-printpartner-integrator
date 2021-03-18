@@ -467,11 +467,11 @@ class PpiProductPage
 			$status = 'error';
 			$information = $create_project_response['body'];
 		}
-
 		$siteUrl = get_site_url();
+		$backUrl =  explode("?", get_permalink($variant_id), 2)[0];
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
-		$editorUrl = $imaxel->get_editor_url($project_id, $siteUrl, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id);
+		$editorUrl = $imaxel->get_editor_url($project_id, $backUrl, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id);
 
 		return array(
 			'status' => $status,
