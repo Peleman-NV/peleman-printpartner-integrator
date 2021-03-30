@@ -471,7 +471,9 @@ class PpiProductPage
 		$backUrl =  explode("?", get_permalink($variant_id), 2)[0];
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
-		$editorUrl = $imaxel->get_editor_url($project_id, $backUrl, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id);
+		$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
+
+		$editorUrl = $imaxel->get_editor_url($project_id, $backUrl, $lang, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id);
 
 		return array(
 			'status' => $status,

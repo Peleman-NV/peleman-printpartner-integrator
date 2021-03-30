@@ -114,7 +114,7 @@ class ImaxelService
      * @param string $projectId
      * @return string
      */
-    public function get_editor_url($project_id, $back_url, $add_to_cart_url)
+    public function get_editor_url($project_id, $back_url, $lang, $add_to_cart_url)
     {
         $context_array = array(
             'projectId' => strval($project_id),
@@ -130,6 +130,7 @@ class ImaxelService
             . '/editUrl?'
             . 'backURL=' . rawurlencode($context_array['backURL'])
             . '&addToCartURL=' . rawurlencode($context_array['addToCartURL'])
+            . '&lang=' . $lang
             . '&redirect=' . $context_array['redirect']
             . '&policy=' . rawurlencode($base_64_encoded_policy_json)
             . '&signedPolicy=' . rawurlencode($signed_policy);
