@@ -15,11 +15,52 @@
                 $('#variation-info').html('');
                 $('#variation-info').removeClass();
 
-                getImaxelUrl(data);
+                let language = getSiteLanguage();
+                let addToCartLabel = setAddToCartLabel(language);
+
+                getImaxelUrl(data, addToCartLabel);
             }
         });
 
-        function getImaxelUrl(data) {
+        function getSiteLanguage() {
+            const cookies = document.cookie;
+            const cookieArray = cookies.split(';');
+            for (const cookie of cookieArray) {
+                if (cookie.startsWith(' wp-wpml_current_language=')) {
+                    return cookie.slice(-2);
+                }
+            }
+            return 'en';
+        }
+
+        function setAddToCartLabel(language) {
+            let addToCartLabel = 'Add to cart';
+
+            switch (language) {
+                case 'en':
+                    addToCartLabel = 'Add to cart';
+                    break;
+                case 'nl':
+                    addToCartLabel = 'Voeg toe aan winkelmand';
+                    break;
+                case 'fr':
+                    addToCartLabel = 'Ajouter au panier';
+                    break;
+                case 'de':
+                    addToCartLabel = 'In den Warenkorb legen';
+                    break;
+                case 'it':
+                    addToCartLabel = 'Añadir a la cest';
+                    break;
+                case 'es':
+                    addToCartLabel = 'Aggiungi al carrello';
+                    break;
+            }
+
+            return addToCartLabel;
+        }
+
+        function getImaxelUrl(data, addToCartLabel) {
             $.ajax({
                 url: ppi_url_object.ajax_url,
                 method: 'POST',
@@ -32,7 +73,9 @@
                     if (response.status === 'success') {
                         if (response.showButton) {
                             $('.quantity').after(
-                                "<button type='submit' class='single_add_to_cart_button button alt'>Add To Cart</button>"
+                                "<button type='submit' class='single_add_to_cart_button button alt'>" +
+                                    addToCartLabel +
+                                    '</button>'
                             );
                         } else {
                             $('.quantity').after(

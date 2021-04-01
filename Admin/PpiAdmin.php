@@ -228,7 +228,7 @@ class PpiAdmin
 			'id' => 'custom_add_to_cart_label',
 			'placeholder' => 'eg: Design project',
 			'class' => 'short',
-			'label' => 'Custom Add to cart label',
+			'label' =>  __('Custom Add to cart label', 'woocommerce'),
 			'type' => 'text',
 			'desc_tip'    => true,
 			'description' => __('Define a custom Add to cart label', 'woocommerce'),
