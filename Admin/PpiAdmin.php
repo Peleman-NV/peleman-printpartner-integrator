@@ -85,7 +85,7 @@ class PpiAdmin
 	/**
 	 * Register plugin settings
 	 */
-	function ppi_register_plugin_settings()
+	public function ppi_register_plugin_settings()
 	{
 		register_setting('ppi_custom_settings', 'ppi-imaxel-private-key');
 		register_setting('ppi_custom_settings', 'ppi-imaxel-public-key');
@@ -183,7 +183,7 @@ class PpiAdmin
 	 * @param Int  $loop An interator to give each input field a unique name
 	 * @param Int  $variation_id Id for the current variation
 	 */
-	function ppi_persist_custom_field_variations($variation_id, $i)
+	public function ppi_persist_custom_field_variations($variation_id, $i)
 	{
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
@@ -203,7 +203,7 @@ class PpiAdmin
 	/**
 	 * Adds text inputs for the general product attributes
 	 */
-	function ppi_add_custom_fields_to_parent_products()
+	public function ppi_add_custom_fields_to_parent_products()
 	{
 		$product_id = (isset($_GET['post']) && $_GET['post'] != '') ? $_GET['post'] : '';
 		$customizable_product = get_post_meta($product_id, 'customizable_product', true);
@@ -239,7 +239,7 @@ class PpiAdmin
 	/**
 	 * Persists custom input fields on parent product
 	 */
-	function ppi_persist_custom_parent_attributes($post_id)
+	public function ppi_persist_custom_parent_attributes($post_id)
 	{
 		$custom_add_to_cart_label = $_POST['custom_add_to_cart_label'];
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
