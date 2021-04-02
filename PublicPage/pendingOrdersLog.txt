@@ -1,0 +1,115 @@
+C:\projects\wordpressTest\wp-content\plugins\peleman-printpartner-integrator\PublicPage\PpiProductPage.php: 558 Array
+(
+    [headers] => Requests_Utility_CaseInsensitiveDictionary Object
+        (
+            [data:protected] => Array
+                (
+                    [date] => Fri, 02 Apr 2021 14:30:13 GMT
+                    [content-type] => application/json; charset=utf-8
+                    [content-length] => 2
+                    [access-control-allow-origin] => *
+                    [access-control-allow-headers] => Origin, X-Requested-With, Content-Type, Accept
+                    [etag] => W/"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w"
+                    [vary] => Accept-Encoding
+                )
+
+        )
+
+    [body] => []
+    [response] => Array
+        (
+            [code] => 200
+            [message] => OK
+        )
+
+    [cookies] => Array
+        (
+        )
+
+    [filename] => 
+    [http_response] => WP_HTTP_Requests_Response Object
+        (
+            [response:protected] => Requests_Response Object
+                (
+                    [body] => []
+                    [raw] => HTTP/1.1 200 OK
+Date: Fri, 02 Apr 2021 14:30:13 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 2
+Connection: close
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+ETag: W/"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w"
+Vary: Accept-Encoding
+
+[]
+                    [headers] => Requests_Response_Headers Object
+                        (
+                            [data:protected] => Array
+                                (
+                                    [date] => Array
+                                        (
+                                            [0] => Fri, 02 Apr 2021 14:30:13 GMT
+                                        )
+
+                                    [content-type] => Array
+                                        (
+                                            [0] => application/json; charset=utf-8
+                                        )
+
+                                    [content-length] => Array
+                                        (
+                                            [0] => 2
+                                        )
+
+                                    [access-control-allow-origin] => Array
+                                        (
+                                            [0] => *
+                                        )
+
+                                    [access-control-allow-headers] => Array
+                                        (
+                                            [0] => Origin, X-Requested-With, Content-Type, Accept
+                                        )
+
+                                    [etag] => Array
+                                        (
+                                            [0] => W/"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w"
+                                        )
+
+                                    [vary] => Array
+                                        (
+                                            [0] => Accept-Encoding
+                                        )
+
+                                )
+
+                        )
+
+                    [status_code] => 200
+                    [protocol_version] => 1.1
+                    [success] => 1
+                    [redirects] => 0
+                    [url] => https://services.imaxel.com/api/v3/receivedorders/pending?policy=eyJwdWJsaWNLZXkiOiJwbVhOekZMUjhoTkc5aEY1MkFmWnhmIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIxLTA0LTAyVDE0OjQwOjEyKzAwOjAwIn0%3D&signedPolicy=t8Mk9rvdE11OOphUVD9wC5kVSznUcAwmyejt79Dgz6M%3D
+                    [history] => Array
+                        (
+                        )
+
+                    [cookies] => Requests_Cookie_Jar Object
+                        (
+                            [cookies:protected] => Array
+                                (
+                                )
+
+                        )
+
+                )
+
+            [filename:protected] => 
+            [data] => 
+            [headers] => 
+            [status] => 
+        )
+
+)
+
