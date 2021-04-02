@@ -140,6 +140,22 @@ class ImaxelService
     }
 
     /**
+     * Get all pending orders
+     * 
+     * @return string
+     */
+    public function get_pending_orders()
+    {
+        $url = $this->base_imaxel_api_url . 'receivedorders/pending';
+
+        $base_64_encoded_policy_json = $this->generate_base64_encoded_policy();
+        $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
+        $url .= "?policy=" . rawurlencode($base_64_encoded_policy_json) . "&signedPolicy=" . rawurlencode($signed_policy);
+
+        return $this->get_response($url, 'GET');
+    }
+
+    /**
      * Returns editor URL for specified project
      * 
      * @param string $projectId
