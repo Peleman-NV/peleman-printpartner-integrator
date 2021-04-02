@@ -55,6 +55,12 @@ class PpiActivator
 			mkdir($uploadDirectory, 0777, true);
 		}
 
+		$imaxelFilesDirectory = ABSPATH . 'wp-content/uploads/ppi/imaxelfiles';
+
+		if (!is_dir($imaxelFilesDirectory)) {
+			mkdir($imaxelFilesDirectory, 0777, true);
+		}
+
 		$thumbnailDirectory = ABSPATH . 'wp-content/uploads/ppi/thumbnails';
 
 		if (!is_dir($thumbnailDirectory)) {

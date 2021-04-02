@@ -40,6 +40,7 @@ if (!in_array('woocommerce/woocommerce.php', $active_plugins)) {
 define('PELEMAN_PRINTPARTNER_INTEGRATOR_VERSION', '1.0.0');
 !defined('PPI_USER_PROJECTS_TABLE') ? define('PPI_USER_PROJECTS_TABLE', $wpdb->prefix . 'ppi_user_projects') : "";
 !defined('PPI_UPLOAD_DIR') ? define('PPI_UPLOAD_DIR', ABSPATH . 'wp-content/uploads/ppi/content') : "";
+!defined('PPI_IMAXEL_FILES_DIR') ? define('PPI_IMAXEL_FILES_DIR', ABSPATH . 'wp-content/uploads/ppi/imaxelfiles') : "";
 !defined('PPI_THUMBNAIL_DIR') ? define('PPI_THUMBNAIL_DIR', ABSPATH . 'wp-content/uploads/ppi/thumbnails') : "";
 !defined('PPI_LOG_DIR') ? define('PPI_LOG_DIR', ABSPATH . 'wp-content/uploads/ppi/logs') : "";
 /**
