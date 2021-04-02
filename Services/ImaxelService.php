@@ -93,7 +93,6 @@ class ImaxelService
     public function create_project($template_id, $variant_code)
     {
         $url = $this->base_imaxel_api_url . 'projects';
-        $template_id = $template_id;
         $context_array = array('productCode' => $template_id, 'variantsCodes' => array($variant_code), 'defaultVariantCode' => $variant_code);
         $base_64_encoded_policy_json = $this->generate_base64_encoded_policy($context_array);
         $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
@@ -104,6 +103,38 @@ class ImaxelService
             "policy" => $base_64_encoded_policy_json,
             "signedPolicy" => $signed_policy
         ), JSON_UNESCAPED_SLASHES);
+
+        return $this->get_response($url, 'POST', $create_project_json);
+    }
+
+    /**
+     * Create imaxel order
+     * 
+     * @param array $project_id
+     * @return string
+     */
+    public function create_order($project_id, $order_id)
+    {
+        $url = $this->base_imaxel_api_url . 'orders';
+
+        $context_array = array(
+            'jobs' => array(
+                array(
+                    'project' => array(
+                        'id' => $project_id
+                    ),
+                    'units' => 1,
+                    'allowDownload' => true
+                ),
+            ),
+            'notes' => 'WC order ID: ' . $order_id
+        );
+        $base_64_encoded_policy_json = $this->generate_base64_encoded_policy($context_array);
+        $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
+        $create_project_json = json_encode(array_merge($context_array, array(
+            "policy" => $base_64_encoded_policy_json,
+            "signedPolicy" => $signed_policy
+        )), JSON_UNESCAPED_SLASHES);
 
         return $this->get_response($url, 'POST', $create_project_json);
     }

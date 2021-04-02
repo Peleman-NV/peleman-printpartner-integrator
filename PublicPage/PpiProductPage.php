@@ -533,4 +533,28 @@ class PpiProductPage
 			$item->add_meta_data('ppi_imaxel_project_id', $values['ppi_imaxel_project_id'], true);
 		}
 	}
+
+	/**
+	 * Get imaxel project files
+	 */
+	public function createImaxelOrder($orderId, $currentStatus, $newStatus, $order)
+	{
+		if ($newStatus !== 'processing') return;
+		$wc_order = wc_get_order($orderId);
+		$orderItems = $wc_order->get_items();
+		if (empty($orderItems)) return;
+
+		foreach ($orderItems as $orderItemId => $orderItem) {
+			$imaxelProjectId = wc_get_order_item_meta($orderItemId, 'ppi_imaxel_project_id');
+			if (empty($imaxelProjectId)) continue;
+
+			$imaxel = new ImaxelService();
+			$imaxelResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
+
+			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($imaxelResponse, true) . PHP_EOL, 3, __DIR__ . '/Log.txt');
+			error_log(PHP_EOL, 3, __DIR__ . '/Log.txt');
+		}
+
+		// TODO make cronjob or something similar that get pending orders and downloads those!!
+	}
 }
