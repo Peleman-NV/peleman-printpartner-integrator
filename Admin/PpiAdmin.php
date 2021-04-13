@@ -174,6 +174,17 @@ class PpiAdmin
 			'value' => $pdf_upload_required == 'yes' ? get_post_meta($variationId, 'pdf_max_pages', true) : "",
 			'custom_attributes' => $pdf_fields_readonly,
 		));
+
+		woocommerce_wp_text_input(array(
+			'id' => 'pdf_price_per_page[' . $loop . ']',
+			'class' => 'short',
+			'label' => 'Price per page',
+			'type' => 'number',
+			'desc_tip'    => true,
+			'description' => __('Price per page', 'woocommerce'),
+			'value' => $pdf_upload_required == 'yes' ? get_post_meta($variationId, 'pdf_price_per_page', true) : "",
+			'custom_attributes' => $pdf_fields_readonly,
+		));
 		echo '</div>';
 	}
 
@@ -191,6 +202,7 @@ class PpiAdmin
 		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
 		$pdf_min_pages = $_POST['pdf_min_pages'][$i];
 		$pdf_max_pages = $_POST['pdf_max_pages'][$i];
+		$pdf_price_per_page = $_POST['pdf_price_per_page'][$i];
 
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
@@ -198,6 +210,7 @@ class PpiAdmin
 		if (isset($pdf_height_mm)) update_post_meta($variation_id, 'pdf_height_mm', esc_attr($pdf_height_mm));
 		if (isset($pdf_min_pages)) update_post_meta($variation_id, 'pdf_min_pages', esc_attr($pdf_min_pages));
 		if (isset($pdf_max_pages)) update_post_meta($variation_id, 'pdf_max_pages', esc_attr($pdf_max_pages));
+		if (isset($pdf_price_per_page)) update_post_meta($variation_id, 'pdf_price_per_page', esc_attr($pdf_price_per_page));
 	}
 
 	/**
