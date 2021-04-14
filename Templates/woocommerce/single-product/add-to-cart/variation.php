@@ -2,20 +2,16 @@
 
 defined('ABSPATH') || exit;
 global $product;
+
 ?>
 <script type="text/template" id="tmpl-variation-template">
 	<div class="woocommerce-variation-description">{{{ data.variation.variation_description }}}</div>
 	<div class="woocommerce-variation-price">{{{ data.variation.price_html }}}</div>
 	<div class="woocommerce-variation-availability">{{{ data.variation.availability_html }}}</div>
-	<?php
-	if ($product != null) {
-		$parent_wc_product = wc_get_product($product->get_id());
-		if ($parent_wc_product->is_type('variable')) {
-			if ($parent_wc_product->get_meta('pdf_upload_required') == "yes") do_action('ppi_file_upload_params_div');
-			do_action('ppi_variant_info_div');
-		}
-	}
-	?>
+<?php
+do_action('ppi_file_upload_params_div');
+do_action('ppi_variant_info_div');
+?>
 </script>
 <script type="text/template" id="tmpl-unavailable-variation-template">
 	<p><?php esc_html_e('Sorry, this product is unavailable. Please choose a different combination.', 'woocommerce'); ?></p>
