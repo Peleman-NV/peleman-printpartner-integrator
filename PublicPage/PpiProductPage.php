@@ -160,7 +160,7 @@ class PpiProductPage
 	public function ppi_output_form($variant)
 	{
 		$uploadDiv = "
-        <div class='ppi-upload-form'>
+        <div class='ppi-upload-form ppi-hidden'>
             <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
         </div>

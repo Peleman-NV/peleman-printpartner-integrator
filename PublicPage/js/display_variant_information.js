@@ -8,7 +8,7 @@
             $('.ppi-upload-parameters').addClass('ppi-hidden');
             getVariantDetails(variationId);
             $('.upload-parameters').removeClass('ppi-hidden');
-
+            $('.ppi-upload-form').addClass('ppi-hidden');
             if ($('.ppi-upload-form')[0] !== undefined) {
                 $('.single_add_to_cart_button').addClass('ppi-disabled');
             }
@@ -35,6 +35,7 @@
                 success: function (response) {
                     console.log(response);
                     if (response.status === 'success') {
+                        $('.ppi-upload-form').removeClass('ppi-hidden');
                         $('#max-upload-size').removeClass('ppi-hidden');
                         if (response.height != '') {
                             $('#content-height').html(response.height + 'mm');

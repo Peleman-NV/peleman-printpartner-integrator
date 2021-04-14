@@ -8,14 +8,9 @@ global $product;
 <div class="woocommerce-variation-add-to-cart variations_button">
 
 	<?php
-	//TO DO: move pdf required to general tab - it's a quality of the
-	$parent_wc_product = wc_get_product($product->get_id());
-	if ($parent_wc_product->is_type('variable')) {
-		if ($parent_wc_product->get_meta('pdf_upload_required') == "yes") {
-			do_action('ppi_file_upload_output_form');
-			do_action('ppi_upload_information_div');
-		}
-	}
+	$wc_product = wc_get_product($product->get_id());
+	do_action('ppi_file_upload_output_form');
+	do_action('ppi_upload_information_div');
 
 	do_action('woocommerce_before_add_to_cart_button');
 	do_action('woocommerce_before_add_to_cart_quantity');
@@ -28,7 +23,7 @@ global $product;
 	);
 	do_action('woocommerce_after_add_to_cart_quantity');
 
-	if ($parent_wc_product->get_meta('customizable_product') == 'yes') { // and templateID present
+	if ($wc_product->get_meta('customizable_product') == 'yes') { // and templateID present
 		echo '<a class="ppi-add-to-cart-button single_add_to_cart_button button alt"><span id="ppi-loading" class="ppi-hidden dashicons dashicons-update rotate"></span>' .  esc_html($product->single_add_to_cart_text()) . '</a>';
 	} else {
 		echo '<button type="submit" class="single_add_to_cart_button button alt">' . esc_html($product->single_add_to_cart_text()) . '</button>';
