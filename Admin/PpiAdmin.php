@@ -64,6 +64,7 @@ class PpiAdmin
 	 */
 	public function enqueue_scripts()
 	{
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/admin-ui.js', array('jquery'), $this->version, true);
 	}
 
 	/**
@@ -128,8 +129,17 @@ class PpiAdmin
 			'value' => get_post_meta($variationId, 'variant_code', true)
 		));
 
-		$pdf_upload_required = get_post_meta($parentId, 'pdf_upload_required', true);
+		$pdf_upload_required = get_post_meta($variationId, 'pdf_upload_required', true);
+		//$pdf_upload_required = get_post_meta($parentId, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
+
+		woocommerce_wp_checkbox(array(
+			'id' => 'pdf_upload_required[' . $loop . ']',
+			'label'       => __('PDF content required?', 'woocommerce'),
+			'description' => __('Check to require a PDF upload', 'woocommerce'),
+			'desc_tip'    => true,
+			'value' => $pdf_upload_required,
+		));
 
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_width_mm[' . $loop . ']',
@@ -198,6 +208,7 @@ class PpiAdmin
 	{
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
+		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
 		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
 		$pdf_min_pages = $_POST['pdf_min_pages'][$i];
@@ -206,6 +217,7 @@ class PpiAdmin
 
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
+		if (isset($pdf_upload_required)) update_post_meta($variation_id, 'pdf_upload_required', $pdf_upload_required);
 		if (isset($pdf_width_mm)) update_post_meta($variation_id, 'pdf_width_mm', esc_attr($pdf_width_mm));
 		if (isset($pdf_height_mm)) update_post_meta($variation_id, 'pdf_height_mm', esc_attr($pdf_height_mm));
 		if (isset($pdf_min_pages)) update_post_meta($variation_id, 'pdf_min_pages', esc_attr($pdf_min_pages));
@@ -229,14 +241,6 @@ class PpiAdmin
 			'value' => $customizable_product,
 		));
 
-		woocommerce_wp_checkbox(array(
-			'id' => 'pdf_upload_required',
-			'label'       => __('PDF content required?', 'woocommerce'),
-			'description' => __('Check to require a PDF upload - save before editing variations', 'woocommerce'),
-			'desc_tip'    => true,
-			'value' => get_post_meta($product_id, 'pdf_upload_required', true)
-		));
-
 		woocommerce_wp_text_input(array(
 			'id' => 'custom_add_to_cart_label',
 			'placeholder' => 'eg: Design project',
@@ -255,11 +259,9 @@ class PpiAdmin
 	public function ppi_persist_custom_parent_attributes($post_id)
 	{
 		$custom_add_to_cart_label = $_POST['custom_add_to_cart_label'];
-		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 		$customizable_product = isset($_POST['customizable_product']) ? 'yes' : 'no';
 
 		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
-		if (isset($pdf_upload_required)) update_post_meta($post_id, 'pdf_upload_required', $pdf_upload_required);
 		if (isset($customizable_product)) update_post_meta($post_id, 'customizable_product', $customizable_product);
 	}
 }
