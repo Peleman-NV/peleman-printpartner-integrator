@@ -211,6 +211,7 @@ class PpiProductPage
 
 		$this->returnResponse($response);
 	}
+
 	/**
 	 * Override the Woocommerce templates with the plugin templates
 	 *
