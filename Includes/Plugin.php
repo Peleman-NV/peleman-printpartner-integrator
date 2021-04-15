@@ -122,7 +122,8 @@ class Plugin
 		$product_page = new PpiProductPage($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_styles');
-		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts');
+		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts', 6);
+		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
 
 		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
 		$this->loader->add_action('ppi_file_upload_params_div', $product_page, 'ppi_output_file_params', 7, 1);
@@ -130,7 +131,9 @@ class Plugin
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
 
-		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
+		$this->loader->add_action('wp_ajax_get_product_variation_data', $product_page, 'get_product_variation_data');
+		$this->loader->add_action('wp_ajax_nopriv_get_product_variation_data', $product_page, 'get_product_variation_data');
+
 		$this->loader->add_action('wp_ajax_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_nopriv_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_display_variant_info', $product_page, 'display_variant_info');

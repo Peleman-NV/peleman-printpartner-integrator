@@ -1,6 +1,10 @@
 (function ($) {
     'use strict';
     $(function () {
+        /**
+         * On showing a variation:
+         *      empty the upload result block
+         */
         $('.variations_form').on('show_variation', e => {
             $('#upload-info').html('');
         });
@@ -23,13 +27,13 @@
             formData.append('action', 'upload_content_file');
             formData.append('file', file);
             formData.append('variant_id', variationId);
-            formData.append('_ajax_nonce', ppi_content_upload_object.nonce);
+            formData.append('_ajax_nonce', ppi_upload_content_object.nonce);
 
             $('#file-upload').submit();
             e.preventDefault();
 
             $.ajax({
-                url: ppi_content_upload_object.ajax_url,
+                url: ppi_upload_content_object.ajax_url,
                 method: 'POST',
                 data: formData,
                 processData: false,

@@ -64,7 +64,7 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
-		//	wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/product-page.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'));
 	}
 
 	/**
@@ -72,31 +72,24 @@ class PpiProductPage
 	 */
 	public function enqueue_ajax()
 	{
-		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/content-upload.js', __FILE__), array('jquery'));
+		// definite ajax call
+		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'));
+		wp_localize_script(
+			'ppi-variation-information',
+			'ppi_product_variation_information_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('ppi_variation_data')
+			)
+		);
+
+		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'));
 		wp_localize_script(
 			'ppi-ajax-upload',
-			'ppi_content_upload_object',
+			'ppi_upload_content_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
 				'nonce' => wp_create_nonce('file_upload_nonce')
-			)
-		);
-		wp_enqueue_script('ppi-variant-info', plugins_url('js/display_variant_information.js', __FILE__), array('jquery'));
-		wp_localize_script(
-			'ppi-variant-info',
-			'ppi_variant_information_object',
-			array(
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('variant_info_nonce')
-			)
-		);
-		wp_enqueue_script('ppi-imaxel-url', plugins_url('js/no-content-upload.js', __FILE__), array('jquery'));
-		wp_localize_script(
-			'ppi-imaxel-url',
-			'ppi_url_object',
-			array(
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('imaxel_url_nonce')
 			)
 		);
 	}
@@ -149,6 +142,13 @@ class PpiProductPage
 						<div class='param-value' id='content-max-pages'>
 						</div>
 					</div>
+					<div class='param-line ppi-hidden'>
+						<div class='param-name'>
+							Price per page
+						</div>
+						<div class='param-value' id='content-price-per-page'>
+						</div>
+					</div>
 				</div>
 			</div>";
 		echo $paramsDiv;
@@ -188,26 +188,32 @@ class PpiProductPage
 			'width' => get_post_meta($variant_id, 'pdf_width_mm', true),
 			'height' => get_post_meta($variant_id, 'pdf_height_mm', true),
 			'min_pages' => get_post_meta($variant_id, 'pdf_min_pages', true),
-			'max_pages' => get_post_meta($variant_id, 'pdf_max_pages', true)
+			'max_pages' => get_post_meta($variant_id, 'pdf_max_pages', true),
+			'price_per_page' => get_post_meta($variant_id, 'price_per_page', true)
 		);
 	}
 
-	/**
-	 * Returns content parameters for a chosen variant to frontend
-	 */
-	public function display_variant_info()
+	public function get_product_variation_data()
 	{
-		check_ajax_referer('variant_info_nonce', '_ajax_nonce');
+		check_ajax_referer('ppi_variation_data', '_ajax_nonce');
 
 		$variant_id = $_GET['variant'];
-		$wc_product = wc_get_product($variant_id);
-		// not a customizable product
-		if ($wc_product->get_meta('customizable_product') != 'yes') {
-			$response['status'] = 'success';
-		}
+		$product_variant = wc_get_product($variant_id);
+		$parent_product = wc_get_product($product_variant->get_parent_id());
 
 		$response =	$this->getVariantContentParameters($variant_id);
 		$response['status'] = "success";
+		$response['variant'] = $variant_id;
+		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
+		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
+
+		// isCustomizable is redundant - the presence of a template_id would be enough
+		if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
+			$response['customButton'] = false;
+		} else {
+			$response['customButton'] = true;
+			$response['imaxelData'] = $this->get_imaxel_url($variant_id);
+		}
 
 		$this->returnResponse($response);
 	}
@@ -263,23 +269,8 @@ class PpiProductPage
 		return __("Design product", 'woocommerce');
 	}
 
-	public function get_imaxel_url()
+	public function get_imaxel_url($variant_id)
 	{
-		check_ajax_referer('imaxel_url_nonce', '_ajax_nonce');
-
-		$variant_id = $_POST['variant_id'];
-		$response['variant'] = $variant_id;
-		$wc_product = wc_get_product($variant_id);
-
-		$parent_product = wc_get_product($wc_product->get_parent_id());
-		// parent product is not customizable or has no Imaxel template ID
-		$isCustomizable = $parent_product->get_meta('customizable_product');
-		if ($isCustomizable != 'yes' || $wc_product->get_meta('template_id') == '') {
-			$response['status'] = 'success';
-			$response['showButton'] = true;
-			$this->returnResponse($response);
-		}
-
 		$imaxel_response = $this->getImaxelData($variant_id);
 
 		if ($imaxel_response['status'] == "error") {
@@ -290,7 +281,20 @@ class PpiProductPage
 		}
 
 		$project_id = $imaxel_response['project_id'];
-		$response['isImaxelProduct'] = true;
+		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
+		$response['url'] = $imaxel_response['url'];
+
+		$user_id = get_current_user_id();
+		$this->insertProject($user_id, $project_id, $variant_id);
+
+		$response['status'] = 'success';
+		return $response;
+	}
+
+	public function get_add_to_cart_label($variant_id)
+	{
+		$wc_product = wc_get_product($variant_id);
+		$parent_product = wc_get_product($wc_product->get_parent_id());
 		if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
 			$addToCartLabel = $parent_product->get_meta('custom_add_to_cart_label');
 		} else if (get_option('ppi-custom-add-to-cart-label') != '') {
@@ -298,14 +302,7 @@ class PpiProductPage
 		} else {
 			$addToCartLabel = "Design Product";
 		}
-		$response['buttonText'] = $addToCartLabel;
-		$response['url'] = $imaxel_response['url'];
-		// TODO add current quantity to url as well
-		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id);
-
-		$response['status'] = 'success';
-		$this->returnResponse($response);
+		return $addToCartLabel;
 	}
 
 	public function upload_content_file()
@@ -455,7 +452,7 @@ class PpiProductPage
 	 */
 	private function getImaxelData($variant_id)
 	{
-		$variant_id = $_POST['variant_id'];
+		$variant_id = $_POST['variant_id'] ?? $variant_id;
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
