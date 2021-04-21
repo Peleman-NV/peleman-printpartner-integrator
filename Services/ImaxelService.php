@@ -17,7 +17,7 @@ class ImaxelService
     {
         $this->private_key = get_option('ppi-imaxel-private-key');
         $this->public_key = get_option('ppi-imaxel-public-key');
-        $this->shop_code =  get_option('ppi-imaxel-shop_code');
+        $this->shop_code =  get_option('ppi-imaxel-shop-code');
     }
 
     /**
