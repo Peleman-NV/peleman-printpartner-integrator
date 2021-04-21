@@ -108,6 +108,8 @@ class Plugin
 		$this->loader->add_action('woocommerce_process_product_meta', $plugin_admin, 'ppi_persist_custom_parent_attributes', 11, 3);
 		$this->loader->add_action('woocommerce_product_after_variable_attributes', $plugin_admin, 'ppi_add_custom_fields_to_variable_products', 11, 3);
 		$this->loader->add_action('woocommerce_save_product_variation', $plugin_admin, 'ppi_persist_custom_field_variations', 11, 2);
+
+		$this->loader->add_action('rest_api_init', $plugin_admin, 'registerCheckPendingOrdersEndpoint');
 	}
 
 	/**

@@ -2,6 +2,9 @@
 
 namespace PelemanPrintpartnerIntegrator\Admin;
 
+use PelemanPrintpartnerIntegrator\Services\ImaxelService;
+use DateTime;
+
 /**
  * The admin-specific functionality of the plugin.
  * 
@@ -21,7 +24,7 @@ namespace PelemanPrintpartnerIntegrator\Admin;
  */
 class PpiAdmin
 {
-
+	private $logFile = PPI_LOG_DIR . '/imaxelFileDownloader.txt';
 	/**
 	 * The ID of this plugin.
 	 *
@@ -264,5 +267,108 @@ class PpiAdmin
 
 		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
 		if (isset($customizable_product)) update_post_meta($post_id, 'customizable_product', $customizable_product);
+	}
+
+	/**	
+	 * Register check pending orders endpoint
+	 */
+	public function registerCheckPendingOrdersEndpoint()
+	{
+		register_rest_route('ppi/v1', '/pendingorders', array(
+			'methods' => 'GET',
+			'callback' => array($this, 'checkPendingOrders'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
+	public function checkPendingOrders()
+	{
+
+		$imaxel = new ImaxelService();
+		$response = $imaxel->get_pending_orders();
+		$pendingOrders = json_decode($response['body']);
+		//wp_send_json($pendingOrders);
+		if (count($pendingOrders) === 0) {
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': No pending orders' . PHP_EOL, 3,  $this->logFile);
+			wp_send_json(array('response' => 'No pending orders'), 200);
+		}
+
+		$response = [];
+		$orders = [];
+		foreach ($pendingOrders as $order) {
+			$orderId = $order->id;
+			$projectId = $order->jobs[0]->project->id;
+			$product = $order->jobs[0]->product->variants[0]->name->default;
+			$wooCommerceOrderId = str_replace('WC order ID: ', '', $order->notes);
+			// extract file URLs from files key
+			$filesCollection = array_map(function ($files) {
+				return $files->url;
+			}, $order->files);
+
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': downloading ' . count($filesCollection) . ' files for order ' . $wooCommerceOrderId . PHP_EOL, 3,  $this->logFile);
+
+			$this->downloadFiles($filesCollection, $wooCommerceOrderId);
+			$orders[] = [
+				'Product' => $product,
+				'Project ID' => $projectId,
+				'Imaxel order ID' => $orderId,
+				'WooCommerce order ID' => $wooCommerceOrderId,
+				'files' => count($filesCollection)
+			];
+
+			$imaxel->mark_order_as_downloaded($orderId);
+
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': marked WC order ' . $wooCommerceOrderId . ' (Imaxel order: ' . $orderId . ') as downloaded.' . PHP_EOL, 3,  $this->logFile);
+		}
+
+		$response['result'] = 'Processed ' . count($pendingOrders) . ' orders';
+		$response['orderData'] = $orders;
+		wp_send_json($response, 200);
+	}
+
+	private function downloadFiles($files, $orderId)
+	{
+		$downloadFolder = PPI_IMAXEL_FILES_DIR . "/{$orderId}";
+		$this->createOrderFolder($downloadFolder);
+
+		$fileName = 0;
+		foreach ($files as $file) {
+			$ext = substr($file, strrpos($file, '.'));
+			$fileName = str_pad($fileName, 5, '0', STR_PAD_LEFT);
+			$fullPath = "{$downloadFolder}/{$fileName}{$ext}";
+			file_put_contents($fullPath, file_get_contents($file));
+
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': downloaded file ' . $file . PHP_EOL, 3,  $this->logFile);
+
+			$fileName++;
+		}
+	}
+
+	private function createOrderFolder($downloadFolder)
+	{
+		// if folder exist, clear all files, else create folder
+		if (file_exists($downloadFolder)) {
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': folder exists' . PHP_EOL, 3,  $this->logFile);
+			$files = glob($downloadFolder . '\*');
+
+			if (!empty($files)) {
+				$now =  new DateTime('NOW');
+				error_log($now->format('c') . ': deleted files' . PHP_EOL, 3,  $this->logFile);
+				foreach ($files as $file) {
+					if (is_file($file)) {
+						unlink($file);
+					}
+				}
+			}
+		} else {
+			mkdir($downloadFolder, 0777);
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': created folder' . PHP_EOL, 3,  $this->logFile);
+		}
 	}
 }

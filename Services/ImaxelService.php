@@ -161,6 +161,28 @@ class ImaxelService
     }
 
     /**
+     * Marks order as downloaded
+     */
+    public function mark_order_as_downloaded($orderId)
+    {
+        $url = $this->base_imaxel_api_url . 'receivedorders/downloaded';
+
+        $context_array = array(
+            'orderId' => $orderId
+        );
+
+        $base_64_encoded_policy_json = $this->generate_base64_encoded_policy($context_array);
+        $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
+
+        $mark_order_as_downloaded_json = json_encode(array_merge($context_array, array(
+            "policy" => $base_64_encoded_policy_json,
+            "signedPolicy" => $signed_policy
+        )), JSON_UNESCAPED_SLASHES);
+
+        return $this->get_response($url, 'POST', $mark_order_as_downloaded_json);
+    }
+
+    /**
      * Returns editor URL for specified project
      * 
      * @param string $projectId
