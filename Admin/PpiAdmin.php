@@ -90,6 +90,7 @@ class PpiAdmin
 	{
 		register_setting('ppi_custom_settings', 'ppi-imaxel-private-key');
 		register_setting('ppi_custom_settings', 'ppi-imaxel-public-key');
+		register_setting('ppi_custom_settings', 'ppi-imaxel-shop-code');
 	}
 
 	/**

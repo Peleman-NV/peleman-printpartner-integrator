@@ -17,7 +17,7 @@
     </ul>
     <form method="POST" action="options.php">
         <hr>
-        <h2>Enter your Imaxel keys here</h2>
+        <h2>Imaxel configuration</h2>
         <?php
         settings_fields('ppi_custom_settings');
         do_settings_sections('ppi_custom_settings');
@@ -36,6 +36,14 @@
             </div>
             <div class="grid-large-column">
                 <input type="text" id="ppi-imaxel-public-key" name="ppi-imaxel-public-key" value="<?= get_option('ppi-imaxel-public-key'); ?>" placeholder="Imaxel public key">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="ppi-imaxel-shop-code">Imaxel shop code</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="text" id="ppi-imaxel-shop-code" name="ppi-imaxel-shop-code" value="<?= get_option('ppi-imaxel-shop-code'); ?>" placeholder="Imaxel Shop code">
             </div>
         </div>
         <hr>
