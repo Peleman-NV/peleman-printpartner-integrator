@@ -9,13 +9,15 @@ class ImaxelService
 {
     private $private_key;
     private $public_key;
+    private $shop_code;
     private $base_imaxel_api_url = "https://services.imaxel.com:443/api/v3/";
 
 
     public function __construct()
     {
-        $this->private_key =  get_option('ppi-imaxel-private-key');
-        $this->public_key =  get_option('ppi-imaxel-public-key');
+        $this->private_key = get_option('ppi-imaxel-private-key');
+        $this->public_key = get_option('ppi-imaxel-public-key');
+        $this->shop_code =  get_option('ppi-imaxel-shop_code');
     }
 
     /**
@@ -126,6 +128,9 @@ class ImaxelService
                     'units' => 1,
                     'allowDownload' => true
                 ),
+            ),
+            'checkout' => array(
+                'shop' => array('code' => $this->shop_code)
             ),
             'notes' => 'WC order ID: ' . $order_id
         );
