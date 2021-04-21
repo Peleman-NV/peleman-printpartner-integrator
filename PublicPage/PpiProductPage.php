@@ -542,19 +542,17 @@ class PpiProductPage
 		$orderItems = $wc_order->get_items();
 		if (empty($orderItems)) return;
 
+		// loop over orderlines
 		foreach ($orderItems as $orderItemId => $orderItem) {
 			$imaxelProjectId = wc_get_order_item_meta($orderItemId, 'ppi_imaxel_project_id');
 			if (empty($imaxelProjectId)) continue;
 
 			$imaxel = new ImaxelService();
-			$imaxelResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($imaxelResponse, true) . PHP_EOL, 3, __DIR__ . '/currentOrderLog.txt');
+			$imaxelResponse = $imaxel->create_order($imaxelProjectId, $orderId);
 		}
 
 		$imaxel = new ImaxelService();
 		$pendingOrders = $imaxel->get_pending_orders();
-		error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($pendingOrders, true) . PHP_EOL, 3, __DIR__ . '/pendingOrdersLog.txt');
-		error_log(PHP_EOL, 3, __DIR__ . '/Log.txt');
-		// TODO make cronjob or something similar that get pending orders and downloads those!!
+		error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($pendingOrders['body'], true) . PHP_EOL, 3, __DIR__ . '/pendingOrdersLog.txt');
 	}
 }
