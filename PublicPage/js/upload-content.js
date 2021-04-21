@@ -1,17 +1,9 @@
 (function ($) {
     'use strict';
     $(function () {
-        /**
-         * On showing a variation:
-         *      empty the upload result block
-         */
-        $('.variations_form').on('show_variation', e => {
-            $('#upload-info').html('');
-        });
-
+        // Event: when the file input change, ie: when a new file is selected
         $('#file-upload').on('change', e => {
             const timeStart = performance.now();
-
             const variationId = $("[name='variation_id']").val();
             $('.single_add_to_cart_button').addClass('ppi-disabled');
             $('#upload-info').html('');

@@ -40,7 +40,10 @@
                             // regular button
                             enableAddToCartBtn(response, addToCartLabel);
                             // if variation requires an upload
-                        } else if (response.requiresPDFUpload === 'no') {
+                        } else if (
+                            response.requiresPDFUpload === 'no' ||
+                            response.requiresPDFUpload === ''
+                        ) {
                             // regular button
                             enableAddToCartBtn(
                                 response,
