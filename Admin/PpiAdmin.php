@@ -366,9 +366,13 @@ class PpiAdmin
 				}
 			}
 		} else {
-			mkdir($downloadFolder, 0777);
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': created folder' . PHP_EOL, 3,  $this->logFile);
+			if (mkdir($downloadFolder, 0777)) {
+				$now =  new DateTime('NOW');
+				error_log($now->format('c') . ': created folder' . PHP_EOL, 3,  $this->logFile);
+			} else {
+				$now =  new DateTime('NOW');
+				error_log($now->format('c') . ': folder not created' . PHP_EOL, 3,  $this->logFile);
+			}
 		}
 	}
 }
