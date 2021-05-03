@@ -454,7 +454,6 @@ class PpiAdmin
 
 	public function diplayImaxelProjectFilesLink($value, $meta, $item)
 	{
-		echo wp_get_upload_dir();
 		$currentPage = basename(get_permalink());
 		$orderId = $item->get_order_id();
 		$projectId = $item->get_meta('_ppi_imaxel_project_id');

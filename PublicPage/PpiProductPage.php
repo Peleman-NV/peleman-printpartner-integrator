@@ -432,7 +432,7 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithExtension);
+		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithExtension, $pages);
 
 		$this->returnResponse($response);
 	}
@@ -488,12 +488,12 @@ class PpiProductPage
 	 * @param Int $project_id
 	 * @param Int $product_id
 	 */
-	private function insertProject($user_id, $project_id, $product_id, $content_filename = NULL)
+	private function insertProject($user_id, $project_id, $product_id, $content_filename = NULL, $pages = NULL)
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
 		if ($content_filename != null) {
-			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename);
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages);
 		} else {
 			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
 		}
@@ -548,13 +548,34 @@ class PpiProductPage
 
 			$imaxel = new ImaxelService();
 			$imaxelResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
-			error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($imaxelResponse, true) . PHP_EOL, 3, __DIR__ . '/currentOrderLog.txt');
 		}
 
 		$imaxel = new ImaxelService();
 		$pendingOrders = $imaxel->get_pending_orders();
-		error_log(__FILE__ . ': ' . __LINE__ . ' ' . print_r($pendingOrders, true) . PHP_EOL, 3, __DIR__ . '/pendingOrdersLog.txt');
-		error_log(PHP_EOL, 3, __DIR__ . '/Log.txt');
-		// TODO make cronjob or something similar that get pending orders and downloads those!!
+	}
+
+	public function adjustItemPriceForAddedPages($cart)
+	{
+		foreach ($cart->get_cart() as $cartItem) {
+			// price adjustment for items with content uploads
+			if (isset($cartItem['variation']['attribute_pa_content-format']) && $cartItem['variation']['attribute_pa_content-format'] != '') {
+				$price = $cartItem['data']->get_price();
+				$productMetaData = get_post_meta($cartItem['variation_id']);
+				$pricePerPage = $productMetaData['price_per_page'][0];
+				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
+
+				$price += ($pages * $pricePerPage);
+				$cartItem['data']->set_price($price);
+			}
+		}
+	}
+
+	private function getNrOfContentPages($projectId)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$result = $wpdb->get_row("SELECT content_pages FROM {$table_name} WHERE project_id = {$projectId};");
+
+		return $result->content_pages;
 	}
 }
