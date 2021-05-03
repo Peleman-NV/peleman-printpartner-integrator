@@ -52,7 +52,7 @@ class PpiAdmin
 	 */
 	public function __construct($plugin_name, $version)
 	{
-
+		$this->getContentFile(6511302);
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->shop = get_option('ppi-imaxel-shop-code');
@@ -380,10 +380,16 @@ class PpiAdmin
 
 	private function zipAllFiles($projectId, $orderId, $downloadFolder, $files)
 	{
-		$this->getContentFile($projectId);
 		$zip = new ZipArchive();
 		$zip->open("{$downloadFolder}/{$orderId}-{$projectId}.zip", ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
 		foreach ($files as $file) {
+			if (!$zip->addFile($file, basename($file))) {
+			};
+		}
+
+		$contentFiles = $this->getContentFile($projectId);
+		foreach ($contentFiles as $file) {
 			if (!$zip->addFile($file, basename($file))) {
 			};
 		}
@@ -472,10 +478,13 @@ class PpiAdmin
 
 	private function getContentFile($projectId)
 	{
-		$contentDirectory = PPI_UPLOAD_DIR;
-		$files = scandir($contentDirectory);
-		//if (in_array($projectId, substr($files)) {
+		$files = array_slice(scandir(PPI_UPLOAD_DIR . '/' . $projectId), 2);
 
-		//}
+		$fullPathFiles = [];
+		foreach ($files as $file) {
+			$fullPathFiles[] = PPI_UPLOAD_DIR . '/' . $projectId . '/' . $file;
+		}
+
+		return $fullPathFiles;
 	}
 }

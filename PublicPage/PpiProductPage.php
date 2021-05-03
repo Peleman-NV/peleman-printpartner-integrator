@@ -345,6 +345,7 @@ class PpiProductPage
 		// $helper = new Helper();
 		// $newFilename = $project_id . '_' . $helper->generateGuid();
 		// $newFilenameWithExtension = $newFilename . '.pdf';
+		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
 
 		try {
