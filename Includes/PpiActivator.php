@@ -33,8 +33,9 @@ class PpiActivator
         user_id int(11) NOT NULL,
         project_id int(11) NOT NULL,
         name tinytext DEFAULT NULL,
-        product_id int(11)  NOT NULL,
+        product_id int(11) NOT NULL,
         content_filename tinytext DEFAULT NULL,
+        content_pages int(11) DEFAULT NULL,
         created datetime DEFAULT CURRENT_TIMESTAMP,
         updated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY  (id)
@@ -49,28 +50,17 @@ class PpiActivator
 	 */
 	public static function init_plugin_folders()
 	{
-		$uploadDirectory = ABSPATH . 'wp-content/uploads/ppi/content';
+		$pluginDirectories = [
+			'uploadDirectory' => ABSPATH . 'wp-content/uploads/ppi/content',
+			'imaxelFilesDirectory' => ABSPATH . 'wp-content/uploads/ppi/imaxelfiles',
+			'thumbnailDirectory' => ABSPATH . 'wp-content/uploads/ppi/thumbnails',
+			'logDirectory' => ABSPATH . 'wp-content/uploads/ppi/logs',
+		];
 
-		if (!is_dir($uploadDirectory)) {
-			mkdir($uploadDirectory, 0777, true);
-		}
-
-		$imaxelFilesDirectory = ABSPATH . 'wp-content/uploads/ppi/imaxelfiles';
-
-		if (!is_dir($imaxelFilesDirectory)) {
-			mkdir($imaxelFilesDirectory, 0777, true);
-		}
-
-		$thumbnailDirectory = ABSPATH . 'wp-content/uploads/ppi/thumbnails';
-
-		if (!is_dir($thumbnailDirectory)) {
-			mkdir($thumbnailDirectory, 0777, true);
-		}
-
-		$logDirectory = ABSPATH . 'wp-content/uploads/ppi/logs';
-
-		if (!is_dir($logDirectory)) {
-			mkdir($logDirectory, 0777, true);
+		foreach ($pluginDirectories as $name => $dir) {
+			if (!is_dir($dir)) {
+				mkdir($dir, 0777, true);
+			}
 		}
 	}
 }
