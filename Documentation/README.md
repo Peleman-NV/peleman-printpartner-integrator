@@ -18,6 +18,9 @@ This plugin allows a WordPress/WooCommerce webshop to show and sell Peleman prod
 
 -   Place the plugin files in the WordPress plugin folder (wp-content/plugins) and activate it in the WordPress admin backend.
 -   In the admin backend, enter your public & private keys from Imaxel
+-   Set up a cronjob that runs every minute and calls the following API GET endpoint: "/wp-json/ppi/v1/pendingorders".
+    -   An example of the exact crontab line is:
+        `* * * * * curl -s "https://example-site.peleman.com/wp-json/ppi/v1/pendingorders" > /dev/null`
 
 ## Product configuration:
 

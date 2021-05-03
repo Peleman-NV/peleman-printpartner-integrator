@@ -15,6 +15,10 @@
         <li>"max_execution_time": 300;</li>
         <li>"max_input_time": 300.</li>
     </ul>
+    <p>This plugin requires a cronjob to download pending orders from Imaxel. Set up a cronjob that runs every minute and calls the following API GET endpoint: <strong>"/wp-json/ppi/v1/pendingorders"</strong>.<br>
+        An example of the exact crontab line is:
+    <pre><strong>* * * * * curl -s "https://example-site.peleman.com/wp-json/ppi/v1/pendingorders" > /dev/null`</strong></pre>
+    </p>
     <form method="POST" action="options.php">
         <hr>
         <h2>Imaxel configuration</h2>
