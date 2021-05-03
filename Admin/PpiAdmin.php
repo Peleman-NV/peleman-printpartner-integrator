@@ -4,6 +4,7 @@ namespace PelemanPrintpartnerIntegrator\Admin;
 
 use PelemanPrintpartnerIntegrator\Services\ImaxelService;
 use DateTime;
+use ZipArchive;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -25,6 +26,8 @@ use DateTime;
 class PpiAdmin
 {
 	private $logFile = PPI_LOG_DIR . '/imaxelFileDownloader.txt';
+	private $shop;
+
 	/**
 	 * The ID of this plugin.
 	 *
@@ -52,6 +55,7 @@ class PpiAdmin
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->shop = get_option('ppi-imaxel-shop-code');
 	}
 
 	/**
@@ -283,11 +287,13 @@ class PpiAdmin
 
 	public function checkPendingOrders()
 	{
+		// add empty line to log
+		error_log(PHP_EOL, 3,  $this->logFile);
 
 		$imaxel = new ImaxelService();
 		$response = $imaxel->get_pending_orders();
 		$pendingOrders = json_decode($response['body']);
-		//wp_send_json($pendingOrders);
+
 		if (count($pendingOrders) === 0) {
 			$now =  new DateTime('NOW');
 			error_log($now->format('c') . ': No pending orders' . PHP_EOL, 3,  $this->logFile);
@@ -295,9 +301,13 @@ class PpiAdmin
 		}
 
 		$response = [];
-		$orders = [];
+		$projects = [];
+
+		error_log(print_r($pendingOrders, true), 3, __DIR__ . '/orders.txt');
+
 		foreach ($pendingOrders as $order) {
 			$orderId = $order->id;
+			$shop = $order->checkout->shop->code;
 			$projectId = $order->jobs[0]->project->id;
 			$product = $order->jobs[0]->product->variants[0]->name->default;
 			$wooCommerceOrderId = str_replace('WC order ID: ', '', $order->notes);
@@ -306,45 +316,82 @@ class PpiAdmin
 				return $files->url;
 			}, $order->files);
 
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': downloading ' . count($filesCollection) . ' files for order ' . $wooCommerceOrderId . PHP_EOL, 3,  $this->logFile);
+			if ($shop !== $this->shop) {
+				$projects[$projectId] = [
+					'Shop' => $shop,
+					'Project ID' => $projectId,
+					'Imaxel order ID' => $orderId,
+					'WooCommerce order ID' => $wooCommerceOrderId,
+					'Processed' => 'no'
+				];
+				$now =  new DateTime('NOW');
+				error_log($now->format('c') . ': order ' . $orderId . ' (project ' . $projectId . ') not for this shop' . PHP_EOL, 3,  $this->logFile);
+				continue;
+			}
 
-			$this->downloadFiles($filesCollection, $wooCommerceOrderId);
-			$orders[] = [
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ': downloading ' . count($filesCollection) . ' files for project ' . $projectId . PHP_EOL, 3,  $this->logFile);
+
+			$this->downloadFiles($filesCollection, $projectId, $wooCommerceOrderId);
+
+			$projects[$projectId] = [
+				'Shop' => $shop,
 				'Product' => $product,
 				'Project ID' => $projectId,
 				'Imaxel order ID' => $orderId,
 				'WooCommerce order ID' => $wooCommerceOrderId,
-				'files' => count($filesCollection)
+				'files' => count($filesCollection),
+				'Processed' => 'yes'
 			];
 
 			$imaxel->mark_order_as_downloaded($orderId);
-
 			$now =  new DateTime('NOW');
 			error_log($now->format('c') . ': marked WC order ' . $wooCommerceOrderId . ' (Imaxel order: ' . $orderId . ') as downloaded.' . PHP_EOL, 3,  $this->logFile);
 		}
 
 		$response['result'] = 'Processed ' . count($pendingOrders) . ' orders';
-		$response['orderData'] = $orders;
+		$response['orderData'] = $projects;
 		wp_send_json($response, 200);
 	}
 
-	private function downloadFiles($files, $orderId)
+	private function downloadFiles($files, $projectId, $orderId)
 	{
-		$downloadFolder = PPI_IMAXEL_FILES_DIR . "/{$orderId}";
+		$downloadFolder = PPI_IMAXEL_FILES_DIR . "/{$projectId}";
 		$this->createOrderFolder($downloadFolder);
 
 		$fileName = 0;
+		$downloadedFiles = [];
 		foreach ($files as $file) {
 			$ext = substr($file, strrpos($file, '.'));
 			$fileName = str_pad($fileName, 5, '0', STR_PAD_LEFT);
 			$fullPath = "{$downloadFolder}/{$fileName}{$ext}";
+			$downloadedFiles[] = $fullPath;
 			file_put_contents($fullPath, file_get_contents($file));
 
 			$now =  new DateTime('NOW');
 			error_log($now->format('c') . ': downloaded file ' . $file . PHP_EOL, 3,  $this->logFile);
 
 			$fileName++;
+		}
+		$this->zipAllFiles($projectId, $orderId, $downloadFolder, $downloadedFiles);
+
+		return true;
+	}
+
+	private function zipAllFiles($projectId, $orderId, $downloadFolder, $files)
+	{
+		$zip = new ZipArchive();
+		$zip->open("{$downloadFolder}/{$orderId}-{$projectId}.zip", ZipArchive::CREATE | ZipArchive::OVERWRITE);
+		foreach ($files as $file) {
+			if (!$zip->addFile($file, basename($file))) {
+				$error = error_get_last();
+			};
+		}
+		$zip->close();
+
+		// delete all files after they've been zipped
+		foreach ($files as $file) {
+			unlink($file);
 		}
 	}
 
@@ -365,14 +412,62 @@ class PpiAdmin
 					}
 				}
 			}
+
+			return [
+				'status' => 'success',
+				'message' => 'folder exists - cleared files'
+			];
 		} else {
 			if (mkdir($downloadFolder, 0777)) {
 				$now =  new DateTime('NOW');
 				error_log($now->format('c') . ': created folder' . PHP_EOL, 3,  $this->logFile);
+
+				return [
+					'status' => 'success',
+					'message' => 'created folder'
+				];
 			} else {
 				$now =  new DateTime('NOW');
 				error_log($now->format('c') . ': folder not created' . PHP_EOL, 3,  $this->logFile);
+
+				wp_send_json([
+					'status' => 'error',
+					'message' => 'folder not created'
+				]);
 			}
 		}
+	}
+
+	public function displayImaxelProjectFilesTitle($display_key, $meta, $item)
+	{
+		$currentPage = basename(get_permalink());
+		$projectId = $item->get_meta('_ppi_imaxel_project_id');
+
+		if (substr($currentPage, 0, 10) === '?post_type' && $display_key === '_ppi_imaxel_project_id' && get_class($item) === 'WC_Order_Item_Product') {
+			return 'Download Imaxel project files';
+		}
+		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
+			return;
+		}
+		return $display_key;
+	}
+
+	public function diplayImaxelProjectFilesLink($value, $meta, $item)
+	{
+		echo wp_get_upload_dir();
+		$currentPage = basename(get_permalink());
+		$orderId = $item->get_order_id();
+		$projectId = $item->get_meta('_ppi_imaxel_project_id');
+
+		if (substr($currentPage, 0, 10) === '?post_type' && $projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
+			$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
+			$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
+			return "<a href='{$url}'>$fileName</a>";
+		}
+		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
+			return '';
+		}
+
+		return $value;
 	}
 }
