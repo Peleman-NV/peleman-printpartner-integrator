@@ -110,7 +110,7 @@ class Plugin
 		$this->loader->add_action('woocommerce_save_product_variation', $plugin_admin, 'ppi_persist_custom_field_variations', 11, 2);
 
 		$this->loader->add_action('woocommerce_order_item_display_meta_key', $plugin_admin, 'displayImaxelProjectFilesTitle', 10, 3);
-		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'diplayImaxelProjectFilesLink', 10, 3);
+		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayImaxelProjectFilesLink', 10, 3);
 
 		$this->loader->add_action('rest_api_init', $plugin_admin, 'registerCheckPendingOrdersEndpoint');
 	}

@@ -342,10 +342,10 @@ class PpiProductPage
 		$project_id = $imaxel_response['project_id'];
 		$response['url'] = $imaxel_response['url'];
 
-		$helper = new Helper();
-		$newFilename = $project_id . '_' . $helper->generateGuid();
-		$newFilenameWithExtension = $newFilename . '.pdf';
-		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $newFilenameWithExtension;
+		// $helper = new Helper();
+		// $newFilename = $project_id . '_' . $helper->generateGuid();
+		// $newFilenameWithExtension = $newFilename . '.pdf';
+		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
 
 		try {
 			$pdf = new Fpdi();
@@ -394,13 +394,7 @@ class PpiProductPage
 			$this->returnResponse($response);
 		}
 
-		// Test which is faster!!
 		move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
-		// $source = fopen($_FILES['file']['tmp_name'], 'r');
-		// $destination = fopen($newFilenameWithPath, 'w');
-		// stream_copy_to_stream($source, $destination);
-		// fclose($destination);
-		// fclose($source);
 
 		$newFilenameWithPath = realpath($newFilenameWithPath);
 
@@ -408,12 +402,12 @@ class PpiProductPage
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
-			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $newFilename . '.jpg';
+			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $project_id . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->setCompressionQuality(25);
 			$imagick->scaleImage(150, 0);
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $newFilename . '.jpg';
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
 		} catch (\Throwable $th) {
@@ -432,7 +426,7 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithExtension, $pages);
+		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithPath, $pages);
 
 		$this->returnResponse($response);
 	}

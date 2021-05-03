@@ -380,11 +380,11 @@ class PpiAdmin
 
 	private function zipAllFiles($projectId, $orderId, $downloadFolder, $files)
 	{
+		$this->getContentFile($projectId);
 		$zip = new ZipArchive();
 		$zip->open("{$downloadFolder}/{$orderId}-{$projectId}.zip", ZipArchive::CREATE | ZipArchive::OVERWRITE);
 		foreach ($files as $file) {
 			if (!$zip->addFile($file, basename($file))) {
-				$error = error_get_last();
 			};
 		}
 		$zip->close();
@@ -452,7 +452,7 @@ class PpiAdmin
 		return $display_key;
 	}
 
-	public function diplayImaxelProjectFilesLink($value, $meta, $item)
+	public function displayImaxelProjectFilesLink($value, $meta, $item)
 	{
 		$currentPage = basename(get_permalink());
 		$orderId = $item->get_order_id();
@@ -468,5 +468,14 @@ class PpiAdmin
 		}
 
 		return $value;
+	}
+
+	private function getContentFile($projectId)
+	{
+		$contentDirectory = PPI_UPLOAD_DIR;
+		$files = scandir($contentDirectory);
+		//if (in_array($projectId, substr($files)) {
+
+		//}
 	}
 }
