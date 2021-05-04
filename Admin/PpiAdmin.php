@@ -470,7 +470,7 @@ class PpiAdmin
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
 			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . '</a>';
-			return '<i>file not ready yet</i>';
+			return '<i>files not ready yet</i>';
 		}
 		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
 			return '';
