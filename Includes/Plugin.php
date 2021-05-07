@@ -162,6 +162,8 @@ class Plugin
 	private function define_api_hooks()
 	{
 		$plugin_api = new PpiAPI($this->get_plugin_name(), $this->get_version());
+
+		$this->loader->add_action('rest_api_init', $plugin_api, 'registerGetProcessingOrderEndpoint');
 	}
 
 	/**

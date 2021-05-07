@@ -38,4 +38,22 @@ class PpiAPI
 	public function enqueue_scripts()
 	{
 	}
+
+	/**	
+	 * Register get processing orders endpoint
+	 */
+	public function registerGetProcessingOrderEndpoint()
+	{
+		register_rest_route('ppi/v1', '/ordersprocessing', array(
+			'methods' => 'GET',
+			'callback' => array($this, 'getProcessingOrders'),
+			'args' => array('page'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
+	public function getProcessingOrders()
+	{
+		return wp_send_json(['godverdomme' => 'it\'s me!']);
+	}
 }
