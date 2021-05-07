@@ -2,6 +2,8 @@
 
 namespace PelemanPrintpartnerIntegrator\API;
 
+use Automattic\WooCommerce\Client;
+
 class PpiAPI
 {
 	/**
@@ -39,6 +41,23 @@ class PpiAPI
 	{
 	}
 
+	/**
+	 * Create an API client to handle uploads
+	 */
+	private function apiClient()
+	{
+		$siteUrl = get_site_url();
+		return new Client(
+			$siteUrl,
+			get_option('ppi-wc-key'),
+			get_option('ppi-wc-secret'),
+			[
+				'wp_api' => true,
+				'version' => 'wc/v3'
+			]
+		);
+	}
+
 	/**	
 	 * Register get processing orders endpoint
 	 */
@@ -54,6 +73,9 @@ class PpiAPI
 
 	public function getProcessingOrders()
 	{
-		return wp_send_json(['godverdomme' => 'it\'s me!']);
+		global $wpdb;
+		$orderStatusProcessing = $wpdb->get_results('SELECT ID from ' . $wpdb->prefix . 'posts WHERE post_type = \'shop_order\' AND post_status = \'wc-processing\';');
+
+		wp_send_json($orderStatusProcessing);
 	}
 }

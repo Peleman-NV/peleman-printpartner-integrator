@@ -9,4 +9,5 @@ return array(
     'setasign\\Fpdi\\' => array($vendorDir . '/setasign/fpdi/src'),
     'setasign\\FpdiPdfParser\\' => array($vendorDir . '/setasign/fpdi_pdf-parser/src'),
     'PelemanPrintpartnerIntegrator\\' => array($baseDir . '/'),
+    'Automattic\\WooCommerce\\' => array($vendorDir . '/automattic/woocommerce/src/WooCommerce'),
 );

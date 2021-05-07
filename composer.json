@@ -13,6 +13,7 @@
     "require": {
         "setasign/fpdf": "1.8.*",
         "setasign/fpdi": "^2.0",
-        "setasign/fpdi_pdf-parser": "2.0.4"
+        "setasign/fpdi_pdf-parser": "2.0.4",
+        "automattic/woocommerce": "^3.0"
     }
 }
