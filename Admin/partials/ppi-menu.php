@@ -21,7 +21,7 @@
     </p>
     <form method="POST" action="options.php">
         <hr>
-        <h2>Imaxel configuration</h2>
+        <h2>Plugin configuration</h2>
         <?php
         settings_fields('ppi_custom_settings');
         do_settings_sections('ppi_custom_settings');
@@ -48,6 +48,22 @@
             </div>
             <div class="grid-large-column">
                 <input type="text" id="ppi-imaxel-shop-code" name="ppi-imaxel-shop-code" value="<?= get_option('ppi-imaxel-shop-code'); ?>" placeholder="Imaxel Shop code">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="ppi-wc-key">WooCommerce key</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="text" id="ppi-wc-key" name="ppi-wc-key" value="<?= get_option('ppi-wc-key'); ?>" placeholder="WooCommerce key">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="ppi-wc-secret">WooCommerce secret</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="text" id="ppi-wc-secret" name="ppi-wc-secret" value="<?= get_option('ppi-wc-secret'); ?>" placeholder="WooCommerce secret">
             </div>
         </div>
         <hr>
