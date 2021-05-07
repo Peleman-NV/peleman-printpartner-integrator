@@ -6,6 +6,7 @@ use PelemanPrintpartnerIntegrator\Includes\PpiLoader;
 use PelemanPrintpartnerIntegrator\Includes\PpiI18n;
 use PelemanPrintpartnerIntegrator\Admin\PpiAdmin;
 use PelemanPrintpartnerIntegrator\PublicPage\PpiProductPage;
+use PelemanPrintpartnerIntegrator\API\PpiAPI;
 
 /**
  * The file that defines the core plugin class
@@ -65,6 +66,7 @@ class Plugin
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+		$this->define_api_hooks();
 	}
 
 	/**
@@ -152,6 +154,14 @@ class Plugin
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
 
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjustItemPriceForAddedPages', 10);
+	}
+
+	/**
+	 * Register all of the hooks related to the API functionality of the plugin.
+	 */
+	private function define_api_hooks()
+	{
+		$plugin_api = new PpiAPI($this->get_plugin_name(), $this->get_version());
 	}
 
 	/**
