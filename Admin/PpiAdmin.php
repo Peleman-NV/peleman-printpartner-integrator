@@ -52,7 +52,6 @@ class PpiAdmin
 	 */
 	public function __construct($plugin_name, $version)
 	{
-		$this->getContentFile(6511302);
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->shop = get_option('ppi-imaxel-shop-code');
