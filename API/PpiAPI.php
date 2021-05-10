@@ -104,7 +104,7 @@ class PpiAPI
 		$imaxel_files = [];
 		foreach ($orderItems as $orderItem) {
 			// assuming the content will have an Imaxel project ID (ie. has some customer created content).
-			$imaxelProjectId = $orderItem->get_meta('ppi_imaxel_project_id');
+			$imaxelProjectId = $orderItem->get_meta('_ppi_imaxel_project_id');
 			if ($imaxelProjectId === '') continue;
 			$fileName = "{$imaxelProjectId}/{$orderId}-{$imaxelProjectId}.zip";
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
@@ -121,7 +121,7 @@ class PpiAPI
 
 			foreach ($orderObject->line_items as $lineItem) {
 				foreach ($lineItem->meta_data as $meta_data) {
-					if ($meta_data->key === 'ppi_imaxel_project_id') {
+					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
 					}
 				}
