@@ -288,9 +288,6 @@ class PpiAdmin
 
 	public function checkPendingOrders()
 	{
-		// add empty line to log
-		error_log(PHP_EOL, 3,  $this->logFile);
-
 		$imaxel = new ImaxelService();
 		$response = $imaxel->get_pending_orders();
 		$pendingOrders = json_decode($response['body']);
