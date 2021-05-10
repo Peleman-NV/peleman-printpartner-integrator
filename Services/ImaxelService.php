@@ -11,7 +11,7 @@ class ImaxelService
     private $public_key;
     private $shop_code;
     private $base_imaxel_api_url = "https://services.imaxel.com:443/api/v3/";
-
+    private $logFile = PPI_LOG_DIR . '/imaxelServiceLog.txt';
 
     public function __construct()
     {
@@ -140,6 +140,9 @@ class ImaxelService
             "policy" => $base_64_encoded_policy_json,
             "signedPolicy" => $signed_policy
         )), JSON_UNESCAPED_SLASHES);
+
+        $now =  new DateTime('NOW');
+        error_log($now->format('c') . ": created Imaxel order for WC {$order_id}" . PHP_EOL, 3,  $this->logFile);
 
         return $this->get_response($url, 'POST', $create_project_json);
     }

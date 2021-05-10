@@ -24,6 +24,8 @@ use DateTime;
  */
 class PpiProductPage
 {
+	private $logFile = PPI_LOG_DIR . '/orderProcessing.txt';
+
 	/**
 	 * The ID of this plugin.
 	 *
@@ -491,6 +493,9 @@ class PpiProductPage
 		}
 
 		$wpdb->insert($table_name, $query);
+
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ": persisted project {$project_id} for user {$user_id} / product {$product_id}" . PHP_EOL, 3,  $this->logFile);
 	}
 
 	private function roundedNumberInRange($number, $baseRange, $precision)
@@ -511,6 +516,9 @@ class PpiProductPage
 		$projectId = esc_attr($_GET['project']);
 		$cart_item_data["_ppi_imaxel_project_id"] = $projectId;
 
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ": added projectID {$projectId} to cart" . PHP_EOL, 3,  $this->logFile);
+
 		return $cart_item_data;
 	}
 
@@ -520,7 +528,11 @@ class PpiProductPage
 	public function add_project_to_order_line_item($item, $cart_item_key, $values, $order)
 	{
 		if (isset($values['_ppi_imaxel_project_id'])) {
-			$item->add_meta_data('_ppi_imaxel_project_id', $values['_ppi_imaxel_project_id'], true);
+			$imaxelProjectId = $values['_ppi_imaxel_project_id'];
+			$item->add_meta_data('_ppi_imaxel_project_id', $imaxelProjectId, true);
+
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
 		}
 	}
 
@@ -530,6 +542,9 @@ class PpiProductPage
 	public function createImaxelOrder($orderId, $currentStatus, $newStatus, $order)
 	{
 		if ($newStatus !== 'processing') return;
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ": order {$orderId} status changed to {$newStatus}" . PHP_EOL, 3,  $this->logFile);
+
 		$wc_order = wc_get_order($orderId);
 		$orderItems = $wc_order->get_items();
 		if (empty($orderItems)) return;
@@ -539,7 +554,10 @@ class PpiProductPage
 			if (empty($imaxelProjectId)) continue;
 
 			$imaxel = new ImaxelService();
-			$imaxelResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
+			$imaxel->create_order($imaxelProjectId, $orderId)['body'];
+
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID {$imaxelProjectId} - WC order {$orderItemId}" . PHP_EOL, 3,  $this->logFile);
 		}
 
 		$imaxel = new ImaxelService();
