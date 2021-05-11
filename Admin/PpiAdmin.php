@@ -275,6 +275,10 @@ class PpiAdmin
 
 	/**	
 	 * Register check pending orders endpoint
+	 * This API route is called by the cronjob every 1-3 minutes to:
+	 * - check where any Imaxel orders are pending
+	 * - if so, download the files and mark the order as downloaded
+	 * In dev this route has to be called manually
 	 */
 	public function registerCheckPendingOrdersEndpoint()
 	{
@@ -299,8 +303,6 @@ class PpiAdmin
 
 		$response = [];
 		$projects = [];
-
-		error_log(print_r($pendingOrders, true), 3, __DIR__ . '/orders.txt');
 
 		foreach ($pendingOrders as $order) {
 			$orderId = $order->id;
@@ -381,14 +383,16 @@ class PpiAdmin
 		$zip->open("{$downloadFolder}/{$orderId}-{$projectId}.zip", ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
 		foreach ($files as $file) {
-			if (!$zip->addFile($file, basename($file))) {
-			};
+			$zip->addFile($file, basename($file));
 		}
 
-		$contentFiles = $this->getContentFile($projectId);
-		foreach ($contentFiles as $file) {
-			if (!$zip->addFile($file, basename($file))) {
-			};
+		// check for content files
+		if ($this->projectHasContentUpload($projectId !== false)) {
+			$contentFiles = $this->getContentFile($projectId);
+			foreach ($contentFiles as $file) {
+				if (!$zip->addFile($file, basename($file))) {
+				};
+			}
 		}
 		$zip->close();
 
@@ -396,6 +400,16 @@ class PpiAdmin
 		foreach ($files as $file) {
 			unlink($file);
 		}
+	}
+
+	private function projectHasContentUpload($projectId)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$result =  $wpdb->get_results("SELECT content_filename FROM {$table_name} WHERE project_id = {$projectId}");
+
+		if ($result[0] === null) return false;
+		return $result[0]->content_filename;
 	}
 
 	private function createOrderFolder($downloadFolder)
