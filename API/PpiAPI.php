@@ -58,19 +58,7 @@ class PpiAPI
 		);
 	}
 
-	/**	
-	 * Register get processing orders endpoint
-	 */
-	public function registerGetProcessingOrdersEndpoint()
-	{
-		register_rest_route('ppi/v1', '/ordersprocessing', array(
-			'methods' => 'GET',
-			'callback' => array($this, 'getProcessingOrders'),
-			'permission_callback' => '__return_true'
-		));
-	}
-
-	public function getProcessingOrders()
+	private function getProcessingOrders()
 	{
 		global $wpdb;
 		$ordersWithStatusProcessing = $wpdb->get_results('SELECT ID from ' . $wpdb->prefix . 'posts WHERE post_type = \'shop_order\' AND post_status = \'wc-processing\';');
@@ -83,7 +71,7 @@ class PpiAPI
 	 */
 	public function registerGetOrderEndpoint()
 	{
-		register_rest_route('ppi/v1', '/order(?:/(?P<order>\d+))?', array(
+		register_rest_route('ppi/v1', '/orders(?:/(?P<order>\d+))?', array(
 			'methods' => 'GET',
 			'callback' => array($this, 'getOrder'),
 			'args' => array('order'),
@@ -94,6 +82,10 @@ class PpiAPI
 	public function getOrder($request)
 	{
 		$orderId = $request['order'];
+
+		if ($orderId == '') {
+			$this->getProcessingOrders();
+		}
 
 		$order = wc_get_order($orderId);
 
