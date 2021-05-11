@@ -119,7 +119,7 @@ class PpiAdmin
 		woocommerce_wp_text_input(array(
 			'id' => 'template_id[' . $loop . ']',
 			'placeholder' => 'Imaxel template ID',
-			'class' => 'short',
+			'wrapper_class' => 'form-row form-row-first',
 			'label' => '<a href="https://services.imaxel.com/peleman/admin">Template ID</a>',
 			'type' => 'text',
 			'desc_tip'    => true,
@@ -130,14 +130,24 @@ class PpiAdmin
 		woocommerce_wp_text_input(array(
 			'id' => 'variant_code[' . $loop . ']',
 			'placeholder' => 'Variant code',
-			'class' => 'short',
+			'wrapper_class' => 'form-row form-row-last',
 			'label' => '<a href="https://services.imaxel.com/peleman/admin">Variant code</a>',
 			'type' => 'text',
 			'desc_tip'    => true,
 			'description' => __('Variant code<br>E.g. 00201<br>Leave empty for no customisation', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'variant_code', true)
 		));
+		woocommerce_wp_text_input(array(
+			'id' => 'price_per_page[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
+			'label' => 'Price per page',
+			'type' => 'number',
+			'desc_tip'    => true,
+			'description' => __('Price per page', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'price_per_page', true)
+		));
 
+		echo '<hr>';
 		$pdf_upload_required = get_post_meta($variationId, 'pdf_upload_required', true);
 		//$pdf_upload_required = get_post_meta($parentId, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
@@ -149,10 +159,9 @@ class PpiAdmin
 			'desc_tip'    => true,
 			'value' => $pdf_upload_required,
 		));
-
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_width_mm[' . $loop . ']',
-			'class' => 'short',
+			'wrapper_class' => 'form-row form-row-full',
 			'label' => 'Page width (mm)',
 			'type' => 'number',
 			'desc_tip'    => true,
@@ -163,7 +172,7 @@ class PpiAdmin
 
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_height_mm[' . $loop . ']',
-			'class' => 'short',
+			'wrapper_class' => 'form-row form-row-full',
 			'label' => 'Page height (mm)',
 			'type' => 'number',
 			'desc_tip'    => true,
@@ -174,7 +183,7 @@ class PpiAdmin
 
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_min_pages[' . $loop . ']',
-			'class' => 'short',
+			'wrapper_class' => 'form-row form-row-full',
 			'label' => 'Minimum number of pages',
 			'type' => 'number',
 			'desc_tip'    => true,
@@ -185,7 +194,7 @@ class PpiAdmin
 
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_max_pages[' . $loop . ']',
-			'class' => 'short',
+			'wrapper_class' => 'form-row form-row-full',
 			'label' => 'Maximum number of pages',
 			'type' => 'number',
 			'desc_tip'    => true,
@@ -194,16 +203,6 @@ class PpiAdmin
 			'custom_attributes' => $pdf_fields_readonly,
 		));
 
-		woocommerce_wp_text_input(array(
-			'id' => 'price_per_page[' . $loop . ']',
-			'class' => 'short',
-			'label' => 'Price per page',
-			'type' => 'number',
-			'desc_tip'    => true,
-			'description' => __('Price per page', 'woocommerce'),
-			'value' => $pdf_upload_required == 'yes' ? get_post_meta($variationId, 'price_per_page', true) : "",
-			'custom_attributes' => $pdf_fields_readonly,
-		));
 		echo '</div>';
 	}
 
