@@ -140,7 +140,7 @@ class PpiAdmin
 		woocommerce_wp_text_input(array(
 			'id' => 'price_per_page[' . $loop . ']',
 			'wrapper_class' => 'form-row form-row-full',
-			'label' => 'Price per page',
+			'label' => 'Price per page (for PDF content, or finished product / A piece/sheet of paper = 2 pages',
 			'type' => 'number',
 			'desc_tip'    => true,
 			'description' => __('Price per page', 'woocommerce'),
