@@ -543,7 +543,7 @@ class PpiProductPage
 	{
 		if ($newStatus !== 'processing') return;
 		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ": order {$orderId} status changed to {$newStatus}" . PHP_EOL, 3,  $this->logFile);
+		error_log($now->format('c') . ": order {$orderId} status changed from {$currentStatus} to {$newStatus}" . PHP_EOL, 3,  $this->logFile);
 
 		$wc_order = wc_get_order($orderId);
 		$orderItems = $wc_order->get_items();
@@ -554,14 +554,11 @@ class PpiProductPage
 			if (empty($imaxelProjectId)) continue;
 
 			$imaxel = new ImaxelService();
-			$imaxel->create_order($imaxelProjectId, $orderId)['body'];
+			$createOrderResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
 
 			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID {$imaxelProjectId} - WC order {$orderItemId}" . PHP_EOL, 3,  $this->logFile);
+			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID {$imaxelProjectId} - WC order item {$orderItemId}" . PHP_EOL, 3,  $this->logFile);
 		}
-
-		$imaxel = new ImaxelService();
-		$pendingOrders = $imaxel->get_pending_orders();
 	}
 
 	public function adjustItemPriceForAddedPages($cart)
