@@ -212,4 +212,24 @@ class ImaxelService
             . '&policy=' . rawurlencode($base_64_encoded_policy_json)
             . '&signedPolicy=' . rawurlencode($signed_policy);
     }
+
+    /**
+     * Get imaxel project JSON
+     * 
+     * @param array $project_id
+     * @return string
+     */
+    public function read_project($project_id)
+    {
+        $context_array = array(
+            'projectId' => strval($project_id)
+        );
+        $base_64_encoded_policy_json = $this->generate_base64_encoded_policy($context_array);
+        $signed_policy = $this->generate_signed_policy($base_64_encoded_policy_json);
+        $url = $this->base_imaxel_api_url . 'projects/' . strval($project_id)
+            . '?policy=' . rawurlencode($base_64_encoded_policy_json)
+            . '&signedPolicy=' . rawurlencode($signed_policy);
+
+        return $this->get_response($url, 'GET');
+    }
 }
