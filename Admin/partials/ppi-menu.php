@@ -79,4 +79,18 @@
         </div>
         <button type="submit" class="button button-primary">Save changes</button>
     </form>
+    <hr>
+    <h2>Display Imaxel project JSON (dev functionality)</h2>
+    <form action="admin-post.php" method="POST">
+        <input type="hidden" name="action" value="read_imaxel_project">
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="project_id">Imaxel Project ID</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="text" id="project_id" name="project_id" placeholder="Project ID">
+            </div>
+        </div>
+        <button type="submit" class="button button-primary">Show it</button>
+    </form>
 </div>
