@@ -408,7 +408,7 @@ class PpiAdmin
 		$table_name = PPI_USER_PROJECTS_TABLE;
 		$result =  $wpdb->get_results("SELECT content_filename FROM {$table_name} WHERE project_id = {$projectId}");
 
-		if ($result[0] === null) return false;
+		if ($result === null) return false;
 		return $result[0]->content_filename;
 	}
 

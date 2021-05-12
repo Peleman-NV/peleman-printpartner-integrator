@@ -3,6 +3,7 @@
 namespace PelemanPrintpartnerIntegrator\API;
 
 use Automattic\WooCommerce\Client;
+use PelemanPrintpartnerIntegrator\Services\ImaxelService;
 
 class PpiAPI
 {
@@ -109,11 +110,32 @@ class PpiAPI
 		try {
 			$api = $this->apiClient();
 			$endpoint = 'orders/' . $orderId;
-			$orderObject = $api->get($endpoint);
+			$orderObject = (object) $api->get($endpoint);
 
+			// add files and number of pages as metadata to line items of order response
 			foreach ($orderObject->line_items as $lineItem) {
 				foreach ($lineItem->meta_data as $meta_data) {
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
+						$imaxelProjectId = $meta_data->value;
+						$result = $this->projectHasContentUpload($imaxelProjectId);
+						// if content was uploaded by user
+						if ($result->content_pages !== null) {
+							$lineItem->number_of_pages = $result->content_pages;
+						} else {
+							// if content was downloaded from Imaxel
+							// product has veriable # of pages, eg:wedding book
+							$imaxel = new ImaxelService();
+							$readProjectResponse = $imaxel->read_project($imaxelProjectId)['body'];
+
+							$decodedResponse = json_decode($readProjectResponse);
+							$pagesObject = $decodedResponse->design->pages;
+							// filter only pages, not cover
+							$numberOfPages = count(array_filter($pagesObject, function ($e) {
+								return $e->partName === "pages";
+							}));
+							$lineItem->number_of_pages = $numberOfPages * 2;
+						}
+
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
 					}
 				}
@@ -122,5 +144,15 @@ class PpiAPI
 		} catch (\Throwable $th) {
 			wp_send_json(['error' => "Error adding files to response for order id {$orderId}"], 404);
 		}
+	}
+
+	private function projectHasContentUpload($projectId)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$result =  $wpdb->get_results("SELECT * FROM {$table_name} WHERE project_id = {$projectId}");
+
+		if ($result[0] === null) return false;
+		return $result[0];
 	}
 }
