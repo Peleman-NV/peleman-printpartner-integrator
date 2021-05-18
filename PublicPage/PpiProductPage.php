@@ -209,7 +209,6 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 
-		// isCustomizable is redundant - the presence of a template_id would be enough
 		if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
 			$response['customButton'] = false;
 		} else {
