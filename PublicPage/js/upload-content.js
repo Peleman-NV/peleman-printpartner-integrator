@@ -35,19 +35,19 @@
                 dataType: 'json',
                 success: function (response) {
                     console.log(response);
-                    if (response.do_not_redirect === true) {
-                        console.log('custom project is here');
-                        replaceBtnWithLink(response.url);
-                    }
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
-                        $('.single_add_to_cart_button').removeClass(
-                            'ppi-disabled'
-                        );
-                        $('.single_add_to_cart_button').prop(
-                            'href',
-                            response.url
-                        );
+                        if (response.do_not_redirect === true) {
+                            replaceBtnWithLink(response.url);
+                        } else {
+                            $('.single_add_to_cart_button').removeClass(
+                                'ppi-disabled'
+                            );
+                            $('.single_add_to_cart_button').prop(
+                                'href',
+                                response.url
+                            );
+                        }
                         $('.ppi-upload-parameters').removeClass('ppi-hidden');
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
@@ -105,16 +105,15 @@
             const btnText = $('.single_add_to_cart_button').html();
 
             $('.single_add_to_cart_button').remove();
-            $('#ppi-loading').addClass('ppi-hidden');
-            $('.single_add_to_cart_button').removeClass('ppi-disabled');
 
             $('.quantity').after(
                 "<a href='" +
                     url +
-                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='ppi-hidden dashicons dashicons-update rotate'></span>" +
+                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
                     btnText +
                     '</a>'
             );
+            $('.single_add_to_cart_button').removeClass('ppi-disabled');
             $('#ppi-loading').addClass('ppi-hidden');
         }
     });
