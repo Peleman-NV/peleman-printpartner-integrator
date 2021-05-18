@@ -31,7 +31,7 @@ class PpiActivator
 		$sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         user_id int(11) NOT NULL,
-        project_id int(11) NOT NULL,
+        project_id int(11) NULL,
         name tinytext DEFAULT NULL,
         product_id int(11) NOT NULL,
         content_filename tinytext DEFAULT NULL,
