@@ -35,28 +35,43 @@
                     if (response.status === 'success') {
                         if (
                             response.isCustomizable === 'no' ||
-                            !response.customButton
+                            response.isCustomizable === ''
                         ) {
-                            // regular button
-                            enableAddToCartBtn(response, addToCartLabel);
-                            // if variation requires an upload
-                        } else if (
-                            response.requiresPDFUpload === 'no' ||
-                            response.requiresPDFUpload === ''
-                        ) {
-                            // regular button
-                            enableAddToCartBtn(
-                                response,
-                                response.imaxelData.buttonText
-                            );
+                            if (
+                                response.requiresPDFUpload === 'no' ||
+                                response.requiresPDFUpload === ''
+                            ) {
+                                // no upload & not customizable - display & enable add to cart btn
+                                enableAddToCartBtn(response, addToCartLabel);
+                            }
+                            if (response.requiresPDFUpload === 'yes') {
+                                // upload & not customizable - display upload block & block add to cart
+                                disableAddToCartBtn();
+                                displayUploadElements(response);
+                            }
                         }
-                        if (response.requiresPDFUpload === 'yes') {
-                            enableAddToCartBtn(
-                                response,
-                                response.imaxelData.buttonText
-                            );
-                            disableAddToCartBtn();
-                            displayUploadElements(response);
+                        if (response.isCustomizable === 'yes') {
+                            if (
+                                response.requiresPDFUpload === 'no' ||
+                                response.requiresPDFUpload === ''
+                            ) {
+                                // no upload & not customizable - display Imaxel link with custom add to cart btn
+                                enableAddToCartBtn(
+                                    response,
+                                    response.imaxelData?.buttonText ??
+                                        addToCartLabel
+                                );
+                            }
+                            if (response.requiresPDFUpload === 'yes') {
+                                // upload & customizable - display upload block & block Imaxel link with custom add to cart btn
+                                enableAddToCartBtn(
+                                    response,
+                                    response.imaxelData?.buttonText ??
+                                        addToCartLabel
+                                );
+                                disableAddToCartBtn();
+                                displayUploadElements(response);
+                            }
                         }
                     } else {
                         $('#variant-info').html(response.message);
@@ -94,13 +109,8 @@
         }
 
         function displayUploadElements(response) {
-            const {
-                height,
-                width,
-                min_pages,
-                max_pages,
-                price_per_page,
-            } = response;
+            const { height, width, min_pages, max_pages, price_per_page } =
+                response;
             $('#ppi-loading').addClass('ppi-hidden');
 
             $('.ppi-upload-form').removeClass('ppi-hidden');

@@ -332,16 +332,30 @@ class PpiProductPage
 			$response['type'] = $file_type;
 		};
 
+		// is customizable?
 		$variant_id = $_POST['variant_id'];
 
-		$imaxel_response = $this->getImaxelData($variant_id);
-		if ($imaxel_response['status'] == "error") {
-			$response['status'] = 'error';
-			$response['information'] = $imaxel_response['information'];
-			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+		$wc_product = wc_get_product($variant_id);
+		$parent_product = wc_get_product($wc_product->get_parent_id());
+		$isCustomizable = $parent_product->get_meta('customizable_product') === 'yes' ? true : false;
+
+		if ($isCustomizable) {
+			$imaxel_response = $this->getImaxelData($variant_id);
+			if ($imaxel_response['status'] == "error") {
+				$response['status'] = 'error';
+				$response['information'] = $imaxel_response['information'];
+				$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+			}
+			$project_id = $imaxel_response['project_id'];
+			$response['url'] = $imaxel_response['url'];
+		} else {
+			$uuidGenerator = new Helper();
+			$project_id = $uuidGenerator->generateGuid();
+			$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
+			$siteUrl = get_site_url() . '/' . $lang;
+			$response['do_not_redirect'] = true;
+			$response['url'] = $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id;
 		}
-		$project_id = $imaxel_response['project_id'];
-		$response['url'] = $imaxel_response['url'];
 
 		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';

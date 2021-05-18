@@ -1,7 +1,7 @@
 (function ($) {
     'use strict';
     $(function () {
-        // Event: when the file input change, ie: when a new file is selected
+        // Event: when the file input changes, ie: when a new file is selected
         $('#file-upload').on('change', e => {
             const timeStart = performance.now();
             const variationId = $("[name='variation_id']").val();
@@ -23,7 +23,7 @@
 
             $('#file-upload').submit();
             e.preventDefault();
-
+            // add GET param to add to cart URL to be saved in DB
             $.ajax({
                 url: ppi_upload_content_object.ajax_url,
                 method: 'POST',
@@ -35,6 +35,10 @@
                 dataType: 'json',
                 success: function (response) {
                     console.log(response);
+                    if (response.do_not_redirect === true) {
+                        console.log('custom project is here');
+                        replaceBtnWithLink(response.url);
+                    }
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
                         $('.single_add_to_cart_button').removeClass(
@@ -95,5 +99,23 @@
             });
             $('#file-upload').val('');
         });
+
+        function replaceBtnWithLink(url) {
+            // get btn textStatus
+            const btnText = $('.single_add_to_cart_button').html();
+
+            $('.single_add_to_cart_button').remove();
+            $('#ppi-loading').addClass('ppi-hidden');
+            $('.single_add_to_cart_button').removeClass('ppi-disabled');
+
+            $('.quantity').after(
+                "<a href='" +
+                    url +
+                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='ppi-hidden dashicons dashicons-update rotate'></span>" +
+                    btnText +
+                    '</a>'
+            );
+            $('#ppi-loading').addClass('ppi-hidden');
+        }
     });
 })(jQuery);
