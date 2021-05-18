@@ -118,22 +118,44 @@ class PpiAPI
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$imaxelProjectId = $meta_data->value;
 						$result = $this->projectHasContentUpload($imaxelProjectId);
-						// if content was uploaded by user
+
 						if ($result->content_pages !== null) {
-							$lineItem->number_of_pages = $result->content_pages;
+							// if content was uploaded by user
+							$lineItem->number_of_pages = intval($result->content_pages);
 						} else {
 							// if content was downloaded from Imaxel
 							// product has veriable # of pages, eg:wedding book
+							// or product has faxed # of pages, eg:Photobook Human Colours (7 photosheets)
 							$imaxel = new ImaxelService();
 							$readProjectResponse = $imaxel->read_project($imaxelProjectId)['body'];
-
 							$decodedResponse = json_decode($readProjectResponse);
+
+							// get variantcode
+							$wcVariation = wc_get_product($lineItem->variation_id);
+							$productMetaData = ['template_id' => $wcVariation->get_meta('template_id'), 'variant_code' => $wcVariation->get_meta('variant_code')];
+
+							// get template info from response
+							$responseTemplate = array_filter($decodedResponse->product->variants, function ($e) use ($productMetaData) {
+								return $e->code !== $productMetaData['template_id'];
+							});
+							// get variant info (that includes pages info) from response
+							$responseTemplateParts = array_values(array_filter($responseTemplate[0]->parts, function ($e) {
+								return $e->name === 'pages';
+							}));
+
+							// get number of sheets
 							$pagesObject = $decodedResponse->design->pages;
 							// filter only pages, not cover
 							$numberOfPages = count(array_filter($pagesObject, function ($e) {
 								return $e->partName === "pages";
 							}));
+
 							$lineItem->number_of_pages = $numberOfPages * 2;
+
+							// check if very first and very last are discarded (ie. inside sheet of the cover) - this key is not always here...!
+							if (isset($responseTemplateParts[0]->output->sheets_processor->discarded_sides) && $responseTemplateParts[0]->output->sheets_processor->discarded_sides === 'first_and_last') {
+								$lineItem->number_of_pages -= 2;
+							}
 						}
 
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
