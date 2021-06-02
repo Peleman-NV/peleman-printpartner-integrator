@@ -91,11 +91,13 @@ class PpiAPI
 		$order = wc_get_order($orderId);
 
 		if ($order === false) wp_send_json(['error' => "No order found for id {$orderId}"], 404);
+		// add language code to top level
 
 		$orderItems = $order->get_items();
 
 		$imaxel_files = [];
 		foreach ($orderItems as $orderItem) {
+
 			// assuming the content will have an Imaxel project ID (ie. has some customer created content).
 			$imaxelProjectId = $orderItem->get_meta('_ppi_imaxel_project_id');
 			if ($imaxelProjectId === '') continue;
@@ -112,57 +114,40 @@ class PpiAPI
 			$endpoint = 'orders/' . $orderId;
 			$orderObject = (object) $api->get($endpoint);
 
+			// add order language
+			$order = wc_get_order($orderId);
+			$orderLanguage  = $order->get_meta('wpml_language');
+			$orderObject->language_code = !empty($orderLanguage) ? $orderLanguage : 'en';
+
 			// add files and number of pages as metadata to line items of order response
 			foreach ($orderObject->line_items as $lineItem) {
 				foreach ($lineItem->meta_data as $meta_data) {
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$imaxelProjectId = $meta_data->value;
 						$result = $this->projectHasContentUpload($imaxelProjectId);
-
+						// if content was uploaded by user
 						if ($result->content_pages !== null) {
-							// if content was uploaded by user
-							$lineItem->number_of_pages = intval($result->content_pages);
+							$lineItem->number_of_pages = $result->content_pages;
 						} else {
 							// if content was downloaded from Imaxel
 							// product has veriable # of pages, eg:wedding book
-							// or product has faxed # of pages, eg:Photobook Human Colours (7 photosheets)
 							$imaxel = new ImaxelService();
 							$readProjectResponse = $imaxel->read_project($imaxelProjectId)['body'];
+
 							$decodedResponse = json_decode($readProjectResponse);
-
-							// get variantcode
-							$wcVariation = wc_get_product($lineItem->variation_id);
-							$productMetaData = ['template_id' => $wcVariation->get_meta('template_id'), 'variant_code' => $wcVariation->get_meta('variant_code')];
-
-							// get template info from response
-							$responseTemplate = array_filter($decodedResponse->product->variants, function ($e) use ($productMetaData) {
-								return $e->code !== $productMetaData['template_id'];
-							});
-							// get variant info (that includes pages info) from response
-							$responseTemplateParts = array_values(array_filter($responseTemplate[0]->parts, function ($e) {
-								return $e->name === 'pages';
-							}));
-
-							// get number of sheets
 							$pagesObject = $decodedResponse->design->pages;
 							// filter only pages, not cover
 							$numberOfPages = count(array_filter($pagesObject, function ($e) {
 								return $e->partName === "pages";
 							}));
-
 							$lineItem->number_of_pages = $numberOfPages * 2;
-
-							// check if very first and very last are discarded (ie. inside sheet of the cover) - this key is not always here...!
-							if (isset($responseTemplateParts[0]->output->sheets_processor->discarded_sides) && $responseTemplateParts[0]->output->sheets_processor->discarded_sides === 'first_and_last') {
-								$lineItem->number_of_pages -= 2;
-							}
 						}
 
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
 					}
 				}
 			}
-			wp_send_json([$orderObject], 200);
+			wp_send_json($orderObject, 200);
 		} catch (\Throwable $th) {
 			wp_send_json(['error' => "Error adding files to response for order id {$orderId}"], 404);
 		}
