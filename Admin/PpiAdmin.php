@@ -137,6 +137,17 @@ class PpiAdmin
 			'description' => __('Variant code<br>E.g. 00201<br>Leave empty for no customisation', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'variant_code', true)
 		));
+
+		woocommerce_wp_text_input(array(
+			'id' => 'custom_variation_add_to_cart_label[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
+			'label' =>  __('Custom Add to cart label', 'woocommerce'),
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('Define a custom Add to cart label', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'custom_variation_add_to_cart_label', true)
+		));
+
 		woocommerce_wp_text_input(array(
 			'id' => 'price_per_page[' . $loop . ']',
 			'wrapper_class' => 'form-row form-row-full',
@@ -216,6 +227,7 @@ class PpiAdmin
 	{
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
+		$custom_variant_add_to_cart_label = $_POST['custom_variation_add_to_cart_label'][$i];
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
 		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
@@ -225,6 +237,7 @@ class PpiAdmin
 
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
+		if (isset($custom_variant_add_to_cart_label)) update_post_meta($variation_id, 'custom_variation_add_to_cart_label', esc_attr($custom_variant_add_to_cart_label));
 		if (isset($pdf_upload_required)) update_post_meta($variation_id, 'pdf_upload_required', $pdf_upload_required);
 		if (isset($pdf_width_mm)) update_post_meta($variation_id, 'pdf_width_mm', esc_attr($pdf_width_mm));
 		if (isset($pdf_height_mm)) update_post_meta($variation_id, 'pdf_height_mm', esc_attr($pdf_height_mm));
