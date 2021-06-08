@@ -3,7 +3,6 @@
 namespace PelemanPrintpartnerIntegrator\PublicPage;
 
 use PelemanPrintpartnerIntegrator\Services\ImaxelService;
-use PelemanPrintpartnerIntegrator\Utils\Helper;
 use setasign\Fpdi\Fpdi;
 use \Imagick;
 use DateTime;
@@ -101,7 +100,14 @@ class PpiProductPage
 	 */
 	public function ppi_output_file_params()
 	{
+		$maxUploadFileSizeLabel = __('Maximum file upload size', PPI_TEXT_DOMAIN);
+		$pDFPageWidth = __('PDF page width', PPI_TEXT_DOMAIN);
+		$pDFPageHeight = __('PDF page height', PPI_TEXT_DOMAIN);
+		$minimumNumberOfPages = __('Minimum nr of pages', PPI_TEXT_DOMAIN);
+		$maximumNumberOfPages = __('Maximum nr of pages', PPI_TEXT_DOMAIN);
+		$pricePerPage = __('Price per page', PPI_TEXT_DOMAIN);
 		$maxUploadFileSize = "100MB";
+
 		$paramsDiv = "
 			<div class='ppi-upload-parameters'>
 				<div class='thumbnail-container'>
@@ -110,7 +116,7 @@ class PpiProductPage
 				<div class='params-container'>
 					<div class='param-line ppi-hidden' id='max-upload-size'>
 						<div class='param-name'>
-							Maximum file upload size
+							{$maxUploadFileSizeLabel}	
 						</div>
 						<div class='param-value'>
 							{$maxUploadFileSize}
@@ -118,35 +124,35 @@ class PpiProductPage
 					</div>
 					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
-							PDF page width
+							{$pDFPageWidth}
 						</div>
 						<div class='param-value' id='content-width'>
 						</div>
 					</div>
 					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
-							PDF page height
+							{$pDFPageHeight}
 						</div>
 						<div class='param-value' id='content-height'>
 						</div>
 					</div>
 					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
-							Minimum nr of pages
+							{$minimumNumberOfPages}
 						</div>
 						<div class='param-value' id='content-min-pages'>
 						</div>
 					</div>					
 					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
-							Maximum nr of pages
+							{$maximumNumberOfPages}
 						</div>
 						<div class='param-value' id='content-max-pages'>
 						</div>
 					</div>
 					<div class='param-line ppi-hidden'>
 						<div class='param-name'>
-							Price per page
+							{$pricePerPage}
 						</div>
 						<div class='param-value' id='content-price-per-page'>
 						</div>
@@ -161,9 +167,10 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
+		$uploadButtonLabel = __('Click here to upload your PDF file', PPI_TEXT_DOMAIN);
 		$uploadDiv = "
         <div class='ppi-upload-form ppi-hidden'>
-            <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
+            <label class='upload-label upload-disabled' for='file-upload'>{$uploadButtonLabel}</label>
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
         </div>
 		<div id='upload-info'></div>";
@@ -209,6 +216,7 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 
+		// isCustomizable is redundant - the presence of a template_id would be enough
 		if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
 			$response['customButton'] = false;
 		} else {
@@ -267,7 +275,7 @@ class PpiProductPage
 			$customText = $wc_product->get_meta('custom_add_to_cart_label');
 			return __($customText, 'woocommerce');
 		}
-		return __("Design product", 'woocommerce');
+		return __("Design product", PPI_TEXT_DOMAIN);
 	}
 
 	public function get_imaxel_url($variant_id)
@@ -277,7 +285,7 @@ class PpiProductPage
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
 			$response['information'] = $imaxel_response['information'];
-			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
 			$this->returnResponse($response);
 		}
 
@@ -296,16 +304,12 @@ class PpiProductPage
 	{
 		$wc_product = wc_get_product($variant_id);
 		$parent_product = wc_get_product($wc_product->get_parent_id());
-
-
-		if ($wc_product->get_meta('custom_variation_add_to_cart_label') != '') {
-			$addToCartLabel = $wc_product->get_meta('custom_variation_add_to_cart_label');
-		} else if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
+		if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
 			$addToCartLabel = $parent_product->get_meta('custom_add_to_cart_label');
 		} else if (get_option('ppi-custom-add-to-cart-label') != '') {
 			$addToCartLabel = get_option('ppi-custom-add-to-cart-label');
 		} else {
-			$addToCartLabel = "Design Product";
+			$addToCartLabel = __('Design Product', PPI_TEXT_DOMAIN);
 		}
 		return $addToCartLabel;
 	}
@@ -316,14 +320,14 @@ class PpiProductPage
 
 		if ($_FILES['file']['error']) {
 			$response['status'] = 'error';
-			$response['message'] = "Error encountered while uploading your file.  Please try again with a different one.";
+			$response['message'] = __('Error encountered while uploading your file.  Please try again with a different one.', PPI_TEXT_DOMAIN);
 			$response['error'] = $_FILES['file']['error'];
 		}
 
 		$max_file_upload_size = (int)(ini_get('upload_max_filesize')) * 1024 * 1024;
 		if ($_FILES['file']['size'] >= $max_file_upload_size) {
 			$response['status'] = 'error';
-			$response['message'] = "Your file is too large, Please upload a file smaller than 100MB.";
+			$response['message'] = __('Your file is too large, Please upload a file smaller than the maximum file upload size.', PPI_TEXT_DOMAIN);
 			$response['filesize'] = $_FILES['file']['size'];
 			$response['max_size'] = $max_file_upload_size;
 		}
@@ -332,34 +336,20 @@ class PpiProductPage
 		$file_type = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 		if ($file_type != 'pdf') {
 			$response['status'] = 'error';
-			$response['message'] = "Please upload a PDF file.";
+			$response['message'] = __('Please upload a PDF file.', PPI_TEXT_DOMAIN);
 			$response['type'] = $file_type;
 		};
 
-		// is customizable?
 		$variant_id = $_POST['variant_id'];
 
-		$wc_product = wc_get_product($variant_id);
-		$parent_product = wc_get_product($wc_product->get_parent_id());
-		$isCustomizable = $parent_product->get_meta('customizable_product') === 'yes' ? true : false;
-
-		if ($isCustomizable) {
-			$imaxel_response = $this->getImaxelData($variant_id);
-			if ($imaxel_response['status'] == "error") {
-				$response['status'] = 'error';
-				$response['information'] = $imaxel_response['information'];
-				$response['message'] = "Something went wrong.  Please refresh the page and try again.";
-			}
-			$project_id = $imaxel_response['project_id'];
-			$response['url'] = $imaxel_response['url'];
-		} else {
-			$uuidGenerator = new Helper();
-			$project_id = $uuidGenerator->generateGuid();
-			$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
-			$siteUrl = get_site_url() . '/' . $lang;
-			$response['do_not_redirect'] = true;
-			$response['url'] = $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id;
+		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
 		}
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
 
 		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
@@ -372,7 +362,7 @@ class PpiProductPage
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['error'] = $th->getMessage();
-			$response['message'] = "We couldn't process \"" . $filename . "\"<br>(possibly due to encryption).<br>Please use a different PDF file.";
+			$response['message'] = __("We couldn't process your file (possibly due to encryption).  Please use a different PDF file.", PPI_TEXT_DOMAIN);
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['filesize'] = $_FILES['file']['size'];
@@ -385,12 +375,12 @@ class PpiProductPage
 		if ($variant['min_pages'] != "" && $pages < $variant['min_pages']) {
 			$response['status'] = 'error';
 			$response['file']['pages'] = $pages;
-			$response['message'] = "\"{$filename}\" has too few pages ({$pages}).  Please upload a file with at least {$variant['min_pages']} pages.";
+			$response['message'] = __("Your file has too few pages.", PPI_TEXT_DOMAIN);
 		}
 		if ($variant['max_pages'] != "" && $pages > $variant['max_pages']) {
 			$response['status'] = 'error';
 			$response['file']['pages'] = $pages;
-			$response['message'] = "\"{$filename}\" has too many pages ({$pages}).  Please upload a file with no more than {$variant['max_pages']} pages.";
+			$response['message'] = __("Your file has too many pages.", PPI_TEXT_DOMAIN);
 		}
 		// precision of 1mm
 
@@ -403,7 +393,7 @@ class PpiProductPage
 			$response['file']['height'] = $dimensions['height'];
 			$displayWidth = round($dimensions['width'], 1);
 			$displayHeight = round($dimensions['height'], 1);
-			$response['message'] = "\"{$filename}\" dimensions are {$displayWidth}mm x {$displayHeight}mm and doesn't match the required dimensions.  Please upload a file with a width x height of {$variant['width']}mm x {$variant['height']}mm.";
+			$response['message'] = __("Your file's dimensions do not match the required dimensions.", PPI_TEXT_DOMAIN);
 		}
 
 		// send response
@@ -426,9 +416,9 @@ class PpiProductPage
 			$imagick->writeImage($thumbnailWithPath);
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
 			$response['status'] = 'success';
-			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
+			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages).', PPI_TEXT_DOMAIN), $filename, $pages);
 		} catch (\Throwable $th) {
-			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
+			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages), but we couldn\'t create a preview thumbnail.', PPI_TEXT_DOMAIN), $filename, $pages);
 			$response['error'] = $th->getMessage();
 
 			$this->returnResponse($response);
