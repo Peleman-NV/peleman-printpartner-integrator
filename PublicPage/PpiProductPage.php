@@ -304,7 +304,9 @@ class PpiProductPage
 	{
 		$wc_product = wc_get_product($variant_id);
 		$parent_product = wc_get_product($wc_product->get_parent_id());
-		if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
+		if ($wc_product->get_meta('custom_variation_add_to_cart_label') != '') {
+			$addToCartLabel = $wc_product->get_meta('custom_variation_add_to_cart_label');
+		} else if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
 			$addToCartLabel = $parent_product->get_meta('custom_add_to_cart_label');
 		} else if (get_option('ppi-custom-add-to-cart-label') != '') {
 			$addToCartLabel = get_option('ppi-custom-add-to-cart-label');
