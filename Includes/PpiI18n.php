@@ -35,7 +35,7 @@ class PpiI18n
 	 */
 	public function load_plugin_textdomain()
 	{
-		$languageDir = realpath(plugin_dir_path(__FILE__) . '/../languages');
+		$languageDir = 'peleman-printpartner-integrator/languages';
 
 		load_plugin_textdomain(
 			'peleman-printpartner-integrator',
