@@ -157,11 +157,13 @@
         }
 
         function enableAddToCartBtn(response, addToCartLabel) {
+            console.log('enabling tha button!');
             $('.single_add_to_cart_button').remove();
             $('#ppi-loading').addClass('ppi-hidden');
             $('.single_add_to_cart_button').removeClass('ppi-disabled');
 
-            if (!response.customButton) {
+            if (!response.customButton || response.imaxelData === undefined) {
+                console.log('no imaxel data');
                 $('.quantity').after(
                     '<button type="submit" class="single_add_to_cart_button button alt">' +
                         addToCartLabel +
