@@ -1,7 +1,55 @@
 :root {
-    --params-width: 65%;
+    /* --params-width: 65%; */
+    --params-width: 55%;
     --thumbnail-width: calc(100% - 2% - var(--params-width));
 }
+
+/*---------------------------*/
+/*----------Testing----------*/
+/*---------------------------*/
+
+.ppi-upload-parameters {
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ppi-upload-parameters .thumbnail-container {
+    width: var(--thumbnail-width);
+    background-color: whitesmoke;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.ppi-upload-parameters table {
+    margin-bottom: 0;
+}
+
+.ppi-upload-parameters table td,
+.ppi-upload-parameters table th {
+    padding: 0.5em 0.5em;
+    font-size: 0.95em;
+}
+
+.ppi-upload-parameters table tr td:nth-child(2) {
+    text-align: right;
+}
+
+.ppi-upload-parameters table tr td:nth-child(1) {
+    /* font-weight: 700; */
+}
+
+.ppi-upload-form {
+    text-align: center;
+    margin-bottom: 8px;
+    display: inline-block;
+    width: var(--params-width);
+    width: 100%;
+}
+/*---------------------------*/
+/*-------End Testing---------*/
+/*---------------------------*/
 
 .ppi-add-to-cart-button {
     text-transform: none !important;
@@ -10,12 +58,12 @@
     align-items: center;
 }
 
-.ppi-upload-form {
+/* .ppi-upload-form {
     text-align: center;
     margin-bottom: 8px;
     display: inline-block;
     width: var(--params-width);
-}
+} */
 
 .upload-disabled {
     border: 1px darkgrey solid !important;
@@ -50,7 +98,7 @@
     pointer-events: none;
 }
 
-.ppi-upload-parameters {
+/* .ppi-upload-parameters {
     margin-bottom: 2px;
     display: flex;
     justify-content: space-between;
@@ -83,7 +131,7 @@
     padding: 0 5px;
     background-color: lightgrey;
     border-bottom: 1px solid darkgrey;
-}
+} */
 
 .ppi-response-error {
     color: red;
