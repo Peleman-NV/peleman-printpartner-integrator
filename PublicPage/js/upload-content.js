@@ -147,7 +147,7 @@
             const url = window.location.href;
             return url.substring(
                 url.indexOf('//') + 2,
-                url.indexOf('/product')
+                url.indexOf('.com') + 4
             );
         }
     });
