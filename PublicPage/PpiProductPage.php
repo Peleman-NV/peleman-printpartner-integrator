@@ -440,6 +440,13 @@ class PpiProductPage
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
+		if (empty($template_id) || empty($variant_code)) {
+			return array(
+				'status' => 'success',
+				'url' => 'no_editor_url'
+			);
+		}
+
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
 
