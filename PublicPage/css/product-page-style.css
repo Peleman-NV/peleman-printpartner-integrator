@@ -1,9 +1,6 @@
 :root {
     --params-width: 55%;
     --thumbnail-width: calc(100% - 2% - var(--params-width));
-    --main-color-humancolours: #ff661f; /* humancolours.com */
-    --main-color-mr-and-mrs-peleman: #ffd721; /* devwebshop.com */
-    --main-color-peleman: #006ad0; /* devshop.com */
 }
 
 .ppi-upload-parameters {

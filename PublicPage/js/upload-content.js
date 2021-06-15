@@ -121,18 +121,22 @@
 
         function setUploadBtnColour() {
             let btnColour = '';
-            switch (getDomain()) {
+            const domain = getDomain();
+            switch (domain) {
                 case 'devwebshop.peleman.com':
-                    btnColour = '--main-color-mr-and-mrs-peleman';
+                    btnColour = '#ffd721'; /* devwebshop.com */
                     break;
                 case 'devhumancolours.peleman.com':
-                    btnColour = '--main-color-humancolours';
+                    btnColour = '#ff661f';
+                    $('.ppi-upload-form .upload-label').css('color', 'white');
                     break;
                 case 'humancolours.peleman.com':
-                    btnColour = '--main-color-humancolours';
+                    btnColour = '#ff661f';
+                    $('.ppi-upload-form .upload-label').css('color', 'white');
                     break;
                 case 'devshop.peleman.com':
-                    btnColour = '--main-color-peleman';
+                    btnColour = '#006ad0'; /* devshop.com */
+                    $('.ppi-upload-form .upload-label').css('color', 'white');
                     break;
             }
 
