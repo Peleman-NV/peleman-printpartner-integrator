@@ -1,7 +1,8 @@
 (function ($) {
     'use strict';
     $(function () {
-        console.log('here');
+        setUploadBtnColour();
+
         // Event: when the file input changes, ie: when a new file is selected
         $('#file-upload').on('change', e => {
             const timeStart = performance.now();
@@ -116,6 +117,34 @@
             );
             $('.single_add_to_cart_button').removeClass('ppi-disabled');
             $('#ppi-loading').addClass('ppi-hidden');
+        }
+
+        function setUploadBtnColour() {
+            let btnColour = '';
+            switch (getDomain()) {
+                case 'devwebshop.peleman.com':
+                    btnColour = '--main-color-mr-and-mrs-peleman';
+                    break;
+                case 'devhumancolours.peleman.com':
+                    btnColour = '--main-color-humancolours';
+                    break;
+                case 'humancolours.peleman.com':
+                    btnColour = '--main-color-humancolours';
+                    break;
+                case 'devshop.peleman.com':
+                    btnColour = '--main-color-peleman';
+                    break;
+            }
+
+            $('.ppi-upload-form').css('background', btnColour);
+        }
+
+        function getDomain() {
+            const url = window.location.href;
+            return url.substring(
+                url.indexOf('//') + 2,
+                url.indexOf('/product')
+            );
         }
     });
 })(jQuery);
