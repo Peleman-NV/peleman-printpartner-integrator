@@ -1,6 +1,7 @@
 (function ($) {
     'use strict';
     $(function () {
+        console.log('here');
         // Event: when the file input changes, ie: when a new file is selected
         $('#file-upload').on('change', e => {
             const timeStart = performance.now();
