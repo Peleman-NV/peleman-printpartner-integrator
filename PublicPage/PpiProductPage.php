@@ -114,87 +114,34 @@ class PpiProductPage
 					<img id='ppi-thumbnail' />
 				</div>
 				<table>
-					<tr>
-						<td>$maxUploadFileSizeLabel</td>
-						<td>$maxUploadFileSize</td>
-					</tr>
-					<tr>
-						<td>$pDFPageWidth</td>
-						<td class='param-value' id='content-width'></td>
-					</tr>
-					<tr>
-						<td>$pDFPageHeight</td>
-						<td class='param-value' id='content-height'></td>
-					</tr>
-					<tr>
-						<td>$minimumNumberOfPages</td>
-						<td class='param-value' id='content-min-pages'></td>
-					</tr>
-					<tr>
-						<td>$maximumNumberOfPages</td>
-						<td class='param-value' id='content-max-pages'></td>
-					</tr>
-					<tr>
-						<td>$pricePerPage</td>
-						<td class='param-value' id='content-price-per-page'></td>
-					</tr>
+					<tbody>
+						<tr>
+							<td>$maxUploadFileSizeLabel</td>
+							<td>$maxUploadFileSize</td>
+						</tr>
+						<tr>
+							<td>$pDFPageWidth</td>
+							<td class='param-value' id='content-width'></td>
+						</tr>
+						<tr>
+							<td>$pDFPageHeight</td>
+							<td class='param-value' id='content-height'></td>
+						</tr>
+						<tr>
+							<td>$minimumNumberOfPages</td>
+							<td class='param-value' id='content-min-pages'></td>
+						</tr>
+						<tr>
+							<td>$maximumNumberOfPages</td>
+							<td class='param-value' id='content-max-pages'></td>
+						</tr>
+						<tr>
+							<td>$pricePerPage</td>
+							<td class='param-value' id='content-price-per-page'></td>
+						</tr>
+					<tbody>						
 				</table>
 				";
-
-
-		/*
-		$paramsDiv = "
-			<div class='ppi-upload-parameters'>
-				<div class='thumbnail-container'>
-					<img id='ppi-thumbnail' />
-				</div>
-				<div class='params-container'>
-					<div class='param-line ppi-hidden' id='max-upload-size'>
-						<div class='param-name'>
-							{$maxUploadFileSizeLabel}	
-						</div>
-						<div class='param-value'>
-							{$maxUploadFileSize}
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							{$pDFPageWidth}
-						</div>
-						<div class='param-value' id='content-width'>
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							{$pDFPageHeight}
-						</div>
-						<div class='param-value' id='content-height'>
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							{$minimumNumberOfPages}
-						</div>
-						<div class='param-value' id='content-min-pages'>
-						</div>
-					</div>					
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							{$maximumNumberOfPages}
-						</div>
-						<div class='param-value' id='content-max-pages'>
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							{$pricePerPage}
-						</div>
-						<div class='param-value' id='content-price-per-page'>
-						</div>
-					</div>
-				</div>
-			</div>";
-		*/
 		echo $paramsDiv;
 	}
 

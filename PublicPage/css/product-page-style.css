@@ -2,6 +2,9 @@
     /* --params-width: 65%; */
     --params-width: 55%;
     --thumbnail-width: calc(100% - 2% - var(--params-width));
+    --main-color-humancolours: #ff661f; /* humancolours.com */
+    --main-color-mr-and-mrs-peleman: #ffd721; /* devwebshop.com */
+    --main-color-peleman: #006ad0; /* devshop.com */
 }
 
 /*---------------------------*/
@@ -24,28 +27,31 @@
 
 .ppi-upload-parameters table {
     margin-bottom: 0;
+    width: 75%;
+    margin: 0 0 0 5px;
 }
 
-.ppi-upload-parameters table td,
-.ppi-upload-parameters table th {
-    padding: 0.5em 0.5em;
-    font-size: 0.95em;
+.ppi-upload-parameters table tbody td,
+.ppi-upload-parameters table tbody th {
+    padding: 0.15em 0.5em;
+    font-size: 15px; /*0.95em;*/
 }
 
-.ppi-upload-parameters table tr td:nth-child(2) {
+.ppi-upload-parameters table tbody tr td:nth-child(2) {
     text-align: right;
 }
 
-.ppi-upload-parameters table tr td:nth-child(1) {
-    /* font-weight: 700; */
+.ppi-upload-parameters table tbody tr td:nth-child(1) {
+    font-weight: 700;
 }
 
 .ppi-upload-form {
     text-align: center;
     margin-bottom: 8px;
     display: inline-block;
-    width: var(--params-width);
     width: 100%;
+    background: #ffd721; /* depends on the site*/
+    border-radius: 6px;
 }
 /*---------------------------*/
 /*-------End Testing---------*/
@@ -76,7 +82,6 @@
 }
 
 .ppi-upload-form .upload-label {
-    border: 2px rgb(105, 105, 105) solid;
     color: rgb(105, 105, 105);
     cursor: pointer;
     user-select: none;
