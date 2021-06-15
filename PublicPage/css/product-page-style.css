@@ -1,15 +1,10 @@
 :root {
-    /* --params-width: 65%; */
     --params-width: 55%;
     --thumbnail-width: calc(100% - 2% - var(--params-width));
     --main-color-humancolours: #ff661f; /* humancolours.com */
     --main-color-mr-and-mrs-peleman: #ffd721; /* devwebshop.com */
     --main-color-peleman: #006ad0; /* devshop.com */
 }
-
-/*---------------------------*/
-/*----------Testing----------*/
-/*---------------------------*/
 
 .ppi-upload-parameters {
     margin-bottom: 2px;
@@ -50,12 +45,11 @@
     margin-bottom: 8px;
     display: inline-block;
     width: 100%;
-    background: #ffd721; /* depends on the site*/
+    background: var(
+        --main-color-peleman
+    ); /* default, but the actual color depends on the url - see js/upload-content.js */
     border-radius: 6px;
 }
-/*---------------------------*/
-/*-------End Testing---------*/
-/*---------------------------*/
 
 .ppi-add-to-cart-button {
     text-transform: none !important;
@@ -63,13 +57,6 @@
     display: flex !important;
     align-items: center;
 }
-
-/* .ppi-upload-form {
-    text-align: center;
-    margin-bottom: 8px;
-    display: inline-block;
-    width: var(--params-width);
-} */
 
 .upload-disabled {
     border: 1px darkgrey solid !important;
@@ -102,41 +89,6 @@
 .ppi-disabled:active {
     pointer-events: none;
 }
-
-/* .ppi-upload-parameters {
-    margin-bottom: 2px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.ppi-upload-parameters .params-container {
-    border-top: 1px solid darkgrey;
-    width: var(--params-width);
-}
-
-.ppi-upload-parameters .thumbnail-container {
-    width: var(--thumbnail-width);
-    background-color: whitesmoke;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-}
-
-.ppi-min-height {
-    min-height: 7em;
-}
-
-.ppi-upload-parameters .param-line {
-    color: rgb(82, 82, 82);
-    cursor: default;
-    user-select: none;
-    display: flex;
-    justify-content: space-between;
-    font-size: 90%;
-    padding: 0 5px;
-    background-color: lightgrey;
-    border-bottom: 1px solid darkgrey;
-} */
 
 .ppi-response-error {
     color: red;
