@@ -3,8 +3,6 @@
     $(function () {
         // Event: when a variation is selected
         $('.variations_form').on('show_variation', e => {
-            console.log('hi');
-
             const variationId = $("[name='variation_id']").val();
             initRefreshVariantElements();
 
@@ -164,13 +162,13 @@
             $('.single_add_to_cart_button').removeClass('ppi-disabled');
 
             if (!response.customButton) {
-                $('.quantity').after(
+                $('.woocommerce-variation-add-to-cart .quantity').after(
                     '<button type="submit" class="single_add_to_cart_button button alt">' +
                         addToCartLabel +
                         '</button>'
                 );
             } else {
-                $('.quantity').after(
+                $('.woocommerce-variation-add-to-cart .quantity').after(
                     "<a href='" +
                         response.imaxelData.url +
                         "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='ppi-hidden dashicons dashicons-update rotate'></span>" +
