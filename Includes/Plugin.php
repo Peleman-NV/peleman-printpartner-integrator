@@ -115,6 +115,7 @@ class Plugin
 		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayImaxelProjectFilesLink', 10, 3);
 
 		$this->loader->add_action('rest_api_init', $plugin_admin, 'registerCheckPendingOrdersEndpoint');
+		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
 
 		$this->loader->add_action('admin_post_read_imaxel_project', $plugin_admin, 'read_imaxel_project');
 	}

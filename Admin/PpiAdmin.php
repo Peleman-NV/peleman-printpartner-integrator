@@ -552,4 +552,18 @@ class PpiAdmin
 
 		wp_send_json($projectInfo);
 	}
+
+	public function displayTrackingInformation($order)
+	{
+		$trackingNumbers = $order->get_meta('f2d_tracking');
+		echo '<h3>Tracking numbers</h3>';
+		if (empty($order->get_meta('f2d_tracking'))) {
+			echo 'No tracking information available';
+			return;
+		}
+		$trackingNumbersArray = explode(',', $trackingNumbers);
+		foreach ($trackingNumbersArray as $trackingNumber) {
+			echo "<a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
+		}
+	}
 }
