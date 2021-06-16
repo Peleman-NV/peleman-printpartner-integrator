@@ -168,6 +168,7 @@ class Plugin
 
 		$this->loader->add_action('rest_api_init', $plugin_api, 'registerGetOrderEndpoint');
 		$this->loader->add_action('rest_api_init', $plugin_api, 'registerCompleteOrderEndpoint');
+		$this->loader->add_action('rest_api_init', $plugin_api, 'registerAddTrackingToOrderEndpoint');
 	}
 
 	/**

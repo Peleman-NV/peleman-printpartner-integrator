@@ -81,13 +81,26 @@ class PpiAPI
 	}
 
 	/**	
-	 * Register complete orde endpoint
+	 * Register complete order endpoint
 	 */
 	public function registerCompleteOrderEndpoint()
 	{
 		register_rest_route('ppi/v1', '/complete-order(?:/(?P<order>\d+))?', array(
 			'methods' => 'POST',
 			'callback' => array($this, 'completeOrder'),
+			'args' => array('order'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
+	/**	
+	 * Register add tracking details to order endpoint
+	 */
+	public function registerAddTrackingToOrderEndpoint()
+	{
+		register_rest_route('ppi/v1', '/order-tracking(?:/(?P<order>\d+))?', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'addTrackingInformationToOrder'),
 			'args' => array('order'),
 			'permission_callback' => '__return_true'
 		));
@@ -194,6 +207,38 @@ class PpiAPI
 			$order->save();
 			$response['status'] = 'success';
 			$response['message'] = 'order status changed from \'processing\' to \'completed\'';
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = $th->getMessage();
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+	}
+
+	public function addTrackingInformationToOrder($request)
+	{
+		$orderId = $request['order'];
+		$body = json_decode($request->get_body(), true);
+
+		$order = wc_get_order($orderId);
+		$response['order'] = $orderId;
+
+		if (!$order) {
+			$response['status'] = 'error';
+			$response['message'] = 'No order found';
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		try {
+			update_post_meta($orderId, 'f2d_tracking', $body['f2d_tracking']);
+			$response['status'] = 'success';
+			$response['message'] = 'add tracking data to order';
 			$statusCode = 200;
 			wp_send_json($response, $statusCode);
 			die();
