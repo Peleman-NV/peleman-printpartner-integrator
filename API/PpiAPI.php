@@ -235,10 +235,27 @@ class PpiAPI
 			die();
 		}
 
-		try {
-			update_post_meta($orderId, 'f2d_tracking', $body['f2d_tracking']);
+		$trackingNumber = $body['f2d_tracking'];
+		$currentTrackingNumbers = $order->get_meta('f2d_tracking');
+
+		$trackingNumbersArray = explode(',', $currentTrackingNumbers);
+		// if already in array, do nothing and return
+
+		if (in_array($trackingNumber, $trackingNumbersArray)) {
+			echo 'already got this one';
 			$response['status'] = 'success';
-			$response['message'] = 'add tracking data to order';
+			$response['message'] = 'tracking number already uploaded';
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		array_push($trackingNumbersArray, $trackingNumber);
+
+		try {
+			update_post_meta($orderId, 'f2d_tracking', implode(',', $trackingNumbersArray));
+			$response['status'] = 'success';
+			$response['message'] = 'added tracking data to order';
 			$statusCode = 200;
 			wp_send_json($response, $statusCode);
 			die();

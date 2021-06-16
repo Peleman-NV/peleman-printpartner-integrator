@@ -241,7 +241,6 @@ class PpiProductPage
 		$trackingNumbers = $order->get_meta('f2d_tracking');
 		$trackingNumbersArray  = explode(',', $trackingNumbers);
 		foreach ($trackingNumbersArray as $trackingNumber) {
-
 			echo "<i>Tracking number:</i> <a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
 		}
 	}
