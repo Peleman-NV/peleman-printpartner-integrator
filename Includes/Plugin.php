@@ -154,8 +154,9 @@ class Plugin
 		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_project_to_order_line_item', 10, 4);
 
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
-
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjustItemPriceForAddedPages', 10);
+
+		$this->loader->add_action('ppi_display_order_tracking_information', $product_page, 'ppi_output_order_tracking_information', 7, 1);
 	}
 
 	/**

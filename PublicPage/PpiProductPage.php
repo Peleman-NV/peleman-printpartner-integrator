@@ -227,8 +227,21 @@ class PpiProductPage
 		if ('variation-add-to-cart-button.php' === basename($template)) {
 			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation-add-to-cart-button.php';
 		}
-
+		if ('order-details-customer.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/order/order-details-customer.php';
+		}
 		return $template;
+	}
+
+	/**
+	 * Output tracking information
+	 */
+	public function ppi_output_order_tracking_information($order)
+	{
+		$trackingInformation = $order->get_meta('f2d_tracking');
+		echo $trackingInformation;
+		echo '<br>';
+		echo 'This is dummy tracking information';
 	}
 
 	/**
