@@ -211,10 +211,10 @@
                     addToCartLabel = 'In den Warenkorb legen';
                     break;
                 case 'it':
-                    addToCartLabel = 'Añadir a la cest';
+                    addToCartLabel = 'Aggiungi al carrello';
                     break;
                 case 'es':
-                    addToCartLabel = 'Aggiungi al carrello';
+                    addToCartLabel = 'Añadir al carrito';
                     break;
             }
 
