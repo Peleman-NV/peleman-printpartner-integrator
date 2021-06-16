@@ -150,26 +150,37 @@ class PpiAdmin
 
 		woocommerce_wp_text_input(array(
 			'id' => 'price_per_page[' . $loop . ']',
-			'wrapper_class' => 'form-row form-row-full',
-			'label' => 'Price per page (for uploaded PDF content, or user-created Imaxel content => A piece/sheet of paper = 2 pages)',
+			'wrapper_class' => 'form-row form-row-first',
+			'label' => 'Price per additional page (piece/sheet of paper = 2 pages)',
 			'type' => 'number',
 			'desc_tip'    => true,
 			'description' => __('Price per page', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'price_per_page', true)
 		));
 
-		echo '<hr>';
+		woocommerce_wp_text_input(array(
+			'id' => 'base_number_of_pages[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-last',
+			'label' => 'Base number of pages',
+			'type' => 'number',
+			'desc_tip'    => true,
+			'description' => __('Standard number of pages included in price', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'base_number_of_pages', true)
+		));
+
 		$pdf_upload_required = get_post_meta($variationId, 'pdf_upload_required', true);
 		//$pdf_upload_required = get_post_meta($parentId, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
 
 		woocommerce_wp_checkbox(array(
 			'id' => 'pdf_upload_required[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
 			'label'       => __('PDF content required?', 'woocommerce'),
 			'description' => __('Check to require a PDF upload', 'woocommerce'),
 			'desc_tip'    => true,
 			'value' => $pdf_upload_required,
 		));
+
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_width_mm[' . $loop . ']',
 			'wrapper_class' => 'form-row form-row-full',
@@ -234,6 +245,7 @@ class PpiAdmin
 		$pdf_min_pages = $_POST['pdf_min_pages'][$i];
 		$pdf_max_pages = $_POST['pdf_max_pages'][$i];
 		$price_per_page = $_POST['price_per_page'][$i];
+		$base_number_of_pages = $_POST['base_number_of_pages'][$i];
 
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
@@ -244,6 +256,7 @@ class PpiAdmin
 		if (isset($pdf_min_pages)) update_post_meta($variation_id, 'pdf_min_pages', esc_attr($pdf_min_pages));
 		if (isset($pdf_max_pages)) update_post_meta($variation_id, 'pdf_max_pages', esc_attr($pdf_max_pages));
 		if (isset($price_per_page)) update_post_meta($variation_id, 'price_per_page', esc_attr($price_per_page));
+		if (isset($base_number_of_pages)) update_post_meta($variation_id, 'base_number_of_pages', esc_attr($base_number_of_pages));
 	}
 
 	/**
