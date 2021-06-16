@@ -239,7 +239,7 @@ class PpiProductPage
 	public function ppi_output_order_tracking_information($order)
 	{
 		$trackingInformation = $order->get_meta('f2d_tracking');
-		echo "Tracking number: <a href=\"https://t.17track.net/en#nums=$trackingInformation\" target=\"blank\">$trackingInformation</a>";
+		echo "Tracking number: <a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingInformation\" target=\"blank\">$trackingInformation</a>";
 	}
 
 	/**
