@@ -80,6 +80,19 @@ class PpiAPI
 		));
 	}
 
+	/**	
+	 * Register complete orde endpoint
+	 */
+	public function registerCompleteOrderEndpoint()
+	{
+		register_rest_route('ppi/v1', '/complete-order(?:/(?P<order>\d+))?', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'completeOrder'),
+			'args' => array('order'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
 	public function getOrder($request)
 	{
 		$orderId = $request['order'];
@@ -150,6 +163,46 @@ class PpiAPI
 			wp_send_json($orderObject, 200);
 		} catch (\Throwable $th) {
 			wp_send_json(['error' => "Error adding files to response for order id {$orderId}"], 404);
+		}
+	}
+
+	public function completeOrder($request)
+	{
+		$orderId = $request['order'];
+		$order = wc_get_order($orderId);
+		$response['order'] = $orderId;
+
+		if (!$order) {
+			$response['status'] = 'error';
+			$response['message'] = 'No order found';
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		if ($order->get_status() !== 'processing') {
+			$response['status'] = 'error';
+			$response['message'] = 'Order status is not processing';
+			$response['order_status'] = $order->get_status();
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		try {
+			$order->set_status('completed');
+			$order->save();
+			$response['status'] = 'success';
+			$response['message'] = 'order status changed from \'processing\' to \'completed\'';
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = $th->getMessage();
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
 		}
 	}
 
