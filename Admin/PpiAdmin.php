@@ -78,7 +78,7 @@ class PpiAdmin
 	 */
 	public function ppi_add_admin_menu()
 	{
-		add_menu_page('Peleman Printshop Integrator', 'Peleman', 'manage_options', 'ppi-menu.php', array($this, 'require_admin_page'),  'dashicons-format-gallery');
+		add_menu_page('Peleman Printshop Integrator', 'Peleman Printpartner Integrator', 'manage_options', 'ppi-menu.php', array($this, 'require_admin_page'),  'dashicons-format-gallery');
 	}
 
 	/**
