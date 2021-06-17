@@ -574,15 +574,22 @@ class PpiProductPage
 
 	public function adjustItemPriceForAddedPages($cart)
 	{
-		foreach ($cart->get_cart() as $cartItem) {
-			// price adjustment for items with content uploads
-			if (isset($cartItem['variation']['attribute_pa_content-format']) && $cartItem['variation']['attribute_pa_content-format'] != '') {
-				$price = $cartItem['data']->get_price();
-				$productMetaData = get_post_meta($cartItem['variation_id']);
-				$pricePerPage = $productMetaData['price_per_page'][0];
-				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
 
-				$price += ($pages * $pricePerPage);
+		foreach ($cart->get_cart() as $cartItem) {
+			if ($cartItem['variation_id'] === 0) return;
+			$cartProduct = wc_get_product($cartItem['variation_id']);
+			$baseNumberOfPages = $cartProduct->get_meta('base_number_of_pages');
+			$pricePerPage = $cartProduct->get_meta('price_per_page');
+
+			if (isset($baseNumberOfPages) && !empty($baseNumberOfPages) && isset($pricePerPage) && !empty($pricePerPage)) {
+				if (empty($cartItem['_ppi_imaxel_project_id'])) return;
+				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
+				$pages = 25;
+				$supplementalPages = $pages - $baseNumberOfPages;
+				if ($supplementalPages <= 0) return;
+
+				$price = $cartItem['data']->get_price();
+				$price += ($supplementalPages * $pricePerPage);
 				$cartItem['data']->set_price($price);
 			}
 		}
