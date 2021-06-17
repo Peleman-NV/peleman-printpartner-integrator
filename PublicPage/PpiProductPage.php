@@ -509,6 +509,23 @@ class PpiProductPage
 		error_log($now->format('c') . ": persisted project {$project_id} for user {$user_id} / product {$product_id}" . PHP_EOL, 3,  $this->logFile);
 	}
 
+	/**
+	 * Add nr of pages to project line in database
+	 *
+	 * @param Int $project_id
+	 */
+	private function addPagesToProject($project_id, $pages)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$query = array('content_pages' => $pages);
+
+		$wpdb->update($table_name, $query, ['project_id' => $project_id]);
+
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ": added pages to imaxel project {$project_id}" . PHP_EOL, 3,  $this->logFile);
+	}
+
 	private function roundedNumberInRange($number, $baseRange, $precision)
 	{
 		if (round(floatval($number), 2) >= floatval($baseRange) - floatval($precision) && round(floatval($number), 2) <= floatval($baseRange) + floatval($precision)) {
@@ -584,8 +601,8 @@ class PpiProductPage
 			if (isset($baseNumberOfPages) && !empty($baseNumberOfPages) && isset($pricePerPage) && !empty($pricePerPage)) {
 				if (empty($cartItem['_ppi_imaxel_project_id'])) return;
 				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
-				$pages = 25;
 				$supplementalPages = $pages - $baseNumberOfPages;
+
 				if ($supplementalPages <= 0) return;
 
 				$price = $cartItem['data']->get_price();
@@ -593,6 +610,8 @@ class PpiProductPage
 				$cartItem['data']->set_price($price);
 			}
 		}
+
+		return $cart;
 	}
 
 	private function getNrOfContentPages($projectId)
@@ -602,5 +621,19 @@ class PpiProductPage
 		$result = $wpdb->get_row("SELECT content_pages FROM {$table_name} WHERE project_id = {$projectId};");
 
 		return $result->content_pages;
+	}
+
+	public function readImaxelProjectOnReturnFromEditor($passed, $product_id, $quantity, $variation_id = '', $variations = '')
+	{
+		if (isset($_GET['project']) && !empty($_GET['project'])) {
+			$imaxelProjectId = $_GET['project'];
+			$imaxel = new ImaxelService();
+			$response = json_decode($imaxel->read_project($imaxelProjectId)['body'], true);
+
+			$pages = count($response['design']['pages']) * 2;
+
+			$this->addPagesToProject($imaxelProjectId, $pages);
+		}
+		return $passed;
 	}
 }
