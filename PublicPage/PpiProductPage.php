@@ -582,7 +582,7 @@ class PpiProductPage
 			$createOrderResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
 
 			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID $imaxelProjectId - Order $orderId - item $orderItemId" . PHP_EOL, 3,  $this->logFile);
+			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID $imaxelProjectId - Order $order - item $orderItemId" . PHP_EOL, 3,  $this->logFile);
 		}
 	}
 
