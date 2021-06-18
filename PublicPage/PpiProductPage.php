@@ -504,9 +504,6 @@ class PpiProductPage
 		}
 
 		$wpdb->insert($table_name, $query);
-
-		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ": persisted project {$project_id} for user {$user_id} / product {$product_id}" . PHP_EOL, 3,  $this->logFile);
 	}
 
 	/**
@@ -585,7 +582,7 @@ class PpiProductPage
 			$createOrderResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
 
 			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID {$imaxelProjectId} - WC order item {$orderItemId}" . PHP_EOL, 3,  $this->logFile);
+			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID $imaxelProjectId - Order $orderId - item $orderItemId" . PHP_EOL, 3,  $this->logFile);
 		}
 	}
 
