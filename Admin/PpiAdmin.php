@@ -483,37 +483,26 @@ class PpiAdmin
 
 	public function displayImaxelProjectFilesTitle($display_key, $meta, $item)
 	{
-		$currentPage = basename(get_permalink());
-		$projectId = $item->get_meta('_ppi_imaxel_project_id');
+		if ($meta->key !== '_ppi_imaxel_project_id') return $display_key;
 
+		$currentPage = basename(get_permalink());
 		if (substr($currentPage, 0, 10) === '?post_type' && $display_key === '_ppi_imaxel_project_id' && get_class($item) === 'WC_Order_Item_Product') {
-			return 'Download Imaxel project files';
+			return 'Imaxel project files';
 		}
-		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
-			return;
-		}
-		return $display_key;
 	}
 
 	public function displayImaxelProjectFilesLink($value, $meta, $item)
 	{
-		$currentPage = basename(get_permalink());
+		if ($meta->key !== '_ppi_imaxel_project_id') return $value;
+
 		$orderId = $item->get_order_id();
 		$projectId = $item->get_meta('_ppi_imaxel_project_id');
+		$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
+		$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
+		$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
-		if (substr($currentPage, 0, 10) === '?post_type' && $projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
-			$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
-			$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
-			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
-
-			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . '</a>';
-			return '<i>files not ready yet</i>';
-		}
-		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
-			return '';
-		}
-
-		return $value;
+		if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . '</a>';
+		return '<i>files not ready yet</i>';
 	}
 
 	private function getContentFile($projectId)
