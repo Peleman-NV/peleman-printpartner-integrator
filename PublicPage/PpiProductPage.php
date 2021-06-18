@@ -629,8 +629,11 @@ class PpiProductPage
 			$imaxelProjectId = $_GET['project'];
 			$imaxel = new ImaxelService();
 			$response = json_decode($imaxel->read_project($imaxelProjectId)['body'], true);
-
 			$pages = count($response['design']['pages']) * 2;
+			// check if the first and last pages need to be ignored
+			if ($response['product']['variants'][0]['parts'][0]['output']['sheets_processor']['discarded_sides'] === 'first_and_last') {
+				$pages -= 2;
+			}
 
 			$this->addPagesToProject($imaxelProjectId, $pages);
 		}

@@ -154,19 +154,6 @@ class PpiAPI
 						// if content was uploaded by user
 						if ($result->content_pages !== null) {
 							$lineItem->number_of_pages = $result->content_pages;
-						} else {
-							// if content was downloaded from Imaxel
-							// product has veriable # of pages, eg:wedding book
-							$imaxel = new ImaxelService();
-							$readProjectResponse = $imaxel->read_project($imaxelProjectId)['body'];
-
-							$decodedResponse = json_decode($readProjectResponse);
-							$pagesObject = $decodedResponse->design->pages;
-							// filter only pages, not cover
-							$numberOfPages = count(array_filter($pagesObject, function ($e) {
-								return $e->partName === "pages";
-							}));
-							$lineItem->number_of_pages = $numberOfPages * 2;
 						}
 
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
