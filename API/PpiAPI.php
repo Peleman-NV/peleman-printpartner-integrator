@@ -62,7 +62,13 @@ class PpiAPI
 	private function getProcessingOrders()
 	{
 		global $wpdb;
-		$ordersWithStatusProcessing = $wpdb->get_results('SELECT ID from ' . $wpdb->prefix . 'posts WHERE post_type = \'shop_order\' AND post_status = \'wc-processing\';');
+		$ordersWithStatusProcessing = $wpdb->get_results("SELECT p.ID as id, pm.meta_value as date_paid from {$wpdb->prefix}posts p INNER JOIN {$wpdb->prefix}postmeta pm on p.ID = pm.post_id  WHERE post_type = 'shop_order' AND post_status = 'wc-processing' AND pm.meta_key = '_date_paid';");
+
+		foreach ($ordersWithStatusProcessing as $order) {
+			$date = new \DateTime();
+			$date->setTimestamp($order->date_paid)->setTimezone(new \DateTimeZone('Europe/Brussels'));
+			$order->date_paid = $date->format('Y-m-d H:i:s');
+		}
 
 		wp_send_json($ordersWithStatusProcessing);
 	}
@@ -155,7 +161,6 @@ class PpiAPI
 						if ($result->content_pages !== null) {
 							$lineItem->number_of_pages = $result->content_pages;
 						}
-
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
 					}
 				}
