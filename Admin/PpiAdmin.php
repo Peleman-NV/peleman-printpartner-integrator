@@ -501,7 +501,7 @@ class PpiAdmin
 		$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
 		$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
-		if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . '</a>';
+		if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . ' (' . round(filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)) / 1024, 2) . ' kB)</a>';
 		return '<i>files not ready yet</i>';
 	}
 

@@ -129,7 +129,6 @@ class PpiAPI
 
 		$imaxel_files = [];
 		foreach ($orderItems as $orderItem) {
-
 			// assuming the content will have an Imaxel project ID (ie. has some customer created content).
 			$imaxelProjectId = $orderItem->get_meta('_ppi_imaxel_project_id');
 			if ($imaxelProjectId === '') continue;
@@ -162,6 +161,7 @@ class PpiAPI
 							$lineItem->number_of_pages = $result->content_pages;
 						}
 						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
+						$lineItem->imaxel_file_size_in_bytes = filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 					}
 				}
 			}
