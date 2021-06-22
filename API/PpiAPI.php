@@ -62,7 +62,7 @@ class PpiAPI
 	private function getProcessingOrders()
 	{
 		global $wpdb;
-		$ordersWithStatusProcessing = $wpdb->get_results("SELECT p.ID as id, pm.meta_value as date_paid from {$wpdb->prefix}posts p INNER JOIN {$wpdb->prefix}postmeta pm on p.ID = pm.post_id  WHERE post_type = 'shop_order' AND post_status = 'wc-processing' AND pm.meta_key = '_date_paid';");
+		$ordersWithStatusProcessing = $wpdb->get_results("SELECT p.ID as ID, pm.meta_value as date_paid from {$wpdb->prefix}posts p INNER JOIN {$wpdb->prefix}postmeta pm on p.ID = pm.post_id  WHERE post_type = 'shop_order' AND post_status = 'wc-processing' AND pm.meta_key = '_date_paid';");
 
 		foreach ($ordersWithStatusProcessing as $order) {
 			$date = new \DateTime();
