@@ -151,7 +151,12 @@ class PpiAPI
 			$orderObject->language_code = !empty($orderLanguage) ? $orderLanguage : 'en';
 
 			// add files and number of pages as metadata to line items of order response
+			// add f2d data to line item
 			foreach ($orderObject->line_items as $lineItem) {
+				$variationId = $lineItem->variation_id;
+				$f2dData =  get_post_meta($variationId, 'f2d_sku_components', true);
+				if (!empty($f2dData)) $lineItem->f2d_sku_components = $f2dData;
+
 				foreach ($lineItem->meta_data as $meta_data) {
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$imaxelProjectId = $meta_data->value;
