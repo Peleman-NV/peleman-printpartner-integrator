@@ -119,7 +119,7 @@ class PpiAdmin
 		woocommerce_wp_text_input(array(
 			'id' => 'f2d_sku_components[' . $loop . ']',
 			'wrapper_class' => 'form-row form-row-full',
-			'label' => 'Fly2Data SKU detail',
+			'label' => 'Fly2Data SKU data',
 			'type' => 'text',
 			'desc_tip'    => true,
 			'description' => __('F2D components that make up a variation', 'woocommerce'),
