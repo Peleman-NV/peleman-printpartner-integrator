@@ -117,6 +117,16 @@ class PpiAdmin
 		echo '<div class="ppi-options-group"><h2 class="ppi-options-group-title">Fly2Data Properties</h2>';
 
 		woocommerce_wp_text_input(array(
+			'id' => 'f2d_sku_components[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
+			'label' => 'Fly2Data SKU detail',
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('F2D components that make up a variation', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'f2d_sku_components', true)
+		));
+
+		woocommerce_wp_text_input(array(
 			'id' => 'template_id[' . $loop . ']',
 			'placeholder' => 'Imaxel template ID',
 			'wrapper_class' => 'form-row form-row-first',
@@ -236,6 +246,7 @@ class PpiAdmin
 	 */
 	public function ppi_persist_custom_field_variations($variation_id, $i)
 	{
+		$f2d_sku_components = $_POST['f2d_sku_components'][$i];
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
 		$custom_variant_add_to_cart_label = $_POST['custom_variation_add_to_cart_label'][$i];
@@ -247,6 +258,7 @@ class PpiAdmin
 		$price_per_page = $_POST['price_per_page'][$i];
 		$base_number_of_pages = $_POST['base_number_of_pages'][$i];
 
+		if (isset($f2d_sku_components)) update_post_meta($variation_id, 'f2d_sku_components', esc_attr($f2d_sku_components));
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
 		if (isset($custom_variant_add_to_cart_label)) update_post_meta($variation_id, 'custom_variation_add_to_cart_label', esc_attr($custom_variant_add_to_cart_label));
