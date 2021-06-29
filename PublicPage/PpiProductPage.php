@@ -337,19 +337,22 @@ class PpiProductPage
 			$response['type'] = $file_type;
 		};
 
+		// $imaxel_response = $this->getImaxelData($variant_id);
+		// if ($imaxel_response['status'] == "error") {
+		// 	$response['status'] = 'error';
+		// 	$response['information'] = $imaxel_response['information'];
+		// 	$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+		// }
+		// $project_id = $imaxel_response['project_id'];
+		// $response['url'] = $imaxel_response['url'];
+
 		$variant_id = $_POST['variant_id'];
+		$timestamp = round(microtime(true) * 1000);
+		$user_id = get_current_user_id();
+		$uniqueId = $user_id . '_' . $variant_id . '_' . $timestamp;
 
-		$imaxel_response = $this->getImaxelData($variant_id);
-		if ($imaxel_response['status'] == "error") {
-			$response['status'] = 'error';
-			$response['information'] = $imaxel_response['information'];
-			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-		}
-		$project_id = $imaxel_response['project_id'];
-		$response['url'] = $imaxel_response['url'];
-
-		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
-		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
+		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $uniqueId);
+		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $uniqueId . '/content.pdf';
 
 		try {
 			$pdf = new Fpdi();
@@ -379,8 +382,8 @@ class PpiProductPage
 			$response['file']['pages'] = $pages;
 			$response['message'] = __("Your file has too many pages.", PPI_TEXT_DOMAIN);
 		}
-		// precision of 1mm
 
+		// precision of 1mm
 		$precision = 0.5;
 		if (($variant['width'] != "" && !$this->roundedNumberInRange($dimensions['width'], $variant['width'], $precision))
 			|| ($variant['height'] != "" && !$this->roundedNumberInRange($dimensions['height'], $variant['height'], $precision))
@@ -388,8 +391,6 @@ class PpiProductPage
 			$response['status'] = 'error';
 			$response['file']['width'] = $dimensions['width'];
 			$response['file']['height'] = $dimensions['height'];
-			$displayWidth = round($dimensions['width'], 1);
-			$displayHeight = round($dimensions['height'], 1);
 			$response['message'] = __("Your file's dimensions do not match the required dimensions.", PPI_TEXT_DOMAIN);
 		}
 
@@ -406,12 +407,12 @@ class PpiProductPage
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
-			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $project_id . '.jpg';
+			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $uniqueId . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->setCompressionQuality(25);
 			$imagick->scaleImage(150, 0);
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $uniqueId . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages).', PPI_TEXT_DOMAIN), $filename, $pages);
 		} catch (\Throwable $th) {
@@ -422,15 +423,15 @@ class PpiProductPage
 		}
 
 		$response['file']['name'] = $filename;
-		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
-		$response['file']['location'] = $newFilenameWithPath;
+		$response['file']['folder'] = $uniqueId;
+		$response['file']['full-location'] = $newFilenameWithPath;
 		$response['file']['filesize'] = $_FILES['file']['size'];
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
 
-		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithPath, $pages);
+
+		//$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithPath, $pages);
 
 		$this->returnResponse($response);
 	}
@@ -441,6 +442,7 @@ class PpiProductPage
 	 */
 	private function returnResponse($response)
 	{
+
 		wp_send_json($response);
 		wp_die();
 	}
