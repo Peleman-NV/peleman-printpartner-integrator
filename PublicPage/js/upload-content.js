@@ -53,6 +53,14 @@
                             response.file.name
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
+
+                        $('.single_add_to_cart_button ').after(
+                            '<input type="hidden" name="content-upload-folder" value="' +
+                                response.file.folder +
+                                '" />'
+                        );
+                        // add folder location to hidden input to save to db
+
                         const timeEnd = performance.now();
                         const duration = ((timeEnd - timeStart) / 1000).toFixed(
                             4
