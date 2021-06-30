@@ -39,9 +39,17 @@
                     console.log(response);
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
-                        $('.single_add_to_cart_button').removeClass(
-                            'ppi-disabled'
-                        );
+                        if (response.do_not_redirect === true) {
+                            replaceBtnWithLink(response.url);
+                        } else {
+                            $('.single_add_to_cart_button').removeClass(
+                                'ppi-disabled'
+                            );
+                            $('.single_add_to_cart_button').prop(
+                                'href',
+                                response.url
+                            );
+                        }
                         $('.ppi-upload-parameters').removeClass('ppi-hidden');
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
@@ -53,14 +61,6 @@
                             response.file.name
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
-
-                        $('.single_add_to_cart_button ').after(
-                            '<input type="hidden" name="content-upload-folder" value="' +
-                                response.file.folder +
-                                '" />'
-                        );
-                        // add folder location to hidden input to save to db
-
                         const timeEnd = performance.now();
                         const duration = ((timeEnd - timeStart) / 1000).toFixed(
                             4
@@ -101,6 +101,23 @@
             });
             $('#file-upload').val('');
         });
+
+        function replaceBtnWithLink(url) {
+            // get btn textStatus
+            const btnText = $('.single_add_to_cart_button').html();
+
+            $('.single_add_to_cart_button').remove();
+
+            $('.quantity').after(
+                "<a href='" +
+                    url +
+                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
+                    btnText +
+                    '</a>'
+            );
+            $('.single_add_to_cart_button').removeClass('ppi-disabled');
+            $('#ppi-loading').addClass('ppi-hidden');
+        }
 
         function setUploadBtnColour() {
             let btnColour = '';

@@ -157,16 +157,29 @@ class PpiAPI
 				$f2dData =  get_post_meta($variationId, 'f2d_sku_components', true);
 				if (!empty($f2dData)) $lineItem->f2d_sku_components = $f2dData;
 
+				$lineItem->files = [];
+
 				foreach ($lineItem->meta_data as $meta_data) {
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$imaxelProjectId = $meta_data->value;
 						$result = $this->projectHasContentUpload($imaxelProjectId);
+
 						// if content was uploaded by user
 						if ($result->content_pages !== null) {
 							$lineItem->number_of_pages = $result->content_pages;
 						}
-						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
-						$lineItem->imaxel_file_size_in_bytes = filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
+						if ($result->content_filename !== null) {
+							$lineItem->files[] = [
+								'file' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
+								'file_size_in_bytes' => filesize(realpath(PPI_UPLOAD_DIR . '/' . $result->content_filename)),
+								'type' => 'Content'
+							];
+						}
+						$lineItem->files[] = [
+							'file' => $imaxel_files[$meta_data->value],
+							'file_size_in_bytes' => filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)),
+							'type' => 'Imaxel'
+						];
 					}
 				}
 			}

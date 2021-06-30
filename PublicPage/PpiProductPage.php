@@ -56,7 +56,8 @@ class PpiProductPage
 	 */
 	public function enqueue_styles()
 	{
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name . 'products', plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name . 'projects', plugin_dir_url(__FILE__) . 'css/projects-page-style.css', array(), $this->version, 'all');
 		wp_enqueue_style('dashicons');
 	}
 
@@ -337,22 +338,19 @@ class PpiProductPage
 			$response['type'] = $file_type;
 		};
 
-		// $imaxel_response = $this->getImaxelData($variant_id);
-		// if ($imaxel_response['status'] == "error") {
-		// 	$response['status'] = 'error';
-		// 	$response['information'] = $imaxel_response['information'];
-		// 	$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-		// }
-		// $project_id = $imaxel_response['project_id'];
-		// $response['url'] = $imaxel_response['url'];
-
 		$variant_id = $_POST['variant_id'];
-		$timestamp = round(microtime(true) * 1000);
-		$user_id = get_current_user_id();
-		$uniqueId = $user_id . '_' . $variant_id . '_' . $timestamp;
 
-		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $uniqueId);
-		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $uniqueId . '/content.pdf';
+		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+		}
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
+
+		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
+		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
 
 		try {
 			$pdf = new Fpdi();
@@ -382,8 +380,8 @@ class PpiProductPage
 			$response['file']['pages'] = $pages;
 			$response['message'] = __("Your file has too many pages.", PPI_TEXT_DOMAIN);
 		}
-
 		// precision of 1mm
+
 		$precision = 0.5;
 		if (($variant['width'] != "" && !$this->roundedNumberInRange($dimensions['width'], $variant['width'], $precision))
 			|| ($variant['height'] != "" && !$this->roundedNumberInRange($dimensions['height'], $variant['height'], $precision))
@@ -407,12 +405,12 @@ class PpiProductPage
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
-			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $uniqueId . '.jpg';
+			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $project_id . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->setCompressionQuality(25);
 			$imagick->scaleImage(150, 0);
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $uniqueId . '.jpg';
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages).', PPI_TEXT_DOMAIN), $filename, $pages);
 		} catch (\Throwable $th) {
@@ -423,15 +421,15 @@ class PpiProductPage
 		}
 
 		$response['file']['name'] = $filename;
-		$response['file']['folder'] = $uniqueId;
-		$response['file']['full-location'] = $newFilenameWithPath;
+		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
+		$response['file']['location'] = $newFilenameWithPath;
 		$response['file']['filesize'] = $_FILES['file']['size'];
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
 
-
-		//$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithPath, $pages);
+		$user_id = get_current_user_id();
+		$this->insertProject($user_id, $project_id, $variant_id, '/' . $project_id . '/content.pdf', $pages);
 
 		$this->returnResponse($response);
 	}
@@ -442,7 +440,6 @@ class PpiProductPage
 	 */
 	private function returnResponse($response)
 	{
-
 		wp_send_json($response);
 		wp_die();
 	}
@@ -628,14 +625,50 @@ class PpiProductPage
 			$imaxelProjectId = $_GET['project'];
 			$imaxel = new ImaxelService();
 			$response = json_decode($imaxel->read_project($imaxelProjectId)['body'], true);
-			$pages = count($response['design']['pages']) * 2;
+
+			$pages = $this->countPagesInImaxelProject($response['design']['pages']);
 			// check if the first and last pages need to be ignored
-			if ($response['product']['variants'][0]['parts'][0]['output']['sheets_processor']['discarded_sides'] === 'first_and_last') {
-				$pages -= 2;
+
+			foreach ($response['product']['variants'][0]['parts'] as $part) {
+				if ($part['name'] === 'pages') {
+					if ($part['output']['sheets_processor']['discarded_sides'] === 'first_and_last') $pages -= 2;
+				}
 			}
 
 			$this->addPagesToProject($imaxelProjectId, $pages);
 		}
 		return $passed;
+	}
+
+	private function countPagesInImaxelProject($designObject)
+	{
+		$sheets = array_filter(
+			$designObject,
+			function ($e) {
+				return $e['partName'] === 'pages';
+			}
+		);
+
+		return count($sheets) * 2;
+	}
+
+	public function add_projects_menu_item($items)
+	{
+		$logout = $items['customer-logout'];
+		unset($items['customer-logout']);
+		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
+		$items['customer-logout'] = $logout;
+
+		return $items;
+	}
+
+	public function register_projects_endpoint()
+	{
+		add_rewrite_endpoint('projects', EP_PAGES);
+	}
+
+	public function projects_endpoint_content()
+	{
+		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
 	}
 }
