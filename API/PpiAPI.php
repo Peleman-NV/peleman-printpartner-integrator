@@ -170,13 +170,13 @@ class PpiAPI
 						}
 						if ($result->content_filename !== null) {
 							$lineItem->files[] = [
-								'file' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
+								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
 								'file_size_in_bytes' => filesize(realpath(PPI_UPLOAD_DIR . '/' . $result->content_filename)),
 								'type' => 'Content'
 							];
 						}
 						$lineItem->files[] = [
-							'file' => $imaxel_files[$meta_data->value],
+							'file_name' => $imaxel_files[$meta_data->value],
 							'file_size_in_bytes' => filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)),
 							'type' => 'Imaxel'
 						];
