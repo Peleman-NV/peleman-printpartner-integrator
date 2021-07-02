@@ -111,8 +111,8 @@ class Plugin
 		$this->loader->add_action('woocommerce_product_after_variable_attributes', $plugin_admin, 'ppi_add_custom_fields_to_variable_products', 11, 3);
 		$this->loader->add_action('woocommerce_save_product_variation', $plugin_admin, 'ppi_persist_custom_field_variations', 11, 2);
 
-		$this->loader->add_action('woocommerce_order_item_display_meta_key', $plugin_admin, 'displayImaxelProjectFilesTitle', 10, 3);
-		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayImaxelProjectFilesLink', 10, 3);
+		$this->loader->add_action('woocommerce_order_item_display_meta_key', $plugin_admin, 'displayCustomMetaDataKey', 10, 3);
+		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayCustomMetaDataValue', 10, 3);
 
 		$this->loader->add_action('rest_api_init', $plugin_admin, 'registerCheckPendingOrdersEndpoint');
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
@@ -153,7 +153,7 @@ class Plugin
 		$this->loader->add_action('woocommerce_add_to_cart_validation', $product_page, 'readImaxelProjectOnReturnFromEditor', 10, 5);
 
 		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 2);
-		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_project_to_order_line_item', 10, 4);
+		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_custom_data_to_order_line_item', 10, 4);
 
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjustItemPriceForAddedPages', 10);

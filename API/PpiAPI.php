@@ -48,6 +48,7 @@ class PpiAPI
 	private function apiClient()
 	{
 		$siteUrl = get_site_url();
+
 		return new Client(
 			$siteUrl,
 			get_option('ppi-wc-key'),
@@ -126,7 +127,6 @@ class PpiAPI
 		// add language code to top level
 
 		$orderItems = $order->get_items();
-
 		$imaxel_files = [];
 		foreach ($orderItems as $orderItem) {
 			// assuming the content will have an Imaxel project ID (ie. has some customer created content).
@@ -136,7 +136,6 @@ class PpiAPI
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
 			if ($isFileReady === false) wp_send_json(['error' => "Files not ready for order id {$orderId}"], 404);
-
 			$imaxel_files[$imaxelProjectId] = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
 		}
 

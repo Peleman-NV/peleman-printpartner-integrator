@@ -493,28 +493,38 @@ class PpiAdmin
 		}
 	}
 
-	public function displayImaxelProjectFilesTitle($display_key, $meta, $item)
+	public function displayCustomMetaDataKey($display_key, $meta, $item)
 	{
-		if ($meta->key !== '_ppi_imaxel_project_id') return $display_key;
-
 		$currentPage = basename(get_permalink());
 		if (substr($currentPage, 0, 10) === '?post_type' && $display_key === '_ppi_imaxel_project_id' && get_class($item) === 'WC_Order_Item_Product') {
 			return 'Imaxel project files';
 		}
+		if (substr($currentPage, 0, 10) === '?post_type' && $display_key === '_content_filename' && get_class($item) === 'WC_Order_Item_Product') {
+			return 'Content files';
+		}
+
+		return $display_key;
 	}
 
-	public function displayImaxelProjectFilesLink($value, $meta, $item)
+	public function displayCustomMetaDataValue($value, $meta, $item)
 	{
-		if ($meta->key !== '_ppi_imaxel_project_id') return $value;
+		if ($meta->key === '_ppi_imaxel_project_id') {
+			$orderId = $item->get_order_id();
+			$projectId = $item->get_meta('_ppi_imaxel_project_id');
+			$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
+			$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
+			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
-		$orderId = $item->get_order_id();
-		$projectId = $item->get_meta('_ppi_imaxel_project_id');
-		$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
-		$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
-		$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
+			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . ' (' . round(filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)) / 1024, 2) . ' kB)</a>';
+			return '<i>files not ready yet</i>';
+		}
+		if ($meta->key === '_content_filename') {
+			$file = $item->get_meta('_content_filename');
+			$url = get_site_url() . '/wp-content/uploads/ppi/content/' . $file;
+			return '<a href="' . $url . '" download>content-files (' . round(filesize(realpath(PPI_UPLOAD_DIR . '/' . $file)) / 1024, 2) . ' kB)</a>';
+		}
 
-		if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . ' (' . round(filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)) / 1024, 2) . ' kB)</a>';
-		return '<i>files not ready yet</i>';
+		return $value;
 	}
 
 	private function getContentFile($projectId)

@@ -513,9 +513,17 @@ class PpiProductPage
 	private function addPagesToProject($project_id, $pages)
 	{
 		global $wpdb;
-		$table_name = PPI_USER_PROJECTS_TABLE;
-		$query = array('content_pages' => $pages);
+		$table_name = $wpdb->prefix . 'ppi_user_projects';
+		// is there content, and does it have pages?  If so, do not overwrite
+		$contentWithPagesExists = $wpdb->get_results("SELECT content_filename, content_pages FROM $table_name WHERE project_id = $project_id;");
 
+		if (strpos($contentWithPagesExists[0]->content_filename, 'content')) {
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": no Imaxel page count added to project {$project_id} - content files page count is already known" . PHP_EOL, 3,  $this->logFile);
+			return;
+		}
+
+		$query = array('content_pages' => $pages);
 		$wpdb->update($table_name, $query, ['project_id' => $project_id]);
 
 		$now =  new DateTime('NOW');
@@ -549,15 +557,31 @@ class PpiProductPage
 	/**
 	 * Add project ID to order line item 
 	 */
-	public function add_project_to_order_line_item($item, $cart_item_key, $values, $order)
+	public function add_custom_data_to_order_line_item($item, $cart_item_key, $values, $order)
 	{
+		$imaxelProjectId = 0;
 		if (isset($values['_ppi_imaxel_project_id'])) {
 			$imaxelProjectId = $values['_ppi_imaxel_project_id'];
 			$item->add_meta_data('_ppi_imaxel_project_id', $imaxelProjectId, true);
-
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
 		}
+		if ($imaxelProjectId !== 0) {
+			$uploadedContent = $this->projectHasContentUpload($imaxelProjectId);
+			if ($uploadedContent !== null) {
+				$item->add_meta_data('_content_filename', $uploadedContent->content_filename, true);
+			}
+		}
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
+	}
+
+	private function projectHasContentUpload($projectId)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$result =  $wpdb->get_results("SELECT * FROM {$table_name} WHERE project_id = {$projectId}");
+
+		if ($result[0] === null) return false;
+		return $result[0];
 	}
 
 	/**
@@ -635,6 +659,7 @@ class PpiProductPage
 				}
 			}
 
+			// if there is content, do not overwrite -> see addPagesToProject project
 			$this->addPagesToProject($imaxelProjectId, $pages);
 		}
 		return $passed;
