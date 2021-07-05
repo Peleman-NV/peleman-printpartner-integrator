@@ -1,15 +1,14 @@
 (function ($) {
     ('use strict');
     $(function () {
-        // Event: when a variation is selected
+        // Event: show variation: when a variation is selected, show variant information
         $('.variations_form').on('show_variation', e => {
             const variationId = $("[name='variation_id']").val();
             initRefreshVariantElements();
-
             getProductVariationData(variationId);
         });
 
-        // Event: when a new variation is chosen
+        // Event: hide variation info: when a new variation is selected, all variant info is hidden
         $('.variations_form').on('hide_variation', e => {
             hideUploadElements();
             disableAddToCartBtn();
@@ -97,6 +96,7 @@
 
         // when showing a (new) variation, all previous elements need to be cleared or hidden
         function initRefreshVariantElements() {
+            // display loading animation
             $('#ppi-loading').removeClass('ppi-hidden');
             // clear any old upload information
             $('#upload-info').html('');
@@ -104,7 +104,9 @@
             $('#max-upload-size').addClass('ppi-hidden');
             // disable add-to-cart btn
             $('.single_add_to_cart_button').addClass('ppi-disabled');
+            // hide upload button
             $('.ppi-upload-form').addClass('ppi-hidden');
+            // hide upload parameters block
             $('.ppi-upload-parameters').addClass('ppi-hidden');
         }
 
@@ -152,7 +154,9 @@
         }
 
         function hideUploadElements() {
+            // hide upload params block
             $('.upload-label').addClass('upload-disabled');
+            // hide upload params block
             $('.upload-parameters').addClass('ppi-hidden');
         }
 
@@ -168,6 +172,7 @@
                         '</button>'
                 );
             } else {
+                // span with loading animation
                 $('.woocommerce-variation-add-to-cart .quantity').after(
                     "<a href='" +
                         response.imaxelData.url +

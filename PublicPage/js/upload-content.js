@@ -9,12 +9,13 @@
             const variationId = $("[name='variation_id']").val();
             $('.single_add_to_cart_button').addClass('ppi-disabled');
             $('#upload-info').html('');
-            $('#upload-info').removeClass();
-            $('#ppi-loading').removeClass('ppi-hidden');
-            $('.thumbnail-container').css('background-image', '');
+            $('#upload-info').removeClass(); // removes all classes from upload info
+            $('#ppi-loading').removeClass('ppi-hidden'); // display loading animation
+            $('.thumbnail-container').css('background-image', ''); // remove thumbnail
             $('.thumbnail-container').removeClass('ppi-min-height');
             $('.thumbnail-container').prop('alt', '');
 
+            // create AJAX POST object for PHP
             const fileInput = document.getElementById('file-upload');
             const file = fileInput.files[0];
             const formData = new FormData();
@@ -23,9 +24,10 @@
             formData.append('variant_id', variationId);
             formData.append('_ajax_nonce', ppi_upload_content_object.nonce);
 
+            // autmatically submit form on change event
             $('#file-upload').submit();
             e.preventDefault();
-            // add GET param to add to cart URL to be saved in DB
+
             $.ajax({
                 url: ppi_upload_content_object.ajax_url,
                 method: 'POST',
@@ -39,18 +41,16 @@
                     console.log(response);
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
-                        if (response.do_not_redirect === true) {
-                            replaceBtnWithLink(response.url);
-                        } else {
-                            $('.single_add_to_cart_button').removeClass(
-                                'ppi-disabled'
-                            );
-                            $('.single_add_to_cart_button').prop(
-                                'href',
-                                response.url
-                            );
-                        }
-                        $('.ppi-upload-parameters').removeClass('ppi-hidden');
+                        // enable add to cart button
+                        $('.single_add_to_cart_button').removeClass(
+                            'ppi-disabled'
+                        );
+                        // this put the correct URL in place - shouldn't happen here
+                        // $('.single_add_to_cart_button').prop(
+                        //     'href',
+                        //     response.url
+                        // );
+                        //$('.ppi-upload-parameters').removeClass('ppi-hidden'); // dunno why this is here
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
                             'background-image',
@@ -61,25 +61,14 @@
                             response.file.name
                         );
                         $('#ppi-loading').addClass('ppi-hidden');
-                        const timeEnd = performance.now();
-                        const duration = ((timeEnd - timeStart) / 1000).toFixed(
-                            4
-                        );
-                        const fileSize =
-                            (response.file.filesize / 1024 / 1024).toFixed(2) +
-                            ' MB.';
-                        console.log(
-                            'It took ' +
-                                duration +
-                                ' seconds to upload ' +
-                                fileSize
-                        );
                     } else {
+                        // if AJAX return is good but it contains an error, add error styling and show msg
                         $('#upload-info').html(response.message);
                         $('#upload-info').addClass('ppi-response-error');
                         $('#ppi-loading').addClass('ppi-hidden');
                     }
                 },
+                // if AJAX fails
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR);
                     $('#upload-info').html(
@@ -102,22 +91,22 @@
             $('#file-upload').val('');
         });
 
-        function replaceBtnWithLink(url) {
-            // get btn textStatus
-            const btnText = $('.single_add_to_cart_button').html();
+        // function replaceBtnWithLink(url) {
+        //     // get btn textStatus
+        //     const btnText = $('.single_add_to_cart_button').html();
 
-            $('.single_add_to_cart_button').remove();
+        //     $('.single_add_to_cart_button').remove();
 
-            $('.quantity').after(
-                "<a href='" +
-                    url +
-                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
-                    btnText +
-                    '</a>'
-            );
-            $('.single_add_to_cart_button').removeClass('ppi-disabled');
-            $('#ppi-loading').addClass('ppi-hidden');
-        }
+        //     $('.quantity').after(
+        //         "<a href='" +
+        //             url +
+        //             "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
+        //             btnText +
+        //             '</a>'
+        //     );
+        //     $('.single_add_to_cart_button').removeClass('ppi-disabled');
+        //     $('#ppi-loading').addClass('ppi-hidden');
+        // }
 
         function setUploadBtnColour() {
             let btnColour = '';
