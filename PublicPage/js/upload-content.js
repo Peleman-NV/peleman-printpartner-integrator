@@ -1,3 +1,15 @@
+/**
+ * This script is only responsible to the content file upload.
+ * If a product requires a content file, 'variable-product.js' will load an upload form.
+ * This script fires on the change event of that form, and performs an AJAX call to
+ * the PHP function "upload_content_file" in PublicPage/PpiProductPage.php,
+ * where the file is validated and uploaded to the server on success.
+ * A response is then return (success or error) after which the "add to cart" button is
+ * enabled, or an error message is displayed.
+ *
+ * The upload button's colour is also set, depending on the URL.
+ */
+
 (function ($) {
     'use strict';
     $(function () {
@@ -45,12 +57,6 @@
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
                         );
-                        // this put the correct URL in place - shouldn't happen here
-                        // $('.single_add_to_cart_button').prop(
-                        //     'href',
-                        //     response.url
-                        // );
-                        //$('.ppi-upload-parameters').removeClass('ppi-hidden'); // dunno why this is here
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
                             'background-image',
@@ -90,23 +96,6 @@
             });
             $('#file-upload').val('');
         });
-
-        // function replaceBtnWithLink(url) {
-        //     // get btn textStatus
-        //     const btnText = $('.single_add_to_cart_button').html();
-
-        //     $('.single_add_to_cart_button').remove();
-
-        //     $('.quantity').after(
-        //         "<a href='" +
-        //             url +
-        //             "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
-        //             btnText +
-        //             '</a>'
-        //     );
-        //     $('.single_add_to_cart_button').removeClass('ppi-disabled');
-        //     $('#ppi-loading').addClass('ppi-hidden');
-        // }
 
         function setUploadBtnColour() {
             let btnColour = '';
