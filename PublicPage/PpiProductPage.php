@@ -67,6 +67,7 @@ class PpiProductPage
 	public function enqueue_scripts()
 	{
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'));
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/add-to-cart.js', array('jquery'));
 	}
 
 	/**
@@ -94,6 +95,8 @@ class PpiProductPage
 				'nonce' => wp_create_nonce('file_upload_nonce')
 			)
 		);
+
+		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'));
 	}
 
 	/**
