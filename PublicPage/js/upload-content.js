@@ -116,6 +116,12 @@
                     btnColour = '#006ad0'; /* devshop.com */
                     $('.ppi-upload-form .upload-label').css('color', 'white');
                     break;
+                default:
+                    $('.ppi-upload-form .upload-label').css(
+                        'border',
+                        '1px solid grey'
+                    );
+                    break;
             }
 
             $('.ppi-upload-form').css('background', btnColour);
