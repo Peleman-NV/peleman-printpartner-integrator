@@ -66,8 +66,6 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'));
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/add-to-cart.js', array('jquery'));
 	}
 
 	/**
@@ -97,6 +95,14 @@ class PpiProductPage
 		);
 
 		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'));
+		wp_localize_script(
+			'ppi-ajax-add-to-cart',
+			'ppi_imaxel_redirection_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('imaxel_redirection_nonce')
+			)
+		);
 	}
 
 	/**
@@ -175,6 +181,16 @@ class PpiProductPage
 	}
 
 	/**
+	 * Outputs a div with information pertaining to the Imaxel redirection,
+	 * more specifically errors in getting the Imaxel URL
+	 */
+	public function ppi_output_redirection_info()
+	{
+		$redirectionInfoDiv = "<div id='redirection-info'></div>";
+		echo $redirectionInfoDiv;
+	}
+
+	/**
 	 * Returns content parameters for a chosen variant
 	 */
 	private function getVariantContentParameters($variant_id)
@@ -204,14 +220,35 @@ class PpiProductPage
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
 
-		// this block is 
-		// // isCustomizable is redundant - the presence of a template_id would be enough
-		// if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
-		// 	$response['customButton'] = false;
-		// } else {
-		// 	$response['customButton'] = true;
-		// 	$response['imaxelData'] = $this->get_imaxel_url($variant_id);
-		// }
+		$this->returnResponse($response);
+	}
+
+	/**
+	 * Get the Imaxel URL and save the user project to the database
+	 */
+	public function get_imaxel_redirection()
+	{
+		check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce');
+		$variant_id = $_GET['variant'];
+		$content_file_id = $_GET['content'];
+
+		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+			$this->returnResponse($response);
+		}
+
+		$project_id = $imaxel_response['project_id'];
+		$user_id = get_current_user_id();
+		$this->insertProject($user_id, $project_id, $variant_id, $content_file_id);
+
+		$response['url'] = $imaxel_response['url'];
+		$response['project-id'] = $project_id;
+
+		$response['status'] = "success";
+		$response['variant'] = $variant_id;
 
 		$this->returnResponse($response);
 	}
@@ -278,28 +315,6 @@ class PpiProductPage
 			return __($customText, 'woocommerce');
 		}
 		return __("Design product", PPI_TEXT_DOMAIN);
-	}
-
-	public function get_imaxel_url($variant_id)
-	{
-		$imaxel_response = $this->getImaxelData($variant_id);
-
-		if ($imaxel_response['status'] == "error") {
-			$response['status'] = 'error';
-			$response['information'] = $imaxel_response['information'];
-			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-			$this->returnResponse($response);
-		}
-
-		$project_id = $imaxel_response['project_id'];
-		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
-		$response['url'] = $imaxel_response['url'];
-
-		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id);
-
-		$response['status'] = 'success';
-		return $response;
 	}
 
 	public function get_add_to_cart_label($variant_id)
@@ -435,7 +450,7 @@ class PpiProductPage
 		}
 
 		$response['file']['name'] = $filename;
-		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
+		$response['file']['content_file_id'] = $contentFileId;
 		$response['file']['location'] = $newFilenameWithPath;
 		$response['file']['filesize'] = $_FILES['file']['size'];
 		$response['file']['width'] = $dimensions['width'];
@@ -469,7 +484,7 @@ class PpiProductPage
 
 		if (empty($template_id) || empty($variant_code)) {
 			return array(
-				'status' => 'success',
+				'status' => 'error',
 				'url' => 'no_editor_url'
 			);
 		}
@@ -510,11 +525,10 @@ class PpiProductPage
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-		if ($content_filename != null) {
-			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages);
-		} else {
-			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
-		}
+
+		$date = new \DateTime();
+		$name = 'Project created on ' . $date->format('H:i d-m-Y');
+		$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages, 'name' => $name);
 
 		$wpdb->insert($table_name, $query);
 	}

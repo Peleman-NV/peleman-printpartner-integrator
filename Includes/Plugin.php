@@ -138,6 +138,7 @@ class Plugin
 		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
 		$this->loader->add_action('ppi_file_upload_params_div', $product_page, 'ppi_output_file_params', 7, 1);
 		$this->loader->add_action('ppi_variant_info_div', $product_page, 'ppi_output_variant_info', 7, 1);
+		$this->loader->add_action('ppi_redirection_info_div', $product_page, 'ppi_output_redirection_info', 7, 1);
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
 
@@ -148,8 +149,8 @@ class Plugin
 		$this->loader->add_action('wp_ajax_nopriv_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_display_variant_info', $product_page, 'display_variant_info');
 		$this->loader->add_action('wp_ajax_nopriv_display_variant_info', $product_page, 'display_variant_info');
-		$this->loader->add_action('wp_ajax_get_imaxel_url', $product_page, 'get_imaxel_url');
-		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_url', $product_page, 'get_imaxel_url');
+		$this->loader->add_action('wp_ajax_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
+		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
 		$this->loader->add_action('woocommerce_add_to_cart_validation', $product_page, 'readImaxelProjectOnReturnFromEditor', 10, 5);
 
 		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 2);

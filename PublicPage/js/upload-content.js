@@ -66,6 +66,13 @@
                             'alt',
                             response.file.name
                         );
+
+                        // add content file id to hidden input
+                        $("[name='variation_id']").after(
+                            '<input type="hidden" name="content_file_id" class="content_file_id" value="' +
+                                response.file.content_file_id +
+                                '"></input>'
+                        );
                         $('#ppi-loading').addClass('ppi-hidden');
                     } else {
                         // if AJAX return is good but it contains an error, add error styling and show msg
@@ -100,8 +107,12 @@
         function setUploadBtnColour() {
             let btnColour = '';
             const domain = getDomain();
+            console.log(domain);
             switch (domain) {
                 case 'devwebshop.peleman.com':
+                    btnColour = '#ffd721'; /* devwebshop.com */
+                    break;
+                case 'store.peleman.com':
                     btnColour = '#ffd721'; /* devwebshop.com */
                     break;
                 case 'devhumancolours.peleman.com':
