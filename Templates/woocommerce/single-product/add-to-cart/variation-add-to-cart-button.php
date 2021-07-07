@@ -30,7 +30,6 @@ global $product;
 	}
 
 	do_action('woocommerce_after_add_to_cart_button');
-	do_action('ppi_redirection_info_div');
 	?>
 	<input type="hidden" name="add-to-cart" value="<?php echo absint($product->get_id()); ?>" />
 	<input type="hidden" name="product_id" value="<?php echo absint($product->get_id()); ?>" />

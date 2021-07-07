@@ -96,16 +96,6 @@ class PpiProductPage
 				'nonce' => wp_create_nonce('file_upload_nonce')
 			)
 		);
-
-		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'));
-		wp_localize_script(
-			'ppi-ajax-add-to-cart',
-			'ppi_imaxel_redirection_object',
-			array(
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('imaxel_redirection_nonce')
-			)
-		);
 	}
 
 	/**
@@ -184,16 +174,6 @@ class PpiProductPage
 	}
 
 	/**
-	 * Outputs a div with information pertaining to the Imaxel redirection,
-	 * more specifically errors in getting the Imaxel URL
-	 */
-	public function ppi_output_redirection_info()
-	{
-		$redirectionInfoDiv = "<div id='redirection-info'></div>";
-		echo $redirectionInfoDiv;
-	}
-
-	/**
 	 * Returns content parameters for a chosen variant
 	 */
 	private function getVariantContentParameters($variant_id)
@@ -221,37 +201,14 @@ class PpiProductPage
 		$response['variant'] = $variant_id;
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
-		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
 
-		$this->returnResponse($response);
-	}
-
-	/**
-	 * Get the Imaxel URL and save the user project to the database
-	 */
-	public function get_imaxel_redirection()
-	{
-		check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce');
-		$variant_id = $_GET['variant'];
-		$content_file_id = $_GET['content'];
-
-		$imaxel_response = $this->getImaxelData($variant_id);
-		if ($imaxel_response['status'] == "error") {
-			$response['status'] = 'error';
-			$response['information'] = $imaxel_response['information'];
-			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-			$this->returnResponse($response);
+		// isCustomizable is redundant - the presence of a template_id would be enough
+		if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
+			$response['customButton'] = false;
+		} else {
+			$response['customButton'] = true;
+			$response['imaxelData'] = $this->get_imaxel_url($variant_id);
 		}
-
-		$project_id = $imaxel_response['project_id'];
-		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id, $content_file_id);
-
-		$response['url'] = $imaxel_response['url'];
-		$response['project-id'] = $project_id;
-
-		$response['status'] = "success";
-		$response['variant'] = $variant_id;
 
 		$this->returnResponse($response);
 	}
@@ -320,6 +277,28 @@ class PpiProductPage
 		return __("Design product", PPI_TEXT_DOMAIN);
 	}
 
+	public function get_imaxel_url($variant_id)
+	{
+		$imaxel_response = $this->getImaxelData($variant_id);
+
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+			$this->returnResponse($response);
+		}
+
+		$project_id = $imaxel_response['project_id'];
+		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
+		$response['url'] = $imaxel_response['url'];
+
+		$user_id = get_current_user_id();
+		$this->insertProject($user_id, $project_id, $variant_id);
+
+		$response['status'] = 'success';
+		return $response;
+	}
+
 	public function get_add_to_cart_label($variant_id)
 	{
 		$wc_product = wc_get_product($variant_id);
@@ -363,26 +342,17 @@ class PpiProductPage
 
 		$variant_id = $_POST['variant_id'];
 
-		// Do I need this imaxeldata???  No, not while uploading a file
-		// WHEN?  When a user clicks the Design button
-		// I need the project ID to link the uploaded content file
-		// in lieu of that, I need a unique ID to be able to link WHEN I get the project ID at a later time
-		// create unique ID - insert as a hidden input
-		// this unique ID is ALSO the folder where the content file is stored
-		//		when I make the call to Imaxel, using the hidden input, link the project nr to it
-		/* this become the response to click the add to cart button */
-		// $imaxel_response = $this->getImaxelData($variant_id);
-		// if ($imaxel_response['status'] == "error") {
-		// 	$response['status'] = 'error';
-		// 	$response['information'] = $imaxel_response['information'];
-		// 	$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-		// }
-		// $response['url'] = $imaxel_response['url'];
+		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+		}
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
 
-		$user_id = get_current_user_id();
-		$contentFileId = $user_id . '_' . round(microtime(true) * 1000) . '_' . $variant_id;
-		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $contentFileId);
-		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $contentFileId . '/content.pdf';
+		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
+		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
 
 		try {
 			$pdf = new Fpdi();
@@ -437,12 +407,12 @@ class PpiProductPage
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
-			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $contentFileId . '.jpg';
+			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $project_id . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->setCompressionQuality(25);
 			$imagick->scaleImage(150, 0);
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $contentFileId . '.jpg';
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages).', PPI_TEXT_DOMAIN), $filename, $pages);
 		} catch (\Throwable $th) {
@@ -453,15 +423,15 @@ class PpiProductPage
 		}
 
 		$response['file']['name'] = $filename;
-		$response['file']['content_file_id'] = $contentFileId;
+		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 		$response['file']['location'] = $newFilenameWithPath;
 		$response['file']['filesize'] = $_FILES['file']['size'];
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
 
-		// do this when the user clicks the button
-		$this->insertProject($user_id, $contentFileId, $variant_id, '/' . $contentFileId . '/content.pdf', $pages);
+		$user_id = get_current_user_id();
+		$this->insertProject($user_id, $project_id, $variant_id, '/' . $project_id . '/content.pdf', $pages);
 
 		$this->returnResponse($response);
 	}
@@ -487,7 +457,7 @@ class PpiProductPage
 
 		if (empty($template_id) || empty($variant_code)) {
 			return array(
-				'status' => 'error',
+				'status' => 'success',
 				'url' => 'no_editor_url'
 			);
 		}
@@ -528,10 +498,11 @@ class PpiProductPage
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-
-		$date = new \DateTime();
-		$name = 'Project created on ' . $date->format('H:i d-m-Y');
-		$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages, 'name' => $name);
+		if ($content_filename != null) {
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages);
+		} else {
+			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
+		}
 
 		$wpdb->insert($table_name, $query);
 	}
@@ -670,7 +641,24 @@ class PpiProductPage
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
 		$result = $wpdb->get_row("SELECT content_pages FROM {$table_name} WHERE project_id = {$projectId};");
-
+		error_log(
+			__FILE__ . ': ' . __LINE__ . ' ' . print_r(
+				$wpdb->last_query,
+				true
+			) . PHP_EOL,
+			3,
+			__DIR__ .
+				'/Log.txt'
+		);
+		error_log(
+			__FILE__ . ': ' . __LINE__ . ' ' . print_r(
+				$result,
+				true
+			) . PHP_EOL,
+			3,
+			__DIR__ .
+				'/Log.txt'
+		);
 		return $result->content_pages;
 	}
 
@@ -680,13 +668,21 @@ class PpiProductPage
 			$imaxelProjectId = $_GET['project'];
 			$imaxel = new ImaxelService();
 			$response = json_decode($imaxel->read_project($imaxelProjectId)['body'], true);
-
+			error_log(
+				__FILE__ . ': ' . __LINE__ . ' ' . print_r(
+					$response,
+					true
+				) . PHP_EOL,
+				3,
+				__DIR__ .
+					'/Log.txt'
+			);
 			$pages = $this->countPagesInImaxelProject($response['design']['pages']);
 			// check if the first and last pages need to be ignored
 
 			foreach ($response['product']['variants'][0]['parts'] as $part) {
 				if ($part['name'] === 'pages') {
-					if ($part['output']['sheets_processor']['discarded_sides'] === 'first_and_last') $pages -= 2;
+					if (isset($part['output']['sheets_processor']['discarded_sides']) && $part['output']['sheets_processor']['discarded_sides'] === 'first_and_last') $pages -= 2;
 				}
 			}
 
