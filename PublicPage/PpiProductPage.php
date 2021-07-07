@@ -641,7 +641,24 @@ class PpiProductPage
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
 		$result = $wpdb->get_row("SELECT content_pages FROM {$table_name} WHERE project_id = {$projectId};");
-
+		error_log(
+			__FILE__ . ': ' . __LINE__ . ' ' . print_r(
+				$wpdb->last_query,
+				true
+			) . PHP_EOL,
+			3,
+			__DIR__ .
+				'/Log.txt'
+		);
+		error_log(
+			__FILE__ . ': ' . __LINE__ . ' ' . print_r(
+				$result,
+				true
+			) . PHP_EOL,
+			3,
+			__DIR__ .
+				'/Log.txt'
+		);
 		return $result->content_pages;
 	}
 
