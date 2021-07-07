@@ -56,8 +56,9 @@ class PpiProductPage
 	 */
 	public function enqueue_styles()
 	{
-		wp_enqueue_style($this->plugin_name . 'products', plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $this->version, 'all');
-		wp_enqueue_style($this->plugin_name . 'projects', plugin_dir_url(__FILE__) . 'css/projects-page-style.css', array(), $this->version, 'all');
+		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
+		wp_enqueue_style($this->plugin_name . 'products', plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $randomNumber, 'all');
+		wp_enqueue_style($this->plugin_name . 'projects', plugin_dir_url(__FILE__) . 'css/projects-page-style.css', array(), $randomNumber, 'all');
 		wp_enqueue_style('dashicons');
 	}
 
@@ -66,6 +67,8 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
+		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'), $randomNumber);
 	}
 
 	/**
@@ -458,7 +461,7 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		// do this when the user clicks the button
-		//$this->insertProject($user_id, $project_id, $variant_id, '/' . $project_id . '/content.pdf', $pages);
+		$this->insertProject($user_id, $contentFileId, $variant_id, '/' . $contentFileId . '/content.pdf', $pages);
 
 		$this->returnResponse($response);
 	}
