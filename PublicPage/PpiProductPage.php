@@ -3,7 +3,6 @@
 namespace PelemanPrintpartnerIntegrator\PublicPage;
 
 use PelemanPrintpartnerIntegrator\Services\ImaxelService;
-use PelemanPrintpartnerIntegrator\Utils\Helper;
 use setasign\Fpdi\Fpdi;
 use \Imagick;
 use DateTime;
@@ -57,7 +56,9 @@ class PpiProductPage
 	 */
 	public function enqueue_styles()
 	{
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $this->version, 'all');
+		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
+		wp_enqueue_style($this->plugin_name . 'products', plugin_dir_url(__FILE__) . 'css/product-page-style.css', array(), $randomNumber, 'all');
+		wp_enqueue_style($this->plugin_name . 'projects', plugin_dir_url(__FILE__) . 'css/projects-page-style.css', array(), $randomNumber, 'all');
 		wp_enqueue_style('dashicons');
 	}
 
@@ -66,7 +67,8 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'));
+		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'), $randomNumber);
 	}
 
 	/**
@@ -101,58 +103,48 @@ class PpiProductPage
 	 */
 	public function ppi_output_file_params()
 	{
+		$maxUploadFileSizeLabel = __('Maximum file upload size', PPI_TEXT_DOMAIN);
+		$pDFPageWidth = __('PDF page width', PPI_TEXT_DOMAIN);
+		$pDFPageHeight = __('PDF page height', PPI_TEXT_DOMAIN);
+		$minimumNumberOfPages = __('Minimum nr of pages', PPI_TEXT_DOMAIN);
+		$maximumNumberOfPages = __('Maximum nr of pages', PPI_TEXT_DOMAIN);
+		$pricePerPage = __('Price per page', PPI_TEXT_DOMAIN);
 		$maxUploadFileSize = "100MB";
+
 		$paramsDiv = "
-			<div class='ppi-upload-parameters'>
+		<div class='ppi-upload-parameters'>
 				<div class='thumbnail-container'>
 					<img id='ppi-thumbnail' />
 				</div>
-				<div class='params-container'>
-					<div class='param-line ppi-hidden' id='max-upload-size'>
-						<div class='param-name'>
-							Maximum file upload size
-						</div>
-						<div class='param-value'>
-							{$maxUploadFileSize}
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							PDF page width
-						</div>
-						<div class='param-value' id='content-width'>
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							PDF page height
-						</div>
-						<div class='param-value' id='content-height'>
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							Minimum nr of pages
-						</div>
-						<div class='param-value' id='content-min-pages'>
-						</div>
-					</div>					
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							Maximum nr of pages
-						</div>
-						<div class='param-value' id='content-max-pages'>
-						</div>
-					</div>
-					<div class='param-line ppi-hidden'>
-						<div class='param-name'>
-							Price per page
-						</div>
-						<div class='param-value' id='content-price-per-page'>
-						</div>
-					</div>
-				</div>
-			</div>";
+				<table>
+					<tbody>
+						<tr>
+							<td>$maxUploadFileSizeLabel</td>
+							<td>$maxUploadFileSize</td>
+						</tr>
+						<tr>
+							<td>$pDFPageWidth</td>
+							<td class='param-value' id='content-width'></td>
+						</tr>
+						<tr>
+							<td>$pDFPageHeight</td>
+							<td class='param-value' id='content-height'></td>
+						</tr>
+						<tr>
+							<td>$minimumNumberOfPages</td>
+							<td class='param-value' id='content-min-pages'></td>
+						</tr>
+						<tr>
+							<td>$maximumNumberOfPages</td>
+							<td class='param-value' id='content-max-pages'></td>
+						</tr>
+						<tr>
+							<td>$pricePerPage</td>
+							<td class='param-value' id='content-price-per-page'></td>
+						</tr>
+					<tbody>						
+				</table>
+				";
 		echo $paramsDiv;
 	}
 
@@ -161,9 +153,10 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
+		$uploadButtonLabel = __('Click here to upload your PDF file', PPI_TEXT_DOMAIN);
 		$uploadDiv = "
         <div class='ppi-upload-form ppi-hidden'>
-            <label class='upload-label upload-disabled' for='file-upload'>Click here to upload your PDF file</label>
+            <label class='upload-label upload-disabled' for='file-upload'>{$uploadButtonLabel}</label>
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
         </div>
 		<div id='upload-info'></div>";
@@ -209,6 +202,7 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 
+		// isCustomizable is redundant - the presence of a template_id would be enough
 		if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
 			$response['customButton'] = false;
 		} else {
@@ -236,8 +230,22 @@ class PpiProductPage
 		if ('variation-add-to-cart-button.php' === basename($template)) {
 			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation-add-to-cart-button.php';
 		}
-
+		if ('order-details-customer.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/order/order-details-customer.php';
+		}
 		return $template;
+	}
+
+	/**
+	 * Output tracking information
+	 */
+	public function ppi_output_order_tracking_information($order)
+	{
+		$trackingNumbers = $order->get_meta('f2d_tracking');
+		$trackingNumbersArray  = explode(',', $trackingNumbers);
+		foreach ($trackingNumbersArray as $trackingNumber) {
+			echo "<i>Tracking number:</i> <a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
+		}
 	}
 
 	/**
@@ -246,7 +254,6 @@ class PpiProductPage
 	public function ppi_change_add_to_cart_text_for_imaxel_products()
 	{
 		global $product;
-
 		$product_id = $product->get_id();
 		$wc_product = wc_get_product($product_id);
 
@@ -267,7 +274,7 @@ class PpiProductPage
 			$customText = $wc_product->get_meta('custom_add_to_cart_label');
 			return __($customText, 'woocommerce');
 		}
-		return __("Design product", 'woocommerce');
+		return __("Design product", PPI_TEXT_DOMAIN);
 	}
 
 	public function get_imaxel_url($variant_id)
@@ -277,7 +284,7 @@ class PpiProductPage
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
 			$response['information'] = $imaxel_response['information'];
-			$response['message'] = "Something went wrong.  Please refresh the page and try again.";
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
 			$this->returnResponse($response);
 		}
 
@@ -296,14 +303,15 @@ class PpiProductPage
 	{
 		$wc_product = wc_get_product($variant_id);
 		$parent_product = wc_get_product($wc_product->get_parent_id());
-		if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
-			$addToCartLabel = $parent_product->get_meta('custom_add_to_cart_label');
+		if ($wc_product->get_meta('custom_variation_add_to_cart_label') != '') {
+			return $wc_product->get_meta('custom_variation_add_to_cart_label');
+		} else if ($parent_product->get_meta('custom_add_to_cart_label') != '') {
+			return $parent_product->get_meta('custom_add_to_cart_label');
 		} else if (get_option('ppi-custom-add-to-cart-label') != '') {
-			$addToCartLabel = get_option('ppi-custom-add-to-cart-label');
+			return get_option('ppi-custom-add-to-cart-label');
 		} else {
-			$addToCartLabel = "Design Product";
+			return __('Design Product', PPI_TEXT_DOMAIN);
 		}
-		return $addToCartLabel;
 	}
 
 	public function upload_content_file()
@@ -312,14 +320,14 @@ class PpiProductPage
 
 		if ($_FILES['file']['error']) {
 			$response['status'] = 'error';
-			$response['message'] = "Error encountered while uploading your file.  Please try again with a different one.";
+			$response['message'] = __('Error encountered while uploading your file.  Please try again with a different one.', PPI_TEXT_DOMAIN);
 			$response['error'] = $_FILES['file']['error'];
 		}
 
 		$max_file_upload_size = (int)(ini_get('upload_max_filesize')) * 1024 * 1024;
 		if ($_FILES['file']['size'] >= $max_file_upload_size) {
 			$response['status'] = 'error';
-			$response['message'] = "Your file is too large, Please upload a file smaller than 100MB.";
+			$response['message'] = __('Your file is too large, Please upload a file smaller than the maximum file upload size.', PPI_TEXT_DOMAIN);
 			$response['filesize'] = $_FILES['file']['size'];
 			$response['max_size'] = $max_file_upload_size;
 		}
@@ -328,34 +336,20 @@ class PpiProductPage
 		$file_type = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 		if ($file_type != 'pdf') {
 			$response['status'] = 'error';
-			$response['message'] = "Please upload a PDF file.";
+			$response['message'] = __('Please upload a PDF file.', PPI_TEXT_DOMAIN);
 			$response['type'] = $file_type;
 		};
 
-		// is customizable?
 		$variant_id = $_POST['variant_id'];
 
-		$wc_product = wc_get_product($variant_id);
-		$parent_product = wc_get_product($wc_product->get_parent_id());
-		$isCustomizable = $parent_product->get_meta('customizable_product') === 'yes' ? true : false;
-
-		if ($isCustomizable) {
-			$imaxel_response = $this->getImaxelData($variant_id);
-			if ($imaxel_response['status'] == "error") {
-				$response['status'] = 'error';
-				$response['information'] = $imaxel_response['information'];
-				$response['message'] = "Something went wrong.  Please refresh the page and try again.";
-			}
-			$project_id = $imaxel_response['project_id'];
-			$response['url'] = $imaxel_response['url'];
-		} else {
-			$uuidGenerator = new Helper();
-			$project_id = $uuidGenerator->generateGuid();
-			$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
-			$siteUrl = get_site_url() . '/' . $lang;
-			$response['do_not_redirect'] = true;
-			$response['url'] = $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id;
+		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
 		}
+		$project_id = $imaxel_response['project_id'];
+		$response['url'] = $imaxel_response['url'];
 
 		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
 		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
@@ -368,7 +362,7 @@ class PpiProductPage
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['error'] = $th->getMessage();
-			$response['message'] = "We couldn't process \"" . $filename . "\"<br>(possibly due to encryption).<br>Please use a different PDF file.";
+			$response['message'] = __("We couldn't process your file (possibly due to encryption).  Please use a different PDF file.", PPI_TEXT_DOMAIN);
 			$response['file']['name'] = $filename;
 			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['filesize'] = $_FILES['file']['size'];
@@ -381,12 +375,12 @@ class PpiProductPage
 		if ($variant['min_pages'] != "" && $pages < $variant['min_pages']) {
 			$response['status'] = 'error';
 			$response['file']['pages'] = $pages;
-			$response['message'] = "\"{$filename}\" has too few pages ({$pages}).  Please upload a file with at least {$variant['min_pages']} pages.";
+			$response['message'] = __("Your file has too few pages.", PPI_TEXT_DOMAIN);
 		}
 		if ($variant['max_pages'] != "" && $pages > $variant['max_pages']) {
 			$response['status'] = 'error';
 			$response['file']['pages'] = $pages;
-			$response['message'] = "\"{$filename}\" has too many pages ({$pages}).  Please upload a file with no more than {$variant['max_pages']} pages.";
+			$response['message'] = __("Your file has too many pages.", PPI_TEXT_DOMAIN);
 		}
 		// precision of 1mm
 
@@ -397,9 +391,7 @@ class PpiProductPage
 			$response['status'] = 'error';
 			$response['file']['width'] = $dimensions['width'];
 			$response['file']['height'] = $dimensions['height'];
-			$displayWidth = round($dimensions['width'], 1);
-			$displayHeight = round($dimensions['height'], 1);
-			$response['message'] = "\"{$filename}\" dimensions are {$displayWidth}mm x {$displayHeight}mm and doesn't match the required dimensions.  Please upload a file with a width x height of {$variant['width']}mm x {$variant['height']}mm.";
+			$response['message'] = __("Your file's dimensions do not match the required dimensions.", PPI_TEXT_DOMAIN);
 		}
 
 		// send response
@@ -422,9 +414,9 @@ class PpiProductPage
 			$imagick->writeImage($thumbnailWithPath);
 			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
 			$response['status'] = 'success';
-			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages).";
+			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages).', PPI_TEXT_DOMAIN), $filename, $pages);
 		} catch (\Throwable $th) {
-			$response['message'] = "Successfully uploaded \"" . $filename . "\" (" . $pages . " pages), but we couldn't create a preview thumbnail.";
+			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages), but we couldn\'t create a preview thumbnail.', PPI_TEXT_DOMAIN), $filename, $pages);
 			$response['error'] = $th->getMessage();
 
 			$this->returnResponse($response);
@@ -439,7 +431,7 @@ class PpiProductPage
 		$response['file']['pages'] = $pages;
 
 		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id, $newFilenameWithPath, $pages);
+		$this->insertProject($user_id, $project_id, $variant_id, '/' . $project_id . '/content.pdf', $pages);
 
 		$this->returnResponse($response);
 	}
@@ -462,6 +454,13 @@ class PpiProductPage
 		$variant_id = $_POST['variant_id'] ?? $variant_id;
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
+
+		if (empty($template_id) || empty($variant_code)) {
+			return array(
+				'status' => 'success',
+				'url' => 'no_editor_url'
+			);
+		}
 
 		$imaxel = new ImaxelService();
 		$create_project_response = $imaxel->create_project($template_id, $variant_code);
@@ -506,9 +505,31 @@ class PpiProductPage
 		}
 
 		$wpdb->insert($table_name, $query);
+	}
+
+	/**
+	 * Add nr of pages to project line in database
+	 *
+	 * @param Int $project_id
+	 */
+	private function addPagesToProject($project_id, $pages)
+	{
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'ppi_user_projects';
+		// is there content, and does it have pages?  If so, do not overwrite
+		$contentWithPagesExists = $wpdb->get_results("SELECT content_filename, content_pages FROM $table_name WHERE project_id = $project_id;");
+
+		if (strpos($contentWithPagesExists[0]->content_filename, 'content')) {
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": no Imaxel page count added to project {$project_id} - content files page count is already known" . PHP_EOL, 3,  $this->logFile);
+			return;
+		}
+
+		$query = array('content_pages' => $pages);
+		$wpdb->update($table_name, $query, ['project_id' => $project_id]);
 
 		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ": persisted project {$project_id} for user {$user_id} / product {$product_id}" . PHP_EOL, 3,  $this->logFile);
+		error_log($now->format('c') . ": added pages to imaxel project {$project_id}" . PHP_EOL, 3,  $this->logFile);
 	}
 
 	private function roundedNumberInRange($number, $baseRange, $precision)
@@ -538,15 +559,31 @@ class PpiProductPage
 	/**
 	 * Add project ID to order line item 
 	 */
-	public function add_project_to_order_line_item($item, $cart_item_key, $values, $order)
+	public function add_custom_data_to_order_line_item($item, $cart_item_key, $values, $order)
 	{
+		$imaxelProjectId = 0;
 		if (isset($values['_ppi_imaxel_project_id'])) {
 			$imaxelProjectId = $values['_ppi_imaxel_project_id'];
 			$item->add_meta_data('_ppi_imaxel_project_id', $imaxelProjectId, true);
-
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
 		}
+		if ($imaxelProjectId !== 0) {
+			$uploadedContent = $this->projectHasContentUpload($imaxelProjectId);
+			if ($uploadedContent !== null) {
+				$item->add_meta_data('_content_filename', $uploadedContent->content_filename, true);
+			}
+		}
+		$now =  new DateTime('NOW');
+		error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
+	}
+
+	private function projectHasContentUpload($projectId)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$result =  $wpdb->get_results("SELECT * FROM {$table_name} WHERE project_id = {$projectId}");
+
+		if ($result[0] === null) return false;
+		return $result[0];
 	}
 
 	/**
@@ -570,24 +607,33 @@ class PpiProductPage
 			$createOrderResponse = $imaxel->create_order($imaxelProjectId, $orderId)['body'];
 
 			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID {$imaxelProjectId} - WC order item {$orderItemId}" . PHP_EOL, 3,  $this->logFile);
+			error_log($now->format('c') . ": created Imaxel order for ImaxelProjectID $imaxelProjectId - Order $order - item $orderItemId" . PHP_EOL, 3,  $this->logFile);
 		}
 	}
 
 	public function adjustItemPriceForAddedPages($cart)
 	{
-		foreach ($cart->get_cart() as $cartItem) {
-			// price adjustment for items with content uploads
-			if (isset($cartItem['variation']['attribute_pa_content-format']) && $cartItem['variation']['attribute_pa_content-format'] != '') {
-				$price = $cartItem['data']->get_price();
-				$productMetaData = get_post_meta($cartItem['variation_id']);
-				$pricePerPage = $productMetaData['price_per_page'][0];
-				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
 
-				$price += ($pages * $pricePerPage);
+		foreach ($cart->get_cart() as $cartItem) {
+			if ($cartItem['variation_id'] === 0) return;
+			$cartProduct = wc_get_product($cartItem['variation_id']);
+			$baseNumberOfPages = $cartProduct->get_meta('base_number_of_pages');
+			$pricePerPage = $cartProduct->get_meta('price_per_page');
+
+			if (isset($baseNumberOfPages) && !empty($baseNumberOfPages) && isset($pricePerPage) && !empty($pricePerPage)) {
+				if (empty($cartItem['_ppi_imaxel_project_id'])) return;
+				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
+				$supplementalPages = $pages - $baseNumberOfPages;
+
+				if ($supplementalPages <= 0) return;
+
+				$price = $cartItem['data']->get_price();
+				$price += ($supplementalPages * $pricePerPage);
 				$cartItem['data']->set_price($price);
 			}
 		}
+
+		return $cart;
 	}
 
 	private function getNrOfContentPages($projectId)
@@ -597,5 +643,59 @@ class PpiProductPage
 		$result = $wpdb->get_row("SELECT content_pages FROM {$table_name} WHERE project_id = {$projectId};");
 
 		return $result->content_pages;
+	}
+
+	public function readImaxelProjectOnReturnFromEditor($passed, $product_id, $quantity, $variation_id = '', $variations = '')
+	{
+		if (isset($_GET['project']) && !empty($_GET['project'])) {
+			$imaxelProjectId = $_GET['project'];
+			$imaxel = new ImaxelService();
+			$response = json_decode($imaxel->read_project($imaxelProjectId)['body'], true);
+
+			$pages = $this->countPagesInImaxelProject($response['design']['pages']);
+			// check if the first and last pages need to be ignored
+
+			foreach ($response['product']['variants'][0]['parts'] as $part) {
+				if ($part['name'] === 'pages') {
+					if ($part['output']['sheets_processor']['discarded_sides'] === 'first_and_last') $pages -= 2;
+				}
+			}
+
+			// if there is content, do not overwrite -> see addPagesToProject project
+			$this->addPagesToProject($imaxelProjectId, $pages);
+		}
+		return $passed;
+	}
+
+	private function countPagesInImaxelProject($designObject)
+	{
+		$sheets = array_filter(
+			$designObject,
+			function ($e) {
+				return $e['partName'] === 'pages';
+			}
+		);
+
+		return count($sheets) * 2;
+	}
+
+	public function add_projects_menu_item($items)
+	{
+		$logout = $items['customer-logout'];
+		unset($items['customer-logout']);
+		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
+		$items['customer-logout'] = $logout;
+
+		return $items;
+	}
+
+	public function register_projects_endpoint()
+	{
+		add_rewrite_endpoint('projects', EP_PAGES);
+	}
+
+	public function projects_endpoint_content()
+	{
+		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
 	}
 }

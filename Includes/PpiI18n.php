@@ -35,11 +35,12 @@ class PpiI18n
 	 */
 	public function load_plugin_textdomain()
 	{
+		$languageDir = dirname(dirname(plugin_basename(__FILE__))) . '/languages/';
 
 		load_plugin_textdomain(
 			'peleman-printpartner-integrator',
 			false,
-			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
+			$languageDir
 		);
 	}
 }

@@ -1,6 +1,8 @@
 (function ($) {
     'use strict';
     $(function () {
+        setUploadBtnColour();
+
         // Event: when the file input changes, ie: when a new file is selected
         $('#file-upload').on('change', e => {
             const timeStart = performance.now();
@@ -35,19 +37,19 @@
                 dataType: 'json',
                 success: function (response) {
                     console.log(response);
-                    if (response.do_not_redirect === true) {
-                        console.log('custom project is here');
-                        replaceBtnWithLink(response.url);
-                    }
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
-                        $('.single_add_to_cart_button').removeClass(
-                            'ppi-disabled'
-                        );
-                        $('.single_add_to_cart_button').prop(
-                            'href',
-                            response.url
-                        );
+                        if (response.do_not_redirect === true) {
+                            replaceBtnWithLink(response.url);
+                        } else {
+                            $('.single_add_to_cart_button').removeClass(
+                                'ppi-disabled'
+                            );
+                            $('.single_add_to_cart_button').prop(
+                                'href',
+                                response.url
+                            );
+                        }
                         $('.ppi-upload-parameters').removeClass('ppi-hidden');
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
@@ -105,17 +107,57 @@
             const btnText = $('.single_add_to_cart_button').html();
 
             $('.single_add_to_cart_button').remove();
-            $('#ppi-loading').addClass('ppi-hidden');
-            $('.single_add_to_cart_button').removeClass('ppi-disabled');
 
             $('.quantity').after(
                 "<a href='" +
                     url +
-                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='ppi-hidden dashicons dashicons-update rotate'></span>" +
+                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
                     btnText +
                     '</a>'
             );
+            $('.single_add_to_cart_button').removeClass('ppi-disabled');
             $('#ppi-loading').addClass('ppi-hidden');
+        }
+
+        function setUploadBtnColour() {
+            let btnColour = '';
+            const domain = getDomain();
+            switch (domain) {
+                case 'devwebshop.peleman.com':
+                    btnColour = '#ffd721'; /* devwebshop.com */
+                    break;
+                case 'store.peleman.com':
+                    btnColour = '#ffd721'; /* devwebshop.com */
+                    break;
+                case 'devhumancolours.peleman.com':
+                    btnColour = '#ff661f';
+                    $('.ppi-upload-form .upload-label').css('color', 'white');
+                    break;
+                case 'humancolours.peleman.com':
+                    btnColour = '#ff661f';
+                    $('.ppi-upload-form .upload-label').css('color', 'white');
+                    break;
+                case 'devshop.peleman.com':
+                    btnColour = '#006ad0'; /* devshop.com */
+                    $('.ppi-upload-form .upload-label').css('color', 'white');
+                    break;
+                default:
+                    $('.ppi-upload-form .upload-label').css(
+                        'border',
+                        '1px solid grey'
+                    );
+                    break;
+            }
+
+            $('.ppi-upload-form').css('background', btnColour);
+        }
+
+        function getDomain() {
+            const url = window.location.href;
+            return url.substring(
+                url.indexOf('//') + 2,
+                url.indexOf('.com') + 4
+            );
         }
     });
 })(jQuery);

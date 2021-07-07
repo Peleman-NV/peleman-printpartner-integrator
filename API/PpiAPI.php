@@ -48,6 +48,7 @@ class PpiAPI
 	private function apiClient()
 	{
 		$siteUrl = get_site_url();
+
 		return new Client(
 			$siteUrl,
 			get_option('ppi-wc-key'),
@@ -62,7 +63,13 @@ class PpiAPI
 	private function getProcessingOrders()
 	{
 		global $wpdb;
-		$ordersWithStatusProcessing = $wpdb->get_results('SELECT ID from ' . $wpdb->prefix . 'posts WHERE post_type = \'shop_order\' AND post_status = \'wc-processing\';');
+		$ordersWithStatusProcessing = $wpdb->get_results("SELECT p.ID as ID, pm.meta_value as date_paid from {$wpdb->prefix}posts p INNER JOIN {$wpdb->prefix}postmeta pm on p.ID = pm.post_id  WHERE post_type = 'shop_order' AND post_status = 'wc-processing' AND pm.meta_key = '_date_paid';");
+
+		foreach ($ordersWithStatusProcessing as $order) {
+			$date = new \DateTime();
+			$date->setTimestamp($order->date_paid)->setTimezone(new \DateTimeZone('Europe/Brussels'));
+			$order->date_paid = $date->format('Y-m-d H:i:s');
+		}
 
 		wp_send_json($ordersWithStatusProcessing);
 	}
@@ -80,6 +87,32 @@ class PpiAPI
 		));
 	}
 
+	/**	
+	 * Register complete order endpoint
+	 */
+	public function registerCompleteOrderEndpoint()
+	{
+		register_rest_route('ppi/v1', '/complete-order(?:/(?P<order>\d+))?', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'completeOrder'),
+			'args' => array('order'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
+	/**	
+	 * Register add tracking details to order endpoint
+	 */
+	public function registerAddTrackingToOrderEndpoint()
+	{
+		register_rest_route('ppi/v1', '/order-tracking(?:/(?P<order>\d+))?', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'addTrackingInformationToOrder'),
+			'args' => array('order'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
 	public function getOrder($request)
 	{
 		$orderId = $request['order'];
@@ -91,9 +124,9 @@ class PpiAPI
 		$order = wc_get_order($orderId);
 
 		if ($order === false) wp_send_json(['error' => "No order found for id {$orderId}"], 404);
+		// add language code to top level
 
 		$orderItems = $order->get_items();
-
 		$imaxel_files = [];
 		foreach ($orderItems as $orderItem) {
 			// assuming the content will have an Imaxel project ID (ie. has some customer created content).
@@ -103,7 +136,6 @@ class PpiAPI
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
 			if ($isFileReady === false) wp_send_json(['error' => "Files not ready for order id {$orderId}"], 404);
-
 			$imaxel_files[$imaxelProjectId] = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
 		}
 
@@ -112,37 +144,136 @@ class PpiAPI
 			$endpoint = 'orders/' . $orderId;
 			$orderObject = (object) $api->get($endpoint);
 
+			// add order language
+			$order = wc_get_order($orderId);
+			$orderLanguage  = $order->get_meta('wpml_language');
+			$orderObject->language_code = !empty($orderLanguage) ? $orderLanguage : 'en';
+
 			// add files and number of pages as metadata to line items of order response
+			// add f2d data to line item
 			foreach ($orderObject->line_items as $lineItem) {
+				$variationId = $lineItem->variation_id;
+				$f2dData =  get_post_meta($variationId, 'f2d_sku_components', true);
+				if (!empty($f2dData)) $lineItem->f2d_sku_components = $f2dData;
+
+				$lineItem->files = [];
+
 				foreach ($lineItem->meta_data as $meta_data) {
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$imaxelProjectId = $meta_data->value;
 						$result = $this->projectHasContentUpload($imaxelProjectId);
+
 						// if content was uploaded by user
 						if ($result->content_pages !== null) {
 							$lineItem->number_of_pages = $result->content_pages;
-						} else {
-							// if content was downloaded from Imaxel
-							// product has veriable # of pages, eg:wedding book
-							$imaxel = new ImaxelService();
-							$readProjectResponse = $imaxel->read_project($imaxelProjectId)['body'];
-
-							$decodedResponse = json_decode($readProjectResponse);
-							$pagesObject = $decodedResponse->design->pages;
-							// filter only pages, not cover
-							$numberOfPages = count(array_filter($pagesObject, function ($e) {
-								return $e->partName === "pages";
-							}));
-							$lineItem->number_of_pages = $numberOfPages * 2;
 						}
-
-						$lineItem->imaxel_files = $imaxel_files[$meta_data->value];
+						if ($result->content_filename !== null) {
+							$lineItem->files[] = [
+								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
+								'file_size_in_bytes' => filesize(realpath(PPI_UPLOAD_DIR . '/' . $result->content_filename)),
+								'type' => 'Content'
+							];
+						}
+						$lineItem->files[] = [
+							'file_name' => $imaxel_files[$meta_data->value],
+							'file_size_in_bytes' => filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)),
+							'type' => 'Imaxel'
+						];
 					}
 				}
 			}
-			wp_send_json([$orderObject], 200);
+			wp_send_json($orderObject, 200);
 		} catch (\Throwable $th) {
 			wp_send_json(['error' => "Error adding files to response for order id {$orderId}"], 404);
+		}
+	}
+
+	public function completeOrder($request)
+	{
+		$orderId = $request['order'];
+		$order = wc_get_order($orderId);
+		$response['order'] = $orderId;
+
+		if (!$order) {
+			$response['status'] = 'error';
+			$response['message'] = 'No order found';
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		if ($order->get_status() !== 'processing') {
+			$response['status'] = 'error';
+			$response['message'] = 'Order status is not processing';
+			$response['order_status'] = $order->get_status();
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		try {
+			$order->set_status('completed');
+			$order->save();
+			$response['status'] = 'success';
+			$response['message'] = 'order status changed from \'processing\' to \'completed\'';
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = $th->getMessage();
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+	}
+
+	public function addTrackingInformationToOrder($request)
+	{
+		$orderId = $request['order'];
+		$body = json_decode($request->get_body(), true);
+
+		$order = wc_get_order($orderId);
+		$response['order'] = $orderId;
+
+		if (!$order) {
+			$response['status'] = 'error';
+			$response['message'] = 'No order found';
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		$trackingNumber = $body['f2d_tracking'];
+		$currentTrackingNumbers = $order->get_meta('f2d_tracking');
+
+		$trackingNumbersArray = explode(',', $currentTrackingNumbers);
+		// if already in array, do nothing and return
+
+		if (in_array($trackingNumber, $trackingNumbersArray)) {
+			echo 'already got this one';
+			$response['status'] = 'success';
+			$response['message'] = 'tracking number already uploaded';
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		array_push($trackingNumbersArray, $trackingNumber);
+
+		try {
+			update_post_meta($orderId, 'f2d_tracking', implode(',', $trackingNumbersArray));
+			$response['status'] = 'success';
+			$response['message'] = 'added tracking data to order';
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = $th->getMessage();
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
 		}
 	}
 

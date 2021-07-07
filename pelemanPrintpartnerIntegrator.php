@@ -21,7 +21,7 @@ require_once plugin_dir_path(__FILE__) . '/Includes/PpiDeactivator.php';
  * Version:           1.0.0
  * Author:            Noë Baeten, Jason Goossens, Chris Schippers
  * Text Domain:       peleman-printpartner-integrator
- * Domain Path:       /Languages
+ * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
@@ -42,6 +42,7 @@ define('PELEMAN_PRINTPARTNER_INTEGRATOR_VERSION', '1.0.0');
 !defined('PPI_IMAXEL_FILES_DIR') ? define('PPI_IMAXEL_FILES_DIR', ABSPATH . 'wp-content/uploads/ppi/imaxelfiles') : "";
 !defined('PPI_THUMBNAIL_DIR') ? define('PPI_THUMBNAIL_DIR', ABSPATH . 'wp-content/uploads/ppi/thumbnails') : "";
 !defined('PPI_LOG_DIR') ? define('PPI_LOG_DIR', ABSPATH . 'wp-content/uploads/ppi/logs') : "";
+!defined('PPI_TEXT_DOMAIN') ? define('PPI_TEXT_DOMAIN', 'peleman-printpartner-integrator') : "";
 /**
  * The code that runs during plugin activation.
  */

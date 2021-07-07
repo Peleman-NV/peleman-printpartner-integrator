@@ -78,7 +78,7 @@ class PpiAdmin
 	 */
 	public function ppi_add_admin_menu()
 	{
-		add_menu_page('Peleman Printshop Integrator', 'Peleman', 'manage_options', 'ppi-menu.php', array($this, 'require_admin_page'),  'dashicons-format-gallery');
+		add_menu_page('Peleman Printshop Integrator', 'Peleman Printpartner Integrator', 'manage_options', 'ppi-menu.php', array($this, 'require_admin_page'),  'dashicons-format-gallery');
 	}
 
 	/**
@@ -117,6 +117,16 @@ class PpiAdmin
 		echo '<div class="ppi-options-group"><h2 class="ppi-options-group-title">Fly2Data Properties</h2>';
 
 		woocommerce_wp_text_input(array(
+			'id' => 'f2d_sku_components[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
+			'label' => 'Fly2Data SKU data',
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('F2D components that make up a variation', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'f2d_sku_components', true)
+		));
+
+		woocommerce_wp_text_input(array(
 			'id' => 'template_id[' . $loop . ']',
 			'placeholder' => 'Imaxel template ID',
 			'wrapper_class' => 'form-row form-row-first',
@@ -137,28 +147,50 @@ class PpiAdmin
 			'description' => __('Variant code<br>E.g. 00201<br>Leave empty for no customisation', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'variant_code', true)
 		));
+
+		woocommerce_wp_text_input(array(
+			'id' => 'custom_variation_add_to_cart_label[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
+			'label' =>  __('Custom Add to cart label', 'woocommerce'),
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('Define a custom Add to cart label', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'custom_variation_add_to_cart_label', true)
+		));
+
 		woocommerce_wp_text_input(array(
 			'id' => 'price_per_page[' . $loop . ']',
-			'wrapper_class' => 'form-row form-row-full',
-			'label' => 'Price per page (for uploaded PDF content, or user-created Imaxel content => A piece/sheet of paper = 2 pages)',
+			'wrapper_class' => 'form-row form-row-first',
+			'label' => 'Price per additional page (piece/sheet of paper = 2 pages)',
 			'type' => 'number',
 			'desc_tip'    => true,
 			'description' => __('Price per page', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'price_per_page', true)
 		));
 
-		echo '<hr>';
+		woocommerce_wp_text_input(array(
+			'id' => 'base_number_of_pages[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-last',
+			'label' => 'Base number of pages',
+			'type' => 'number',
+			'desc_tip'    => true,
+			'description' => __('Standard number of pages included in price', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'base_number_of_pages', true)
+		));
+
 		$pdf_upload_required = get_post_meta($variationId, 'pdf_upload_required', true);
 		//$pdf_upload_required = get_post_meta($parentId, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
 
 		woocommerce_wp_checkbox(array(
 			'id' => 'pdf_upload_required[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
 			'label'       => __('PDF content required?', 'woocommerce'),
 			'description' => __('Check to require a PDF upload', 'woocommerce'),
 			'desc_tip'    => true,
 			'value' => $pdf_upload_required,
 		));
+
 		woocommerce_wp_text_input(array(
 			'id' => 'pdf_width_mm[' . $loop . ']',
 			'wrapper_class' => 'form-row form-row-full',
@@ -214,23 +246,29 @@ class PpiAdmin
 	 */
 	public function ppi_persist_custom_field_variations($variation_id, $i)
 	{
+		$f2d_sku_components = $_POST['f2d_sku_components'][$i];
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
+		$custom_variant_add_to_cart_label = $_POST['custom_variation_add_to_cart_label'][$i];
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
 		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
 		$pdf_min_pages = $_POST['pdf_min_pages'][$i];
 		$pdf_max_pages = $_POST['pdf_max_pages'][$i];
 		$price_per_page = $_POST['price_per_page'][$i];
+		$base_number_of_pages = $_POST['base_number_of_pages'][$i];
 
+		if (isset($f2d_sku_components)) update_post_meta($variation_id, 'f2d_sku_components', esc_attr($f2d_sku_components));
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
+		if (isset($custom_variant_add_to_cart_label)) update_post_meta($variation_id, 'custom_variation_add_to_cart_label', esc_attr($custom_variant_add_to_cart_label));
 		if (isset($pdf_upload_required)) update_post_meta($variation_id, 'pdf_upload_required', $pdf_upload_required);
 		if (isset($pdf_width_mm)) update_post_meta($variation_id, 'pdf_width_mm', esc_attr($pdf_width_mm));
 		if (isset($pdf_height_mm)) update_post_meta($variation_id, 'pdf_height_mm', esc_attr($pdf_height_mm));
 		if (isset($pdf_min_pages)) update_post_meta($variation_id, 'pdf_min_pages', esc_attr($pdf_min_pages));
 		if (isset($pdf_max_pages)) update_post_meta($variation_id, 'pdf_max_pages', esc_attr($pdf_max_pages));
 		if (isset($price_per_page)) update_post_meta($variation_id, 'price_per_page', esc_attr($price_per_page));
+		if (isset($base_number_of_pages)) update_post_meta($variation_id, 'base_number_of_pages', esc_attr($base_number_of_pages));
 	}
 
 	/**
@@ -455,36 +493,35 @@ class PpiAdmin
 		}
 	}
 
-	public function displayImaxelProjectFilesTitle($display_key, $meta, $item)
+	public function displayCustomMetaDataKey($display_key, $meta, $item)
 	{
 		$currentPage = basename(get_permalink());
-		$projectId = $item->get_meta('_ppi_imaxel_project_id');
-
 		if (substr($currentPage, 0, 10) === '?post_type' && $display_key === '_ppi_imaxel_project_id' && get_class($item) === 'WC_Order_Item_Product') {
-			return 'Download Imaxel project files';
+			return 'Imaxel project files';
 		}
-		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
-			return;
+		if (substr($currentPage, 0, 10) === '?post_type' && $display_key === '_content_filename' && get_class($item) === 'WC_Order_Item_Product') {
+			return 'Content files';
 		}
+
 		return $display_key;
 	}
 
-	public function displayImaxelProjectFilesLink($value, $meta, $item)
+	public function displayCustomMetaDataValue($value, $meta, $item)
 	{
-		$currentPage = basename(get_permalink());
-		$orderId = $item->get_order_id();
-		$projectId = $item->get_meta('_ppi_imaxel_project_id');
-
-		if (substr($currentPage, 0, 10) === '?post_type' && $projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
+		if ($meta->key === '_ppi_imaxel_project_id') {
+			$orderId = $item->get_order_id();
+			$projectId = $item->get_meta('_ppi_imaxel_project_id');
 			$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
 			$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
-			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . '</a>';
+			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . ' (' . round(filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)) / 1024, 2) . ' kB)</a>';
 			return '<i>files not ready yet</i>';
 		}
-		if ($projectId !== '' && get_class($item) === 'WC_Order_Item_Product') {
-			return '';
+		if ($meta->key === '_content_filename') {
+			$file = $item->get_meta('_content_filename');
+			$url = get_site_url() . '/wp-content/uploads/ppi/content/' . $file;
+			return '<a href="' . $url . '" download>content-files (' . round(filesize(realpath(PPI_UPLOAD_DIR . '/' . $file)) / 1024, 2) . ' kB)</a>';
 		}
 
 		return $value;
@@ -525,5 +562,19 @@ class PpiAdmin
 		}
 
 		wp_send_json($projectInfo);
+	}
+
+	public function displayTrackingInformation($order)
+	{
+		$trackingNumbers = $order->get_meta('f2d_tracking');
+		echo '<h3>Tracking numbers</h3>';
+		if (empty($order->get_meta('f2d_tracking'))) {
+			echo 'No tracking information available';
+			return;
+		}
+		$trackingNumbersArray = explode(',', $trackingNumbers);
+		foreach ($trackingNumbersArray as $trackingNumber) {
+			echo "<a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
+		}
 	}
 }

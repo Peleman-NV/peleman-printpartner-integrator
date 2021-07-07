@@ -1,6 +1,51 @@
 :root {
-    --params-width: 65%;
+    --params-width: 55%;
     --thumbnail-width: calc(100% - 2% - var(--params-width));
+}
+
+.ppi-upload-parameters {
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ppi-upload-parameters .thumbnail-container {
+    width: var(--thumbnail-width);
+    background-color: whitesmoke;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.ppi-upload-parameters table {
+    margin-bottom: 0;
+    width: 75%;
+    margin: 0 0 0 5px;
+}
+
+.ppi-upload-parameters table tbody td,
+.ppi-upload-parameters table tbody th {
+    padding: 0.15em 0.5em;
+    font-size: 15px; /*0.95em;*/
+}
+
+.ppi-upload-parameters table tbody tr td:nth-child(2) {
+    text-align: right;
+}
+
+.ppi-upload-parameters table tbody tr td:nth-child(1) {
+    font-weight: 700;
+}
+
+.ppi-upload-form {
+    text-align: center;
+    margin-bottom: 8px;
+    display: inline-block;
+    width: 100%;
+    background: var(
+        --main-color-peleman
+    ); /* default, but the actual color depends on the url - see js/upload-content.js */
+    border-radius: 6px;
 }
 
 .ppi-add-to-cart-button {
@@ -8,13 +53,6 @@
     font-weight: 700 !important;
     display: flex !important;
     align-items: center;
-}
-
-.ppi-upload-form {
-    text-align: center;
-    margin-bottom: 8px;
-    display: inline-block;
-    width: var(--params-width);
 }
 
 .upload-disabled {
@@ -28,7 +66,6 @@
 }
 
 .ppi-upload-form .upload-label {
-    border: 2px rgb(105, 105, 105) solid;
     color: rgb(105, 105, 105);
     cursor: pointer;
     user-select: none;
@@ -48,41 +85,6 @@
 
 .ppi-disabled:active {
     pointer-events: none;
-}
-
-.ppi-upload-parameters {
-    margin-bottom: 2px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.ppi-upload-parameters .params-container {
-    border-top: 1px solid darkgrey;
-    width: var(--params-width);
-}
-
-.ppi-upload-parameters .thumbnail-container {
-    width: var(--thumbnail-width);
-    background-color: whitesmoke;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-}
-
-.ppi-min-height {
-    min-height: 7em;
-}
-
-.ppi-upload-parameters .param-line {
-    color: rgb(82, 82, 82);
-    cursor: default;
-    user-select: none;
-    display: flex;
-    justify-content: space-between;
-    font-size: 90%;
-    padding: 0 5px;
-    background-color: lightgrey;
-    border-bottom: 1px solid darkgrey;
 }
 
 .ppi-response-error {

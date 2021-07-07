@@ -162,13 +162,13 @@
             $('.single_add_to_cart_button').removeClass('ppi-disabled');
 
             if (!response.customButton) {
-                $('.quantity').after(
+                $('.woocommerce-variation-add-to-cart .quantity').after(
                     '<button type="submit" class="single_add_to_cart_button button alt">' +
                         addToCartLabel +
                         '</button>'
                 );
             } else {
-                $('.quantity').after(
+                $('.woocommerce-variation-add-to-cart .quantity').after(
                     "<a href='" +
                         response.imaxelData.url +
                         "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='ppi-hidden dashicons dashicons-update rotate'></span>" +
@@ -211,10 +211,10 @@
                     addToCartLabel = 'In den Warenkorb legen';
                     break;
                 case 'it':
-                    addToCartLabel = 'Añadir a la cest';
+                    addToCartLabel = 'Aggiungi al carrello';
                     break;
                 case 'es':
-                    addToCartLabel = 'Aggiungi al carrello';
+                    addToCartLabel = 'Añadir al carrito';
                     break;
             }
 

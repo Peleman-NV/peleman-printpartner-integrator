@@ -66,8 +66,6 @@
                 <input type="text" id="ppi-wc-secret" name="ppi-wc-secret" value="<?= get_option('ppi-wc-secret'); ?>" placeholder="WooCommerce secret">
             </div>
         </div>
-        <hr>
-        <h2>Custom Add to cart label (default label is "Design Product")</h2>
         <p>Here you define the custom label for all products. Each product can have its own custom label as well.</p>
         <div class="form-row">
             <div class="grid-medium-column">
@@ -91,6 +89,6 @@
                 <input type="text" id="project_id" name="project_id" placeholder="Project ID">
             </div>
         </div>
-        <button type="submit" class="button button-primary">Show it</button>
+        <button type="submit" class="button button-info">Show it</button>
     </form>
 </div>
