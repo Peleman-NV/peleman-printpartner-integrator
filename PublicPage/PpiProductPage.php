@@ -201,14 +201,7 @@ class PpiProductPage
 		$response['variant'] = $variant_id;
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
-
-		// isCustomizable is redundant - the presence of a template_id would be enough
-		if ($response['isCustomizable'] === 'no' || $product_variant->get_meta('template_id') === '') {
-			$response['customButton'] = false;
-		} else {
-			$response['customButton'] = true;
-			$response['imaxelData'] = $this->get_imaxel_url($variant_id);
-		}
+		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
 
 		$this->returnResponse($response);
 	}
@@ -310,7 +303,7 @@ class PpiProductPage
 		} else if (get_option('ppi-custom-add-to-cart-label') != '') {
 			return get_option('ppi-custom-add-to-cart-label');
 		} else {
-			return __('Design Product', PPI_TEXT_DOMAIN);
+			return null;
 		}
 	}
 
