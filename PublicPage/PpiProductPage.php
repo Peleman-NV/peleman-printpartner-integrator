@@ -76,7 +76,6 @@ class PpiProductPage
 	 */
 	public function enqueue_ajax()
 	{
-		// definite ajax call
 		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'));
 		wp_localize_script(
 			'ppi-variation-information',
@@ -94,6 +93,16 @@ class PpiProductPage
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
 				'nonce' => wp_create_nonce('file_upload_nonce')
+			)
+		);
+
+		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'));
+		wp_localize_script(
+			'ppi-ajax-add-to-cart',
+			'ppi_imaxel_redirection_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('imaxel_redirection_nonce')
 			)
 		);
 	}
@@ -174,6 +183,16 @@ class PpiProductPage
 	}
 
 	/**
+	 * Outputs a div with information pertaining to the Imaxel redirection,
+	 * more specifically errors in getting the Imaxel URL
+	 */
+	public function ppi_output_redirection_info()
+	{
+		$redirectionInfoDiv = "<div id='redirection-info'></div>";
+		echo $redirectionInfoDiv;
+	}
+
+	/**
 	 * Returns content parameters for a chosen variant
 	 */
 	private function getVariantContentParameters($variant_id)
@@ -202,6 +221,36 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
+
+		$this->returnResponse($response);
+	}
+
+	/**
+	 * Get the Imaxel URL and save the user project to the database
+	 */
+	public function get_imaxel_redirection()
+	{
+		check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce');
+		$variant_id = $_GET['variant'];
+		$content_file_id = $_GET['content'];
+
+		$imaxel_response = $this->getImaxelData($variant_id);
+		if ($imaxel_response['status'] == "error") {
+			$response['status'] = 'error';
+			$response['information'] = $imaxel_response['information'];
+			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+			$this->returnResponse($response);
+		}
+
+		$project_id = $imaxel_response['project_id'];
+		$user_id = get_current_user_id();
+		$this->insertProject($user_id, $project_id, $variant_id, $content_file_id);
+
+		$response['url'] = $imaxel_response['url'];
+		$response['project-id'] = $project_id;
+
+		$response['status'] = "success";
+		$response['variant'] = $variant_id;
 
 		$this->returnResponse($response);
 	}
@@ -270,27 +319,27 @@ class PpiProductPage
 		return __("Design product", PPI_TEXT_DOMAIN);
 	}
 
-	public function get_imaxel_url($variant_id)
-	{
-		$imaxel_response = $this->getImaxelData($variant_id);
+	// public function get_imaxel_url($variant_id)
+	// {
+	// 	$imaxel_response = $this->getImaxelData($variant_id);
 
-		if ($imaxel_response['status'] == "error") {
-			$response['status'] = 'error';
-			$response['information'] = $imaxel_response['information'];
-			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-			$this->returnResponse($response);
-		}
+	// 	if ($imaxel_response['status'] == "error") {
+	// 		$response['status'] = 'error';
+	// 		$response['information'] = $imaxel_response['information'];
+	// 		$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
+	// 		$this->returnResponse($response);
+	// 	}
 
-		$project_id = $imaxel_response['project_id'];
-		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
-		$response['url'] = $imaxel_response['url'];
+	// 	$project_id = $imaxel_response['project_id'];
+	// 	$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
+	// 	$response['url'] = $imaxel_response['url'];
 
-		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id);
+	// 	$user_id = get_current_user_id();
+	// 	$this->insertProject($user_id, $project_id, $variant_id);
 
-		$response['status'] = 'success';
-		return $response;
-	}
+	// 	$response['status'] = 'success';
+	// 	return $response;
+	// }
 
 	public function get_add_to_cart_label($variant_id)
 	{
