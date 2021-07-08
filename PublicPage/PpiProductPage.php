@@ -234,6 +234,16 @@ class PpiProductPage
 		$variant_id = $_GET['variant'];
 		$content_file_id = $_GET['content'];
 
+		$product_variant = wc_get_product($variant_id);
+		$parent_product = wc_get_product($product_variant->get_parent_id());
+		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
+
+		// if not customizable, no need to call Imaxel
+		if ($parent_product->get_meta('customizable_product') === 'no') {
+			$response['status'] = "success";
+			$this->returnResponse($response);
+		}
+
 		$imaxel_response = $this->getImaxelData($variant_id);
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';

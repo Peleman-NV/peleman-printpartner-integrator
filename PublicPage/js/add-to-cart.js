@@ -41,7 +41,11 @@
                     success: function (response) {
                         console.log(response);
                         if (response.status === 'success') {
-                            window.location.href = response.url;
+                            if (response.isCustomizable === 'yes') {
+                                window.location.href = response.url;
+                            } else {
+                                $('.cart').submit();
+                            }
                         }
                         if (response.status === 'error') {
                             $('#redirection-info').html(response.message);
