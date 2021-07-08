@@ -747,11 +747,12 @@ class PpiProductPage
 
 	public function register_projects_endpoint()
 	{
-		add_rewrite_endpoint('projects', EP_PAGES);
+		add_rewrite_endpoint('projects',  EP_ROOT | EP_PAGES);
+		flush_rewrite_rules();
 	}
 
 	public function projects_endpoint_content()
 	{
-		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
+		$var = wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
 	}
 }
