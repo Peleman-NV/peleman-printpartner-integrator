@@ -1,3 +1,15 @@
+/**
+ * This script is only responsible to the content file upload.
+ * If a product requires a content file, 'variable-product.js' will load an upload form.
+ * This script fires on the change event of that form, and performs an AJAX call to
+ * the PHP function "upload_content_file" in PublicPage/PpiProductPage.php,
+ * where the file is validated and uploaded to the server on success.
+ * A response is then return (success or error) after which the "add to cart" button is
+ * enabled, or an error message is displayed.
+ *
+ * The upload button's colour is also set, depending on the URL.
+ */
+
 (function ($) {
     'use strict';
     $(function () {
@@ -9,9 +21,9 @@
             const variationId = $("[name='variation_id']").val();
             $('.single_add_to_cart_button').addClass('ppi-disabled');
             $('#upload-info').html('');
-            $('#upload-info').removeClass();
-            $('#ppi-loading').removeClass('ppi-hidden');
-            $('.thumbnail-container').css('background-image', '');
+            $('#upload-info').removeClass(); // removes all classes from upload info
+            $('#ppi-loading').removeClass('ppi-hidden'); // display loading animation
+            $('.thumbnail-container').css('background-image', ''); // remove thumbnail
             $('.thumbnail-container').removeClass('ppi-min-height');
             $('.thumbnail-container').prop('alt', '');
 
@@ -23,9 +35,10 @@
             formData.append('variant_id', variationId);
             formData.append('_ajax_nonce', ppi_upload_content_object.nonce);
 
+            // autmatically submit form on change event
             $('#file-upload').submit();
             e.preventDefault();
-            // add GET param to add to cart URL to be saved in DB
+
             $.ajax({
                 url: ppi_upload_content_object.ajax_url,
                 method: 'POST',
@@ -39,18 +52,10 @@
                     console.log(response);
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
-                        if (response.do_not_redirect === true) {
-                            replaceBtnWithLink(response.url);
-                        } else {
-                            $('.single_add_to_cart_button').removeClass(
-                                'ppi-disabled'
-                            );
-                            $('.single_add_to_cart_button').prop(
-                                'href',
-                                response.url
-                            );
-                        }
-                        $('.ppi-upload-parameters').removeClass('ppi-hidden');
+                        // enable add to cart button
+                        $('.single_add_to_cart_button').removeClass(
+                            'ppi-disabled'
+                        );
                         $('.thumbnail-container').addClass('ppi-min-height');
                         $('.thumbnail-container').css(
                             'background-image',
@@ -60,20 +65,14 @@
                             'alt',
                             response.file.name
                         );
+
+                        // add content file id to hidden input
+                        $("[name='variation_id']").after(
+                            '<input type="hidden" name="content_file_id" class="content_file_id" value="' +
+                                response.file.content_file_id +
+                                '"></input>'
+                        );
                         $('#ppi-loading').addClass('ppi-hidden');
-                        const timeEnd = performance.now();
-                        const duration = ((timeEnd - timeStart) / 1000).toFixed(
-                            4
-                        );
-                        const fileSize =
-                            (response.file.filesize / 1024 / 1024).toFixed(2) +
-                            ' MB.';
-                        console.log(
-                            'It took ' +
-                                duration +
-                                ' seconds to upload ' +
-                                fileSize
-                        );
                     } else {
                         $('#upload-info').html(response.message);
                         $('#upload-info').addClass('ppi-response-error');
@@ -102,32 +101,15 @@
             $('#file-upload').val('');
         });
 
-        function replaceBtnWithLink(url) {
-            // get btn textStatus
-            const btnText = $('.single_add_to_cart_button').html();
-
-            $('.single_add_to_cart_button').remove();
-
-            $('.quantity').after(
-                "<a href='" +
-                    url +
-                    "' class='ppi-add-to-cart-button single_add_to_cart_button button alt'><span id='ppi-loading' class='dashicons dashicons-update rotate'></span>" +
-                    btnText +
-                    '</a>'
-            );
-            $('.single_add_to_cart_button').removeClass('ppi-disabled');
-            $('#ppi-loading').addClass('ppi-hidden');
-        }
-
         function setUploadBtnColour() {
             let btnColour = '';
             const domain = getDomain();
             switch (domain) {
                 case 'devwebshop.peleman.com':
-                    btnColour = '#ffd721'; /* devwebshop.com */
+                    btnColour = '#ffd721';
                     break;
                 case 'store.peleman.com':
-                    btnColour = '#ffd721'; /* devwebshop.com */
+                    btnColour = '#ffd721';
                     break;
                 case 'devhumancolours.peleman.com':
                     btnColour = '#ff661f';
@@ -138,7 +120,7 @@
                     $('.ppi-upload-form .upload-label').css('color', 'white');
                     break;
                 case 'devshop.peleman.com':
-                    btnColour = '#006ad0'; /* devshop.com */
+                    btnColour = '#006ad0';
                     $('.ppi-upload-form .upload-label').css('color', 'white');
                     break;
                 default:

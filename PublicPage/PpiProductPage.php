@@ -333,20 +333,6 @@ class PpiProductPage
 			$response['type'] = $file_type;
 		};
 
-		$variant_id = $_POST['variant_id'];
-
-		$imaxel_response = $this->getImaxelData($variant_id);
-		if ($imaxel_response['status'] == "error") {
-			$response['status'] = 'error';
-			$response['information'] = $imaxel_response['information'];
-			$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-		}
-		$project_id = $imaxel_response['project_id'];
-		$response['url'] = $imaxel_response['url'];
-
-		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $project_id);
-		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $project_id . '/content.pdf';
-
 		try {
 			$pdf = new Fpdi();
 			$pages = $pdf->setSourceFile($_FILES['file']['tmp_name']);
@@ -357,11 +343,12 @@ class PpiProductPage
 			$response['error'] = $th->getMessage();
 			$response['message'] = __("We couldn't process your file (possibly due to encryption).  Please use a different PDF file.", PPI_TEXT_DOMAIN);
 			$response['file']['name'] = $filename;
-			$response['file']['tmp'] = $_FILES['file']['tmp_name'];
 			$response['file']['filesize'] = $_FILES['file']['size'];
 
 			$this->returnResponse($response);
 		}
+
+		$variant_id = $_POST['variant_id'];
 
 		// page & dimension validation
 		$variant = $this->getVariantContentParameters($variant_id);
@@ -392,20 +379,23 @@ class PpiProductPage
 			$this->returnResponse($response);
 		}
 
+		$user_id = get_current_user_id();
+		$contentFileId = $user_id . '_' . round(microtime(true) * 1000) . '_' . $variant_id;
+		mkdir(realpath(PPI_UPLOAD_DIR) . '/' . $contentFileId);
+		$newFilenameWithPath = realpath(PPI_UPLOAD_DIR) . '/' . $contentFileId . '/content.pdf';
 		move_uploaded_file($_FILES['file']['tmp_name'], $newFilenameWithPath);
-
 		$newFilenameWithPath = realpath($newFilenameWithPath);
 
 		try {
 			$imagick = new Imagick();
 			$imagick->readImage($newFilenameWithPath . '[0]');
 			$imagick->setImageFormat('jpg');
-			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $project_id . '.jpg';
+			$thumbnailWithPath = realpath(PPI_THUMBNAIL_DIR) . '/' . $contentFileId . '.jpg';
 			$imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
 			$imagick->setCompressionQuality(25);
 			$imagick->scaleImage(150, 0);
 			$imagick->writeImage($thumbnailWithPath);
-			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $project_id . '.jpg';
+			$response['file']['thumbnail'] = plugin_dir_url(__FILE__) . '../../../uploads/ppi/thumbnails/' . $contentFileId . '.jpg';
 			$response['status'] = 'success';
 			$response['message'] = sprintf(__('Successfully uploaded your file "%s" (%d pages).', PPI_TEXT_DOMAIN), $filename, $pages);
 		} catch (\Throwable $th) {
@@ -416,15 +406,12 @@ class PpiProductPage
 		}
 
 		$response['file']['name'] = $filename;
-		$response['file']['tmp'] = $_FILES['file']['tmp_name'];
+		$response['file']['content_file_id'] = $contentFileId;
 		$response['file']['location'] = $newFilenameWithPath;
 		$response['file']['filesize'] = $_FILES['file']['size'];
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
-
-		$user_id = get_current_user_id();
-		$this->insertProject($user_id, $project_id, $variant_id, '/' . $project_id . '/content.pdf', $pages);
 
 		$this->returnResponse($response);
 	}
@@ -450,7 +437,7 @@ class PpiProductPage
 
 		if (empty($template_id) || empty($variant_code)) {
 			return array(
-				'status' => 'success',
+				'status' => 'error',
 				'url' => 'no_editor_url'
 			);
 		}
