@@ -151,6 +151,8 @@ class Plugin
 		$this->loader->add_action('wp_ajax_nopriv_display_variant_info', $product_page, 'display_variant_info');
 		$this->loader->add_action('wp_ajax_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
 		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
+		$this->loader->add_action('wp_ajax_handle_project_action', $product_page, 'handle_project_action');
+		$this->loader->add_action('wp_ajax_nopriv_handle_project_action', $product_page, 'handle_project_action');
 		$this->loader->add_action('woocommerce_add_to_cart_validation', $product_page, 'readImaxelProjectOnReturnFromEditor', 10, 5);
 
 		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 2);

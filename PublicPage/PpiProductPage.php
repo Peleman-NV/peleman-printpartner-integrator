@@ -104,6 +104,16 @@ class PpiProductPage
 				'nonce' => wp_create_nonce('imaxel_redirection_nonce')
 			)
 		);
+
+		wp_enqueue_script('ppi-ajax-projects-page', plugins_url('js/projects-page.js', __FILE__), array('jquery'), $randomNumber);
+		wp_localize_script(
+			'ppi-ajax-projects-page',
+			'ppi_project_action_object',
+			array(
+				'ajax_url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('project_action_nonce')
+			)
+		);
 	}
 
 	/**
@@ -543,11 +553,9 @@ class PpiProductPage
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-		if ($content_filename != null) {
-			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages);
-		} else {
-			$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id);
-		}
+		$date = new \DateTime;
+		$defaultName = 'Project (' . $date->format('d/m/Y') . ')';
+		$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages, 'name' => $defaultName);
 
 		$wpdb->insert($table_name, $query);
 	}
@@ -686,24 +694,7 @@ class PpiProductPage
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
 		$result = $wpdb->get_row("SELECT content_pages FROM {$table_name} WHERE project_id = {$projectId};");
-		error_log(
-			__FILE__ . ': ' . __LINE__ . ' ' . print_r(
-				$wpdb->last_query,
-				true
-			) . PHP_EOL,
-			3,
-			__DIR__ .
-				'/Log.txt'
-		);
-		error_log(
-			__FILE__ . ': ' . __LINE__ . ' ' . print_r(
-				$result,
-				true
-			) . PHP_EOL,
-			3,
-			__DIR__ .
-				'/Log.txt'
-		);
+
 		return $result->content_pages;
 	}
 
@@ -757,5 +748,49 @@ class PpiProductPage
 	public function projects_endpoint_content()
 	{
 		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
+	}
+
+	public function handle_project_action()
+	{
+		check_ajax_referer('project_action_nonce', '_ajax_nonce');
+
+		$action = $_POST['projectAction'];
+		$projectId = $_POST['projectId'];
+		$name = $_POST['name'];
+
+		switch ($action) {
+			case 'edit-project':
+				# code...
+				break;
+			case 'rename-project':
+				if (empty($name) || $name === null) {
+					$response['status'] = 'error';
+					$response['message'] = 'No valid name found.';
+					$this->returnResponse($response);
+				}
+				$response['result'] = $this->renameProject($projectId, $name);
+				break;
+			case 'add-project-to-cart':
+				# code...
+				break;
+			case 'duplicate-project':
+				# code...
+				break;
+		}
+
+		$response['status'] = 'success';
+		$response['project_id'] = $projectId;
+
+		$this->returnResponse($response);
+	}
+
+	private function renameProject($projectId, $name)
+	{
+		global $wpdb;
+
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$wpdb->update($table_name, ['name' => $name], ['project_id' => $projectId]);
+
+		return ['action' => 'rename-project', 'message' => "Project $projectId changed to $name"];
 	}
 }
