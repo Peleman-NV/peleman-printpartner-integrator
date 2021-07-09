@@ -67,8 +67,6 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
-		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'), $randomNumber);
 	}
 
 	/**
@@ -76,7 +74,8 @@ class PpiProductPage
 	 */
 	public function enqueue_ajax()
 	{
-		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'));
+		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
+		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'), $randomNumber);
 		wp_localize_script(
 			'ppi-variation-information',
 			'ppi_product_variation_information_object',
@@ -86,7 +85,7 @@ class PpiProductPage
 			)
 		);
 
-		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'));
+		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'), $randomNumber);
 		wp_localize_script(
 			'ppi-ajax-upload',
 			'ppi_upload_content_object',
@@ -96,7 +95,7 @@ class PpiProductPage
 			)
 		);
 
-		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'));
+		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'), $randomNumber);
 		wp_localize_script(
 			'ppi-ajax-add-to-cart',
 			'ppi_imaxel_redirection_object',
@@ -231,8 +230,15 @@ class PpiProductPage
 	public function get_imaxel_redirection()
 	{
 		check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce');
+
 		$variant_id = $_GET['variant'];
 		$content_file_id = $_GET['content'];
+
+		// if no variant Id present, return
+		if ($variant_id === null) {
+			$response['status'] = "success";
+			$this->returnResponse($response);
+		}
 
 		$product_variant = wc_get_product($variant_id);
 		$parent_product = wc_get_product($product_variant->get_parent_id());
@@ -737,11 +743,8 @@ class PpiProductPage
 
 	public function add_projects_menu_item($items)
 	{
-		$logout = $items['customer-logout'];
-		unset($items['customer-logout']);
-		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
-		$items['customer-logout'] = $logout;
-
+		$items['projects'] = 'Projects';
+		echo 'hi';
 		return $items;
 	}
 
@@ -753,6 +756,6 @@ class PpiProductPage
 
 	public function projects_endpoint_content()
 	{
-		$var = wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
+		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
 	}
 }

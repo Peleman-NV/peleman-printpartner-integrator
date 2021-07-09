@@ -13,62 +13,68 @@
  * -a non-existing template defined in the backend
  */
 
-(function ($) {
+ (function ($) {
     ('use strict');
     $(function () {
-        $('.single_add_to_cart_button').on('click', e => {
+        $('.single_add_to_cart_button').on(
+            'click',
+            blockDefaultAddToCartBehavior
+        );
+
+        function blockDefaultAddToCartBehavior(e) {
             e.preventDefault();
             const variationId = $("[name='variation_id']").val();
             const contentFileId = $("[name='content_file_id']").val();
-
             getImaxelRedirection(variationId, contentFileId);
+        }
 
-            function getImaxelRedirection(variationId, contentFileId = null) {
-                $('#redirection-info').html('');
-                const data = {
-                    variant: variationId,
-                    content: contentFileId,
-                    action: 'get_imaxel_redirection',
-                    _ajax_nonce: ppi_imaxel_redirection_object.nonce,
-                };
+        function getImaxelRedirection(variationId, contentFileId = null) {
+            $('#redirection-info').html('');
+            const data = {
+                variant: variationId,
+                content: contentFileId,
+                action: 'get_imaxel_redirection',
+                _ajax_nonce: ppi_imaxel_redirection_object.nonce,
+            };
 
-                $.ajax({
-                    url: ppi_imaxel_redirection_object.ajax_url,
-                    method: 'GET',
-                    data: data,
-                    cache: false,
-                    dataType: 'json',
-                    success: function (response) {
-                        console.log(response);
-                        if (response.status === 'success') {
-                            if (response.isCustomizable === 'yes') {
-                                window.location.href = response.url;
-                            } else {
-                                $('.cart').submit();
-                            }
-                        }
-                        if (response.status === 'error') {
-                            $('#redirection-info').html(response.message);
-                            $('#redirection-info').addClass(
-                                'ppi-response-error'
+            $.ajax({
+                url: ppi_imaxel_redirection_object.ajax_url,
+                method: 'GET',
+                data: data,
+                cache: false,
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    if (response.status === 'success') {
+                        if (response.isCustomizable === 'yes') {
+                            window.location.href = response.url;
+                        } else {
+                            $('.single_add_to_cart_button').off(
+                                'click',
+                                blockDefaultAddToCartBehavior
                             );
+                            $('.single_add_to_cart_button').trigger('click');
                         }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log({ jqXHR });
-                        console.error(
-                            'Something went wrong:\n' +
-                                jqXHR.status +
-                                ': ' +
-                                jqXHR.statusText +
-                                '\nTextstatus: ' +
-                                textStatus +
-                                '\nError thrown: ' +
-                                errorThrown
-                        );
-                    },
-                });
-            }
-        });
+                    }
+                    if (response.status === 'error') {
+                        $('#redirection-info').html(response.message);
+                        $('#redirection-info').addClass('ppi-response-error');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log({ jqXHR });
+                    console.error(
+                        'Something went wrong:\n' +
+                            jqXHR.status +
+                            ': ' +
+                            jqXHR.statusText +
+                            '\nTextstatus: ' +
+                            textStatus +
+                            '\nError thrown: ' +
+                            errorThrown
+                    );
+                },
+            });
+        }
     });
 })(jQuery);
