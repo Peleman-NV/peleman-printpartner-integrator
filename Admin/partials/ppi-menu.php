@@ -66,6 +66,14 @@
                 <input type="text" id="ppi-wc-secret" name="ppi-wc-secret" value="<?= get_option('ppi-wc-secret'); ?>" placeholder="WooCommerce secret">
             </div>
         </div>
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="ppi-order-id-prefix">Order ID prefix</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="text" id="ppi-order-id-prefix" name="ppi-order-id-prefix" value="<?= get_option('ppi-order-id-prefix'); ?>">
+            </div>
+        </div>
         <p>Here you define the custom label for all products. Each product can have its own custom label as well.</p>
         <div class="form-row">
             <div class="grid-medium-column">

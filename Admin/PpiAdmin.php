@@ -99,6 +99,7 @@ class PpiAdmin
 		register_setting('ppi_custom_settings', 'ppi-imaxel-shop-code');
 		register_setting('ppi_custom_settings', 'ppi-wc-key');
 		register_setting('ppi_custom_settings', 'ppi-wc-secret');
+		register_setting('ppi_custom_settings', 'ppi-order-id-prefix');
 	}
 
 	/**
@@ -576,5 +577,13 @@ class PpiAdmin
 		foreach ($trackingNumbersArray as $trackingNumber) {
 			echo "<a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
 		}
+	}
+
+	public function addOrderPrefix($orderId)
+	{
+		$prefix = get_option('ppi-order-id-prefix');
+		$newOrderId = $prefix . $orderId;
+
+		return $newOrderId;
 	}
 }
