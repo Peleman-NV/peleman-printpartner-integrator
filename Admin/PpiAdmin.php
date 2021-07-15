@@ -578,12 +578,4 @@ class PpiAdmin
 			echo "<a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
 		}
 	}
-
-	public function addOrderPrefix($orderId)
-	{
-		$prefix = get_option('ppi-order-id-prefix');
-		$newOrderId = $prefix . $orderId;
-
-		return $newOrderId;
-	}
 }

@@ -113,7 +113,6 @@ class Plugin
 
 		$this->loader->add_action('woocommerce_order_item_display_meta_key', $plugin_admin, 'displayCustomMetaDataKey', 10, 3);
 		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayCustomMetaDataValue', 10, 3);
-		$this->loader->add_action('woocommerce_order_number', $plugin_admin, 'addOrderPrefix', 10, 1);
 
 		$this->loader->add_action('rest_api_init', $plugin_admin, 'registerCheckPendingOrdersEndpoint');
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
