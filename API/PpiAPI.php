@@ -322,7 +322,7 @@ class PpiAPI
 		}
 
 		$response['status'] = 'success';
-		$response['order-key'] = $order->get_order_key();
+		$response['orderKey'] = $order->get_order_key();
 		$statusCode = 200;
 		wp_send_json($response, $statusCode);
 		die();
