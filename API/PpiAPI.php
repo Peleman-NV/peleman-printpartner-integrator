@@ -118,7 +118,7 @@ class PpiAPI
 	 */
 	public function registerGetWcKeyEndpoint()
 	{
-		register_rest_route('ppi/v1', '/orderkey(?:/(?P<order>\d+))?', array(
+		register_rest_route('ppi/v1', '/orderkey(?:/(?P<order>[a-zA-Z0-9_]+))?', array(
 			'methods' => 'GET',
 			'callback' => array($this, 'getWcOrderKey'),
 			'args' => array('order'),
