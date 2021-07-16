@@ -2,15 +2,27 @@
     ('use strict');
     $(function () {
         $('.project-line .actions button').on('click', handleProjectAction);
+        $('.project-line .actions .ppi-btn-disabled').hover(displayAlreadyOrderedWarning);
         $('#close-modal').on('click', closeModal);
         $('#project-name').on('keyup', e => {
             $('#project-name').removeClass('ppi-input-invalid');
         });
 
-        function showModal() {
+        let projectId;
+        let variantId;
+
+        function displayAlreadyOrderedWarning(e) {
+            e.preventDefault();
+            $(this).siblings('.ordered').toggle();
+
+        }
+
+        function showModal(element) {
+            const currentName = element.parent().parent().children('#project-name').html();
+            console.log(currentName);
             $('.modal').css('display', 'flex');
             $('#overlay').css('display', 'block');
-            $('#project-name').val('');
+            $('#new-project-name').val(currentName);
         }
 
         function closeModal(e) {
@@ -20,39 +32,40 @@
             projectId = undefined;
         }
 
-        let projectId;
         function handleProjectAction(e) {
             let action = e.target.id;
             projectId = $(this).parent().parent().attr('id');
 
             if (action === 'rename-project') {
-                showModal();
-                console.log(projectId);
+                showModal($(this));
                 $('#save-name').on('click', e => {
                     e.preventDefault();
-                    if ($('#project-name').val() === '') {
-                        $('#project-name').addClass('ppi-input-invalid');
+                    if ($('#new-project-name').val() === '') {
+                        $('#new-project-name').addClass('ppi-input-invalid');
                         projectId = undefined;
 
                         return false;
                     }
-                    const name = $('#project-name').val();
-                    $('#project-name').val('');
-                    //const projectId = $(this).parent().parent().attr('id');
+                    const name = $('#new-project-name').val();
+                    $('#new-project-name').val('');
                     performAjaxCall(action, projectId, name);
                     $('.modal').css('display', 'none');
                     $('#overlay').css('display', 'none');
                 });
+            } else if (action === 'add-project-to-cart') {
+                    variantId = $(this).parent().parent().children('#variant-id').data('variantId');
+                    performAjaxCall(action, projectId, null, variantId);
             } else {
                 const projectId = $(this).parent().parent().attr('id');
                 performAjaxCall(action, projectId);
             }
         }
 
-        function performAjaxCall(projectAction, projectId, name = null) {
+        function performAjaxCall(projectAction, projectId, name = null, variantId = null) {
             const data = {
                 projectAction: projectAction,
                 projectId: projectId,
+                variantId: variantId,
                 name: name,
                 action: 'handle_project_action',
                 _ajax_nonce: ppi_project_action_object.nonce,
@@ -67,6 +80,20 @@
                 success: function (response) {
                     console.log(response);
                     if (response.status === 'success') {
+                        switch (response.action) {
+                            case 'edit-project':
+                            case 'add-project-to-cart':
+                                location.href = response.redirectUrl;
+                                break;
+                            // case 'add-project-to-cart':
+                            //     location.href = response.redirectUrl;
+                            //     break;
+                            case 'rename-project':
+                                setTimeout(e => location.reload(), 500);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     if (response.status === 'error') {
                     }
@@ -85,7 +112,6 @@
                     );
                 },
             });
-            setTimeout(e => location.reload(), 500);
         }
     });
 })(jQuery);

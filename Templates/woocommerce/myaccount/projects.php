@@ -31,8 +31,77 @@ function getProjectsForUser($userId)
             text-decoration: underline;
         }
 
+        .project-line {}
+
+        .project-line .actions {
+            user-select: none;
+            position: relative;
+        }
+
         .ppi-btn-warning {
             background-color: red !important;
+        }
+
+        .ppi-btn-disabled {
+            background-color: grey !important;
+            cursor: not-allowed !important;
+        }
+
+        .ppi-btn-disabled:active {
+            pointer-events: none;
+        }
+
+        .ordered {
+            display: none;
+            background-color: white;
+            border: 1px solid lightgrey;
+            color: black;
+            z-index: 999;
+            padding: 5px 10px;
+            border-radius: 10px;
+            position: absolute;
+            top: 30px;
+            left: 50px;
+        }
+
+        #overlay {
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: none;
+        }
+
+        .modal {
+            background: white;
+            position: absolute;
+            padding: 18px;
+            border-radius: 25px;
+            border: 1px solid black;
+            left: 50%;
+            top: 50%;
+            margin: auto;
+            transform: translate(-50%, -50%);
+            right: auto !important;
+            bottom: auto !important;
+            align-items: center;
+
+        }
+
+        .modal h4,
+        form,
+        input {
+            display: inline-block;
+            line-height: 1.05;
+        }
+
+        .modal h4 {
+            margin: 5px;
+        }
+
+        .ppi-input-invalid {
+            border: 1px solid red;
         }
     </style>
 
@@ -48,82 +117,35 @@ function getProjectsForUser($userId)
         </thead>
         <tbody>
             <?php foreach ($userProjects as $project) : ?>
-                <tr class="project-line">
-                    <input type="hidden" name="project_id" value="<?php echo $project->project_id; ?>">
-                    <td><?php echo $project->name; ?></td>
-                    <td><?php $product = wc_get_product($project->product_id);
-                        echo '<a href="' . get_permalink($project->product_id) . '">' . $product->get_title() . '</a>';  ?></td>
+                <tr class="project-line" id="<?php echo $project->project_id; ?>">
+                    <td id="project-name"><?php echo $project->name; ?></td>
+                    <td id="variant-id" data-variant-id="<?= $project->product_id; ?>">
+                        <?php $product = wc_get_product($project->product_id);
+                        echo '<a href="' . get_permalink($project->product_id) . '">' . $product->get_title() . '</a>';  ?>
+                    </td>
                     <td><?php $date = new DateTime($project->created);
                         echo $date->format('Y-m-d'); ?></td>
-                    <td><button id="edit-project" class="woocommerce-button button">Edit</button>
-                        <button id="rename-project" class="woocommerce-button button">Rename</button>
+                    <td class="actions">
+                        <button id="edit-project" class=" woocommerce-button button <?= $project->ordered ? 'ppi-btn-disabled' : '' ?>">Edit</button>
+                        <?= $project->ordered ? '<div class="ordered">This project has already been ordered,<br>and cannot be modified.</div>' : '' ?>
+                        <button id="rename-project" class=" woocommerce-button button">Rename</button>
                         <button id="add-project-to-cart" class="woocommerce-button button">Order</button>
-                        <button id="delete-project" class="woocommerce-button button ppi-btn-warning">Delete</button>
+                        <button id="duplicate-project" class=" woocommerce-button button">Duplicate</button>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+    <div class="modal" id="name-modal">
+        <h4>Please enter a name</h4>
+        <form action="">
+            <label for="project-name"></label>
+            <input id="new-project-name" name="project-name" type="text" required>
+            <button id="save-name" class="woocommerce-button button">Save name</button>
+            <button id="close-modal" name="close" class="woocommerce-button button">X</button>
+        </form>
+    </div>
+    <div id="overlay"></div>
 </body>
-<script type="text/javascript">
-    (function($) {
-        ('use strict');
-        $(function() {
-
-            $('.project-line').on('click', e => {
-                let action = e.target.id;
-                let projectId = e.currentTarget.children[0].value;
-
-                switch (action) {
-                    case 'edit-project':
-                        editProject(projectId);
-                        break;
-                    case 'rename-project':
-                        renameProject(projectId);
-                        break;
-                    case 'add-project-to-cart':
-                        orderProject(projectId);
-                        break;
-                    case 'delete-project':
-                        deleteProject(projectId);
-                        break;
-                }
-            });
-
-            function editProject(projectId) {
-                /**
-                 * redirect to Imaxel with ?
-                 * backURL projects page -> Imaxel label is Add to cart though
-                 */
-                console.log('Edit ' + projectId);
-            }
-
-            function renameProject(projectId) {
-                console.log('Rename ' + projectId);
-                const name = prompt('New project name?');
-                console.log(name);
-
-            }
-
-            function orderProject(projectId) {
-                /**
-                 * create project
-                 * read JSON
-                 * add to cart
-                 */
-                console.log('Order ' + projectId);
-            }
-
-            function deleteProject(projectId) {
-                const confirmDelete = confirm('Are you sure you want to delete project ' + projectId);
-                if (confirmDelete) {
-                    console.log('Delete ' + projectId);
-                }
-                console.log('Not deleting project ' + projectId);
-
-            }
-        });
-    })(jQuery);
-</script>
 
 </html>
