@@ -567,15 +567,16 @@ class PpiAdmin
 
 	public function displayTrackingInformation($order)
 	{
-		$trackingNumbers = $order->get_meta('f2d_tracking');
+		$trackingData = $order->get_meta('f2d_tracking_data');
 		echo '<h3>Tracking numbers</h3>';
-		if (empty($order->get_meta('f2d_tracking'))) {
+		if (empty($trackingData)) {
 			echo 'No tracking information available';
 			return;
 		}
-		$trackingNumbersArray = explode(',', $trackingNumbers);
-		foreach ($trackingNumbersArray as $trackingNumber) {
-			echo "<a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
+		$decodedTrackingData = json_decode($trackingData, true);
+
+		foreach ($decodedTrackingData as $trackingObject) {
+			echo '<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
 		}
 	}
 }

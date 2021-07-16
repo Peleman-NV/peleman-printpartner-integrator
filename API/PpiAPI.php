@@ -257,27 +257,32 @@ class PpiAPI
 			die();
 		}
 
-		$trackingNumber = $body['f2d_tracking'];
-		$currentTrackingNumbers = $order->get_meta('f2d_tracking');
+		$trackingDataObject = [
+			'number' => $body['f2d_tracking_data'],
+			'url' => $body['f2d_tracking_url'],
+			'date' => $body['f2d_tracking_date']
+		];
 
-		$trackingNumbersArray = explode(',', $currentTrackingNumbers);
-		// if already in array, do nothing and return
+		$currentTrackingData = $order->get_meta('f2d_tracking_data');
+		$decodedTrackingData = json_decode($currentTrackingData, true);
 
-		if (in_array($trackingNumber, $trackingNumbersArray)) {
-			echo 'already got this one';
-			$response['status'] = 'success';
-			$response['message'] = 'tracking number already uploaded';
-			$statusCode = 200;
-			wp_send_json($response, $statusCode);
-			die();
+		// if it exists already, update, else add
+		$trackingDataIdentifier = array_column($decodedTrackingData, 'number');
+		if (in_array($trackingDataObject['number'], $trackingDataIdentifier)) {
+			$response['message'] = "updated existing tracking data for order $orderId";
+			$flippedTrackingDataIdentifier = array_flip($trackingDataIdentifier);
+			$keyToUpdate = $flippedTrackingDataIdentifier[$trackingDataObject['number']];
+			$decodedTrackingData[$keyToUpdate] = $trackingDataObject;
+		} else {
+			$response['message'] = "added new tracking data to order $orderId";
+			$decodedTrackingData[] = $trackingDataObject;
 		}
 
-		array_push($trackingNumbersArray, $trackingNumber);
+		$encodedTrackingData = json_encode($decodedTrackingData);
 
 		try {
-			update_post_meta($orderId, 'f2d_tracking', implode(',', $trackingNumbersArray));
+			update_post_meta($orderId, 'f2d_tracking_data', $encodedTrackingData);
 			$response['status'] = 'success';
-			$response['message'] = 'added tracking data to order';
 			$statusCode = 200;
 			wp_send_json($response, $statusCode);
 			die();

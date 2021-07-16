@@ -309,10 +309,10 @@ class PpiProductPage
 	 */
 	public function ppi_output_order_tracking_information($order)
 	{
-		$trackingNumbers = $order->get_meta('f2d_tracking');
-		$trackingNumbersArray  = explode(',', $trackingNumbers);
-		foreach ($trackingNumbersArray as $trackingNumber) {
-			echo "<i>Tracking number:</i> <a style=\"text-decoration: underline;\" href=\"https://t.17track.net/en#nums=$trackingNumber\" target=\"blank\">$trackingNumber</a><br>";
+		$trackingData = $order->get_meta('f2d_tracking_data');
+
+		foreach ($trackingData as $trackingObject) {
+			echo '<i>Tracking number:</i> <a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
 		}
 	}
 
