@@ -31,8 +31,6 @@ function getProjectsForUser($userId)
             text-decoration: underline;
         }
 
-        .project-line {}
-
         .project-line .actions {
             user-select: none;
             position: relative;
