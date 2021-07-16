@@ -345,28 +345,6 @@ class PpiProductPage
 		return __("Design product", PPI_TEXT_DOMAIN);
 	}
 
-	// public function get_imaxel_url($variant_id)
-	// {
-	// 	$imaxel_response = $this->getImaxelData($variant_id);
-
-	// 	if ($imaxel_response['status'] == "error") {
-	// 		$response['status'] = 'error';
-	// 		$response['information'] = $imaxel_response['information'];
-	// 		$response['message'] = __('Something went wrong.  Please refresh the page and try again.', PPI_TEXT_DOMAIN);
-	// 		$this->returnResponse($response);
-	// 	}
-
-	// 	$project_id = $imaxel_response['project_id'];
-	// 	$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
-	// 	$response['url'] = $imaxel_response['url'];
-
-	// 	$user_id = get_current_user_id();
-	// 	$this->insertProject($user_id, $project_id, $variant_id);
-
-	// 	$response['status'] = 'success';
-	// 	return $response;
-	// }
-
 	public function get_add_to_cart_label($variant_id)
 	{
 		$wc_product = wc_get_product($variant_id);
@@ -735,7 +713,7 @@ class PpiProductPage
 	public function add_projects_menu_item($items)
 	{
 		$items['projects'] = 'Projects';
-		echo 'hi';
+
 		return $items;
 	}
 
