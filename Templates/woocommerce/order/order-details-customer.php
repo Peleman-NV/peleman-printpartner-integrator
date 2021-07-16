@@ -21,7 +21,7 @@ defined('ABSPATH') || exit;
 $show_shipping = !wc_ship_to_billing_address_only() && $order->needs_shipping_address();
 ?>
 <section class="woocommerce-customer-details">
-	<?php if ($order->get_meta('f2d_tracking') !== '') : ?>
+	<?php if ($order->get_meta('f2d_tracking_data') !== '') : ?>
 		<section class="woocommerce-columns woocommerce-columns--2">
 			<h2 class="woocommerce-column__title"><?php esc_html_e('Tracking information', 'woocommerce'); ?></h2>
 			<?php do_action('ppi_display_order_tracking_information', $order); ?>

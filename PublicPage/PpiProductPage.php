@@ -310,9 +310,10 @@ class PpiProductPage
 	public function ppi_output_order_tracking_information($order)
 	{
 		$trackingData = $order->get_meta('f2d_tracking_data');
+		$decodedTrackingData = json_decode($trackingData, true);
 
-		foreach ($trackingData as $trackingObject) {
-			echo '<i>Tracking number:</i> <a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
+		foreach ($decodedTrackingData as $trackingObject) {
+			echo '<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
 		}
 	}
 
