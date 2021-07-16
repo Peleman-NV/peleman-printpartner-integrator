@@ -517,7 +517,7 @@ class PpiAdmin
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
 			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . ' (' . round(filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)) / 1024, 2) . ' kB)</a>';
-			return '<i>files not ready yet</i>';
+			return '<i style="color: red; font weight="700";>files are still syncing - please check again in 5 minutes</i>';
 		}
 		if ($meta->key === '_content_filename') {
 			$file = $item->get_meta('_content_filename');
