@@ -227,6 +227,7 @@ class PpiProductPage
 		$response =	$this->getVariantContentParameters($variant_id);
 		$response['status'] = "success";
 		$response['variant'] = $variant_id;
+		$response['inStock'] = $product_variant->is_in_stock();
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);

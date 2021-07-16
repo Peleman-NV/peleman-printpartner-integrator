@@ -100,6 +100,14 @@
                                 displayUploadElements(response);
                             }
                         }
+                        /**
+                         * If the variant isn't in stock, all the above doesn't matter
+                         * and the add to cart & upload buttons should be disabled
+                         */
+                        if (!response.inStock) {
+                            disableAddToCartBtn();
+                            $('.upload-label').addClass('ppi-disabled');
+                        }
                     } else {
                         $('#variant-info').html(response.message);
                         $('#variant-info').addClass('ppi-response-error');
@@ -142,6 +150,7 @@
          * Function displays the necessary parameters, when present
          */
         function displayUploadElements(response) {
+            $('.upload-label').removeClass('ppi-disabled');
             const { height, width, min_pages, max_pages, price_per_page } =
                 response;
             $('#ppi-loading').addClass('ppi-hidden');
