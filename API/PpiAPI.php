@@ -126,6 +126,19 @@ class PpiAPI
 		));
 	}
 
+	/**	
+	 * Register book order and payment as paid
+	 */
+	public function registerOrderAsPaidEndpoint()
+	{
+		register_rest_route('ppi/v1', '/orderpaid(?:/(?P<order>[a-zA-Z0-9_]+))?', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'updateOrderToPaid'),
+			'args' => array('order'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
 	public function getOrder($request)
 	{
 		$orderId = $request['order'];
@@ -328,6 +341,27 @@ class PpiAPI
 
 		$response['status'] = 'success';
 		$response['orderKey'] = $order->get_order_key();
+		$statusCode = 200;
+		wp_send_json($response, $statusCode);
+		die();
+	}
+
+	function updateOrderToPaid($request)
+	{
+		$orderId = $request['order'];
+		$order = wc_get_order($orderId);
+
+		// set order status to processing
+		if ($order) {
+			$order->update_status('processing', '', true);
+		}
+
+		// set payment to payment_completed
+		$paymentId = $order->get_meta('_pronamic_payment_id');
+
+		$response['order'] = $orderId;
+		$response['paymentId'] = $paymentId;
+
 		$statusCode = 200;
 		wp_send_json($response, $statusCode);
 		die();
