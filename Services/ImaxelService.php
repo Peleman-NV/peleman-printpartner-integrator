@@ -61,7 +61,7 @@ class ImaxelService
     }
 
     /**
-     * Exectues a CURL request
+     * Exectues a CURL request - tesdt
      * 
      * @param string $url
      * @param string $requestType
