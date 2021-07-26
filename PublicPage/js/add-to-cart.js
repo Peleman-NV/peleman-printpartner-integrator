@@ -13,7 +13,7 @@
  * -a non-existing template defined in the backend
  */
 
- (function ($) {
+(function ($) {
     ('use strict');
     $(function () {
         $('.single_add_to_cart_button').on(

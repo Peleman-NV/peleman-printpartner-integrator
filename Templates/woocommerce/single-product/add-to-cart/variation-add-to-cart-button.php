@@ -22,12 +22,7 @@ global $product;
 		)
 	);
 	do_action('woocommerce_after_add_to_cart_quantity');
-
-	if ($wc_product->get_meta('customizable_product') == 'yes') { // and templateID present
-		echo '<a class="ppi-add-to-cart-button single_add_to_cart_button button alt"><span id="ppi-loading" class="ppi-hidden dashicons dashicons-update rotate"></span>' .  esc_html($product->single_add_to_cart_text()) . '</a>';
-	} else {
-		echo '<button type="submit" class="single_add_to_cart_button button alt">' . esc_html($product->single_add_to_cart_text()) . '</button>';
-	}
+	echo '<button type="submit" class="ppi-add-to-cart-button single_add_to_cart_button button alt"><span id="ppi-loading" class="ppi-hidden dashicons dashicons-update rotate"></span>' . esc_html($product->single_add_to_cart_text()) . '</button>';
 
 	do_action('woocommerce_after_add_to_cart_button');
 	do_action('ppi_redirection_info_div');

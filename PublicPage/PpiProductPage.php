@@ -218,7 +218,7 @@ class PpiProductPage
 
 	public function get_product_variation_data()
 	{
-		check_ajax_referer('ppi_variation_data', '_ajax_nonce');
+		//check_ajax_referer('ppi_variation_data', '_ajax_nonce');
 
 		$variant_id = $_GET['variant'];
 		$product_variant = wc_get_product($variant_id);
@@ -251,12 +251,10 @@ class PpiProductPage
 			$this->returnResponse($response);
 		}
 
-		$product_variant = wc_get_product($variant_id);
-		$parent_product = wc_get_product($product_variant->get_parent_id());
-		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
+		$response['isCustomizable'] = !empty(wc_get_product($variant_id)->get_meta('template_id')) ? 'yes' : 'no';
 
 		// if not customizable, no need to call Imaxel
-		if ($parent_product->get_meta('customizable_product') === 'no') {
+		if ($response['isCustomizable'] === 'no') {
 			$response['status'] = "success";
 			$this->returnResponse($response);
 		}
@@ -492,7 +490,7 @@ class PpiProductPage
 
 		if (empty($template_id) || empty($variant_code)) {
 			return array(
-				'status' => 'error',
+				'status' => 'success',
 				'url' => 'no_editor_url'
 			);
 		}

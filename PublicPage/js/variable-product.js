@@ -40,7 +40,7 @@
             const data = {
                 variant: variationId,
                 action: 'get_product_variation_data',
-                _ajax_nonce: ppi_product_variation_information_object.nonce,
+                //_ajax_nonce: ppi_product_variation_information_object.nonce,
             };
             let fallbackAddToCartLabel = setAddToCartLabel();
 
