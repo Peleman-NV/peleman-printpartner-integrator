@@ -67,6 +67,8 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
+		// $randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
+		// wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'), $randomNumber);
 	}
 
 	/**
@@ -75,27 +77,18 @@ class PpiProductPage
 	public function enqueue_ajax()
 	{
 		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
-		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'), $randomNumber);
+
+		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'), $randomNumber, true);
 		wp_localize_script(
 			'ppi-variation-information',
 			'ppi_product_variation_information_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('ppi_variation_data')
+				//	'nonce' => wp_create_nonce('ppi_variation_data')
 			)
 		);
 
-		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'), $randomNumber);
-		wp_localize_script(
-			'ppi-ajax-upload',
-			'ppi_upload_content_object',
-			array(
-				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('file_upload_nonce')
-			)
-		);
-
-		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'), $randomNumber);
+		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'), $randomNumber, true);
 		wp_localize_script(
 			'ppi-ajax-add-to-cart',
 			'ppi_imaxel_redirection_object',
@@ -105,13 +98,13 @@ class PpiProductPage
 			)
 		);
 
-		wp_enqueue_script('ppi-ajax-projects-page', plugins_url('js/projects-page.js', __FILE__), array('jquery'), $randomNumber);
+		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'), $randomNumber, true);
 		wp_localize_script(
-			'ppi-ajax-projects-page',
-			'ppi_project_action_object',
+			'ppi-ajax-upload',
+			'ppi_upload_content_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('project_action_nonce')
+				'nonce' => wp_create_nonce('file_upload_nonce')
 			)
 		);
 	}
@@ -712,63 +705,21 @@ class PpiProductPage
 
 	public function add_projects_menu_item($items)
 	{
-		$items['projects'] = 'Projects';
+		$logout = $items['customer-logout'];
+		unset($items['customer-logout']);
+		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
+		$items['customer-logout'] = $logout;
 
 		return $items;
 	}
 
 	public function register_projects_endpoint()
 	{
-		add_rewrite_endpoint('projects',  EP_ROOT | EP_PAGES);
-		flush_rewrite_rules();
+		add_rewrite_endpoint('projects', EP_PAGES);
 	}
 
 	public function projects_endpoint_content()
 	{
 		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
-	}
-
-	public function handle_project_action()
-	{
-		check_ajax_referer('project_action_nonce', '_ajax_nonce');
-
-		$action = $_POST['projectAction'];
-		$projectId = $_POST['projectId'];
-		$name = $_POST['name'];
-
-		switch ($action) {
-			case 'edit-project':
-				# code...
-				break;
-			case 'rename-project':
-				if (empty($name) || $name === null) {
-					$response['status'] = 'error';
-					$response['message'] = 'No valid name found.';
-					$this->returnResponse($response);
-				}
-				$response['result'] = $this->renameProject($projectId, $name);
-				break;
-			case 'add-project-to-cart':
-				# code...
-				break;
-			case 'duplicate-project':
-				# code...
-				break;
-		}
-
-		$response['status'] = 'success';
-		$response['project_id'] = $projectId;
-
-		$this->returnResponse($response);
-	}
-
-	private function renameProject($projectId, $name)
-	{
-		global $wpdb;
-
-		$table_name = PPI_USER_PROJECTS_TABLE;
-		$wpdb->update($table_name, ['name' => $name], ['project_id' => $projectId]);
-
-		return ['action' => 'rename-project', 'message' => "Project $projectId changed to $name"];
 	}
 }

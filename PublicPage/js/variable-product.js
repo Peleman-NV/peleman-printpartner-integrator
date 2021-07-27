@@ -99,14 +99,14 @@
                                 disableAddToCartBtn(buttonText);
                                 displayUploadElements(response);
                             }
-                        }
-                        /**
-                         * If the variant isn't in stock, all the above doesn't matter
-                         * and the add to cart & upload buttons should be disabled
-                         */
-                        if (!response.inStock) {
-                            disableAddToCartBtn();
-                            $('.upload-label').addClass('ppi-disabled');
+                            /**
+                             * If the variant isn't in stock, all the above doesn't matter
+                             * and the add to cart & upload buttons should be disabled
+                             */
+                            if (!response.inStock) {
+                                disableAddToCartBtn(buttonText);
+                                $('.upload-label').addClass('ppi-disabled');
+                            }
                         }
                     } else {
                         $('#variant-info').html(response.message);
