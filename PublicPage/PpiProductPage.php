@@ -284,6 +284,9 @@ class PpiProductPage
 	 */
 	public function ppi_override_wc_templates($template, $template_name, $template_path)
 	{
+		if ('simple.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/simple.php';
+		}
 		if ('variation.php' === basename($template)) {
 			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation.php';
 		}
@@ -637,23 +640,38 @@ class PpiProductPage
 
 	public function adjustItemPriceForAddedPages($cart)
 	{
-
 		foreach ($cart->get_cart() as $cartItem) {
-			if ($cartItem['variation_id'] === 0) return;
-			$cartProduct = wc_get_product($cartItem['variation_id']);
-			$baseNumberOfPages = $cartProduct->get_meta('base_number_of_pages');
-			$pricePerPage = $cartProduct->get_meta('price_per_page');
+			// for variable products
+			if ($cartItem['variation_id'] !== 0) {
+				$variableCartProduct = wc_get_product($cartItem['variation_id']);
+				// nr of pages price adjustment
+				$baseNumberOfPages = $variableCartProduct->get_meta('base_number_of_pages');
+				$pricePerPage = $variableCartProduct->get_meta('price_per_page');
+				if (isset($baseNumberOfPages) && !empty($baseNumberOfPages) && isset($pricePerPage) && !empty($pricePerPage)) {
+					if (empty($cartItem['_ppi_imaxel_project_id'])) return;
+					$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
+					$supplementalPages = $pages - $baseNumberOfPages;
 
-			if (isset($baseNumberOfPages) && !empty($baseNumberOfPages) && isset($pricePerPage) && !empty($pricePerPage)) {
-				if (empty($cartItem['_ppi_imaxel_project_id'])) return;
-				$pages = $this->getNrOfContentPages($cartItem['_ppi_imaxel_project_id']);
-				$supplementalPages = $pages - $baseNumberOfPages;
+					if ($supplementalPages <= 0) return;
 
-				if ($supplementalPages <= 0) return;
-
-				$price = $cartItem['data']->get_price();
-				$price += ($supplementalPages * $pricePerPage);
-				$cartItem['data']->set_price($price);
+					$price = $cartItem['data']->get_price();
+					$price += ($supplementalPages * $pricePerPage);
+					$cartItem['data']->set_price($price);
+				}
+				// unit price adjustment
+				$cartUnitPrice = $variableCartProduct->get_meta('cart_price');
+				if (isset($cartUnitPrice) && !empty($cartUnitPrice)) {
+					$cartItem['data']->set_price($cartUnitPrice);
+				}
+			}
+			// for simple products
+			if ($cartItem['variation_id'] === 0) {
+				$simpleCartProduct = wc_get_product($cartItem['product_id']);
+				// unit price adjustment
+				$cartUnitPrice = $simpleCartProduct->get_meta('cart_price');
+				if (isset($cartUnitPrice) && !empty($cartUnitPrice)) {
+					$cartItem['data']->set_price($cartUnitPrice);
+				}
 			}
 		}
 
@@ -721,5 +739,19 @@ class PpiProductPage
 	public function projects_endpoint_content()
 	{
 		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
+	}
+
+	public function add_unit_data_to_variation_object($array, $instance, $variation)
+	{
+		$cartPrice = get_post_meta($array['variation_id'], 'cart_price', true);
+		if (!empty($cartPrice)) {
+			$array['custom_cart_price'] = $cartPrice;
+		}
+		$cartUnits = get_post_meta($array['variation_id'], 'cart_units', true);
+		if (!empty($cartPrice)) {
+			$array['custom_cart_units'] = $cartUnits;
+		}
+
+		return $array;
 	}
 }

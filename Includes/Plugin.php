@@ -141,6 +141,7 @@ class Plugin
 		$this->loader->add_action('ppi_redirection_info_div', $product_page, 'ppi_output_redirection_info', 7, 1);
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
+		$this->loader->add_action('woocommerce_available_variation', $product_page, 'add_unit_data_to_variation_object', 11, 3);
 
 		$this->loader->add_action('wp_ajax_get_product_variation_data', $product_page, 'get_product_variation_data');
 		$this->loader->add_action('wp_ajax_nopriv_get_product_variation_data', $product_page, 'get_product_variation_data');
