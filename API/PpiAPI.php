@@ -119,19 +119,6 @@ class PpiAPI
 		));
 	}
 
-	/**	
-	 * Register get WC order key endpoint
-	 */
-	public function registerGetWcKeyEndpoint()
-	{
-		register_rest_route('ppi/v1', '/orderkey(?:/(?P<order>[a-zA-Z0-9_]+))?', array(
-			'methods' => 'GET',
-			'callback' => array($this, 'getWcOrderKey'),
-			'args' => array('order'),
-			'permission_callback' => '__return_true'
-		));
-	}
-
 	public function getOrder($request)
 	{
 		$orderId = $request['order'];
@@ -309,33 +296,5 @@ class PpiAPI
 
 		if ($result[0] === null) return false;
 		return $result[0];
-	}
-
-	public function getWcOrderKey($request)
-	{
-		$orderId = $request['order'];
-
-		if ($orderId == '') {
-			$response['status'] = 'error';
-			$response['message'] = 'No order found';
-			$statusCode = 400;
-			wp_send_json($response, $statusCode);
-			die();
-		}
-
-		$order = wc_get_order($orderId);
-		if ($order === false) {
-			$response['status'] = 'error';
-			$response['message'] = "No order found for id {$orderId}";
-			$statusCode = 400;
-			wp_send_json($response, $statusCode);
-			die();
-		}
-
-		$response['status'] = 'success';
-		$response['orderKey'] = $order->get_order_key();
-		$statusCode = 200;
-		wp_send_json($response, $statusCode);
-		die();
 	}
 }
