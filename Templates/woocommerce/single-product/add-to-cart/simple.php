@@ -1,21 +1,5 @@
 <?php
 
-/**
- * Simple product add to cart
- *
- * This template can be overridden by copying it to yourtheme/woocommerce/single-product/add-to-cart/simple.php.
- *
- * HOWEVER, on occasion WooCommerce will need to update template files and you
- * (the theme developer) will need to copy the new files to your theme to
- * maintain compatibility. We try to do this as little as possible, but it does
- * happen. When this occurs the version of the template file will be bumped and
- * the readme will list any important changes.
- *
- * @see https://docs.woocommerce.com/document/template-structure/
- * @package WooCommerce\Templates
- * @version 3.4.0
- */
-
 defined('ABSPATH') || exit;
 
 global $product;
@@ -26,13 +10,21 @@ if (!$product->is_purchasable()) {
 echo wc_get_stock_html($product); // WPCS: XSS ok.
 
 $cartPrice = $product->get_meta('cart_price');
-if (isset($cartPrice) && !empty($cartPrice)) {
+$cartUnits = $product->get_meta('cart_units');
+if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cartUnits)) {
+	$vatMultiplier = 1;
+	$tax_rates = WC_Tax::get_rates($product->get_tax_class());
+	if (!empty($tax_rates)) {
+		$tax_rate = reset($tax_rates);
+		$vatMultiplier = 1 + ($tax_rate['rate'] / 100);
+	}
+	$priceInclVat = $cartPrice * $vatMultiplier;
 	echo '<div class="woocommerce-variation-price extra-margin">';
 	esc_html_e('Purchase unit price', PPI_TEXT_DOMAIN);
 	echo '<span class="price"> ';
 	echo get_woocommerce_currency_symbol();
-	echo $cartPrice;
-	echo '<small class="woocommerce-price-suffix"> Incl. VAT</small>';
+	echo $priceInclVat;
+	echo '<small class="woocommerce-price-suffix"> Incl. VAT (' . $cartUnits . ' pieces)</small>';
 	echo '</span>';
 	echo '</div>';
 }

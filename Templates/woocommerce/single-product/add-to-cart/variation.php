@@ -12,7 +12,7 @@ global $product;
 	<?php esc_html_e('Purchase unit price', PPI_TEXT_DOMAIN); ?>
 		<span class="price">
 		<?= get_woocommerce_currency_symbol(); ?>{{{ data.variation.custom_cart_price }}}
-		<small class="woocommerce-price-suffix">Incl. VAT</small>
+		<small class="woocommerce-price-suffix">Incl. VAT ({{{ data.variation.custom_cart_units }}} pieces)</small>
 		</span>
 	</div>
 	
