@@ -754,4 +754,21 @@ class PpiProductPage
 
 		return $array;
 	}
+
+	public function adjustMiniCartItemPrice($output, $cart_item, $cart_item_key)
+	{
+		if ($cart_item['variation_id'] === 0) {
+			$productId = $cart_item['product_id'];
+		} else {
+			$productId = $cart_item['variation_id'];
+		}
+
+		$product = wc_get_product($productId);
+		$cartItemPrice = $product->get_meta('cart_price');
+
+		if (isset($cartItemPrice) && !empty($cartItemPrice)) {
+			return '<span class="quantity">' . sprintf('%s &times; %s%s', $cart_item['quantity'], get_woocommerce_currency_symbol(), $cartItemPrice) . '</span>';
+		}
+		return $output;
+	}
 }

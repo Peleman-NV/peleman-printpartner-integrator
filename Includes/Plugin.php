@@ -161,6 +161,7 @@ class Plugin
 
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjustItemPriceForAddedPages', 10);
+		$this->loader->add_action('woocommerce_widget_cart_item_quantity', $product_page, 'adjustMiniCartItemPrice', 10, 3);
 
 		$this->loader->add_action('ppi_display_order_tracking_information', $product_page, 'ppi_output_order_tracking_information', 7, 1);
 
