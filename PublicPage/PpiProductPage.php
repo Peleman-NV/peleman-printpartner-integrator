@@ -78,7 +78,7 @@ class PpiProductPage
 	{
 		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
 
-		wp_enqueue_script('ppi-variation-information', plugins_url('js/variable-product.js', __FILE__), array('jquery'), $randomNumber, true);
+		wp_enqueue_script('ppi-variation-information', plugins_url('js/show-variation.js', __FILE__), array('jquery'), $randomNumber, true);
 		wp_localize_script(
 			'ppi-variation-information',
 			'ppi_product_variation_information_object',
