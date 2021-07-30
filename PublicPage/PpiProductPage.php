@@ -224,6 +224,14 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
+		$cartPrice = $product_variant->get_meta('cart_price');
+		$response['unitPriceObject'] = [
+			'unitPriceExists' => (isset($cartPrice) && empty($cartPrice)) ? false : true,
+			'singularPriceText' => __('Individual price', PPI_TEXT_DOMAIN),
+			'unitPriceText' => __('Purchase unit price', PPI_TEXT_DOMAIN),
+			'priceText' => get_woocommerce_currency_symbol() . $cartPrice,
+			'unitText' => '(' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
+		];
 
 		$this->returnResponse($response);
 	}

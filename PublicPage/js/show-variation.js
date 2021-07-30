@@ -17,6 +17,8 @@
  * If no content is required, the custom add to cart buton is displayed and enabled.
  *
  * The upload button's colour is also set, depending on the URL.
+ *
+ * An additional aspect is displaying the per piece and per unit prices for each variable
  */
 
 (function ($) {
@@ -34,6 +36,7 @@
         $('.variations_form').on('hide_variation', e => {
             hideUploadElements();
             disableAddToCartBtn(buttonText);
+            resetUnitPrice();
         });
 
         function getProductVariationData(variationId) {
@@ -53,6 +56,9 @@
                 success: function (response) {
                     console.log(response);
                     if (response.status === 'success') {
+                        if (response.unitPriceObject.unitPriceExists === true) {
+                            showUnitPrice(response.unitPriceObject);
+                        }
                         buttonText =
                             response.buttonText ?? fallbackAddToCartLabel;
                         if (
@@ -249,6 +255,27 @@
                 }
             }
             return 'en';
+        }
+
+        function showUnitPrice(unitPriceInformationObject) {
+            $('.cart-unit-block').removeClass('ppi-hidden');
+            $('.individual-price-text').html(
+                unitPriceInformationObject.singularPriceText + ' '
+            );
+            $('.unit-price-text').html(
+                unitPriceInformationObject.unitPriceText + ' '
+            );
+            $('.cart-unit-block span.price').html(
+                unitPriceInformationObject.priceText +
+                    '<small class="woocommerce-price-suffix"> Incl. VAT ' +
+                    unitPriceInformationObject.unitText +
+                    '</small>'
+            );
+        }
+
+        function resetUnitPrice() {
+            $('.cart-unit-block').addClass('ppi-hidden');
+            $('.individual-price-text').html();
         }
     });
 })(jQuery);
