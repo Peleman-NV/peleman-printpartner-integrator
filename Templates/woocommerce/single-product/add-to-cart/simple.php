@@ -11,7 +11,7 @@ echo wc_get_stock_html($product); // WPCS: XSS ok.
 
 $cartPrice = $product->get_meta('cart_price');
 $cartUnits = $product->get_meta('cart_units');
-if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cartUnits)) {
+if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cartUnits) && $cartUnits > 1) {
 	$vatMultiplier = 1;
 	$tax_rates = WC_Tax::get_rates($product->get_tax_class());
 	if (!empty($tax_rates)) {
