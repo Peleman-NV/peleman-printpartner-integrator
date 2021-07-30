@@ -57,3 +57,15 @@ msgstr "Caricato correttamente il file %s" (%d pagine)."
 
 msgid "Successfully uploaded your file "%s" (%d pages), but we couldn\'t create a preview thumbnail."
 msgstr "Caricato con successo il file "%s" (%d pagine), ma non siamo riusciti a creare una miniatura di anteprima."
+
+msgid "Individual price"
+msgstr "Prezzo unitario"
+
+msgid "Purchase unit price"
+msgstr "Acquisto prezzo unitario"
+
+msgid "pieces"
+msgstr "pezzi"
+
+msgid "Incl. VAT"
+msgstr "IVA inclusa"

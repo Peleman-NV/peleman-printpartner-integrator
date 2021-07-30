@@ -57,3 +57,15 @@ msgstr "Erfolgreich hochgeladen Dateien "%s" (%d Seiten)."
 
 msgid "Successfully uploaded your file "%s" (%d pages), but we couldn\'t create a preview thumbnail."
 msgstr "Erfolgreich hochgeladen Dateien "%s" (%d Seiten), aber wir konnten nicht eine Miniaturvorschau erstellen."
+
+msgid "Individual price"
+msgstr "Einzelpreis"
+
+msgid "Purchase unit price"
+msgstr "Kauf Stückpreis"
+
+msgid "pieces"
+msgstr "Stücke"
+
+msgid "Incl. VAT"
+msgstr "einschließlich MwSt"

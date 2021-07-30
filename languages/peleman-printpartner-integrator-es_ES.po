@@ -57,3 +57,15 @@ msgstr "Se ha subido correctamente el archivo "%s" (%d páginas)."
 
 msgid "Successfully uploaded your file "%s" (%d pages), but we couldn\'t create a preview thumbnail."
 msgstr "Se ha subido correctamente el archivo "%s" (%d páginas), pero no pudimos crear una vista previa en miniatura."
+
+msgid "Individual price"
+msgstr "Precio individual"
+
+msgid "Purchase unit price"
+msgstr "Precio unitario de compra"
+
+msgid "pieces"
+msgstr "piezas"
+
+msgid "Incl. VAT"
+msgstr "incluye IVA"

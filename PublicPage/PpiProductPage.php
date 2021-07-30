@@ -230,7 +230,7 @@ class PpiProductPage
 			'singularPriceText' => __('Individual price', PPI_TEXT_DOMAIN),
 			'unitPriceText' => __('Purchase unit price', PPI_TEXT_DOMAIN),
 			'priceText' => get_woocommerce_currency_symbol() . $cartPrice,
-			'unitText' => '(' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
+			'unitText' => __('Incl. VAT', PPI_TEXT_DOMAIN) . ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
 		];
 
 		$this->returnResponse($response);

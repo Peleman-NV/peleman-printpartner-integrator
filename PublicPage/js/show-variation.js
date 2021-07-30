@@ -267,7 +267,7 @@
             );
             $('.cart-unit-block span.price').html(
                 unitPriceInformationObject.priceText +
-                    '<small class="woocommerce-price-suffix"> Incl. VAT ' +
+                    '<small class="woocommerce-price-suffix"> ' +
                     unitPriceInformationObject.unitText +
                     '</small>'
             );

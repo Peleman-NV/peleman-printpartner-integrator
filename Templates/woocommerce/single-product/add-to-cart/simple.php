@@ -24,7 +24,7 @@ if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cart
 	echo '<span class="price"> ';
 	echo get_woocommerce_currency_symbol();
 	echo $priceInclVat;
-	echo '<small class="woocommerce-price-suffix"> Incl. VAT (' . $cartUnits . ' pieces)</small>';
+	echo '<small class="woocommerce-price-suffix">' . esc_html_e('Incl. VAT', PPI_TEXT_DOMAIN) .  '(' . $cartUnits . ' pieces)</small>';
 	echo '</span>';
 	echo '</div>';
 }
