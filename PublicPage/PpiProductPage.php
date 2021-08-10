@@ -67,8 +67,6 @@ class PpiProductPage
 	 */
 	public function enqueue_scripts()
 	{
-		// $randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
-		// wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/variable-product.js', array('jquery'), $randomNumber);
 	}
 
 	/**
@@ -76,19 +74,17 @@ class PpiProductPage
 	 */
 	public function enqueue_ajax()
 	{
-		$randomNumber = rand(0, 2000); // prevent caching by adding a 'new' version number on each request
-
-		wp_enqueue_script('ppi-variation-information', plugins_url('js/show-variation.js', __FILE__), array('jquery'), $randomNumber, true);
+		wp_enqueue_script('ppi-variation-information', plugins_url('js/show-variation.js', __FILE__), array('jquery'), rand(0, 2000), true);
 		wp_localize_script(
 			'ppi-variation-information',
 			'ppi_product_variation_information_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
-				//	'nonce' => wp_create_nonce('ppi_variation_data')
+				'nonce' => wp_create_nonce('ppi_variation_data')
 			)
 		);
 
-		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'), $randomNumber, true);
+		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'), rand(0, 2000), true);
 		wp_localize_script(
 			'ppi-ajax-add-to-cart',
 			'ppi_imaxel_redirection_object',
@@ -98,7 +94,7 @@ class PpiProductPage
 			)
 		);
 
-		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'), $randomNumber, true);
+		wp_enqueue_script('ppi-ajax-upload', plugins_url('js/upload-content.js', __FILE__), array('jquery'), rand(0, 2000), true);
 		wp_localize_script(
 			'ppi-ajax-upload',
 			'ppi_upload_content_object',
@@ -211,7 +207,11 @@ class PpiProductPage
 
 	public function get_product_variation_data()
 	{
-		//check_ajax_referer('ppi_variation_data', '_ajax_nonce');
+		// if (!check_ajax_referer('ppi_variation_data', '_ajax_nonce', 0)) {
+		// 	$response['status'] = 'error';
+		// 	$response['message'] = __('Could not verify the origin of this request.', PPI_TEXT_DOMAIN);
+		// 	$this->returnResponse($response);
+		// }
 
 		$variant_id = $_GET['variant'];
 		$product_variant = wc_get_product($variant_id);
@@ -241,7 +241,11 @@ class PpiProductPage
 	 */
 	public function get_imaxel_redirection()
 	{
-		check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce');
+		// if (!check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce')) {
+		// 	$response['status'] = 'error';
+		// 	$response['message'] = __('Could not verify the origin of this request.', PPI_TEXT_DOMAIN);
+		// 	$this->returnResponse($response);
+		// }
 
 		$variant_id = $_GET['variant'];
 		$content_file_id = $_GET['content'];
@@ -366,7 +370,11 @@ class PpiProductPage
 
 	public function upload_content_file()
 	{
-		check_ajax_referer('file_upload_nonce', '_ajax_nonce');
+		// if (!check_ajax_referer('file_upload_nonce', '_ajax_nonce', false)) {
+		// 	$response['status'] = 'error';
+		// 	$response['message'] = __('Could not verify the origin of this request.', PPI_TEXT_DOMAIN);
+		// 	$this->returnResponse($response);
+		// }
 
 		if ($_FILES['file']['error']) {
 			$response['status'] = 'error';

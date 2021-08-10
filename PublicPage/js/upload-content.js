@@ -17,7 +17,6 @@
 
         // Event: when the file input changes, ie: when a new file is selected
         $('#file-upload').on('change', e => {
-            const timeStart = performance.now();
             const variationId = $("[name='variation_id']").val();
             $('.single_add_to_cart_button').addClass('ppi-disabled');
             $('#upload-info').html('');
