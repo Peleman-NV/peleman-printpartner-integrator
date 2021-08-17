@@ -210,12 +210,12 @@
 
         function enableAddToCartBtn(addToCartLabel) {
             $('.single_add_to_cart_button').removeClass('ppi-disabled');
-            $('.single_add_to_cart_button').text(addToCartLabel);
+            $('.single_add_to_cart_button').html('<span id="ppi-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>' + addToCartLabel);
         }
 
         function disableAddToCartBtn(addToCartLabel) {
             $('.single_add_to_cart_button').addClass('ppi-disabled');
-            $('.single_add_to_cart_button').text(addToCartLabel);
+            $('.single_add_to_cart_button').html('<span id="ppi-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>' + addToCartLabel);
         }
 
         function setAddToCartLabel() {
