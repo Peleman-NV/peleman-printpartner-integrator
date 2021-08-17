@@ -165,9 +165,9 @@ class Plugin
 
 		$this->loader->add_action('ppi_display_order_tracking_information', $product_page, 'ppi_output_order_tracking_information', 7, 1);
 
-		$this->loader->add_action('woocommerce_account_menu_items', $product_page, 'add_projects_menu_item', 7, 1);
-		$this->loader->add_action('init', $product_page, 'register_projects_endpoint', 7, 1);
-		$this->loader->add_action('woocommerce_account_projects_endpoint', $product_page, 'projects_endpoint_content', 7, 1);
+		// $this->loader->add_action('woocommerce_account_menu_items', $product_page, 'add_projects_menu_item', 7, 1);
+		// $this->loader->add_action('init', $product_page, 'register_projects_endpoint', 7, 1);
+		// $this->loader->add_action('woocommerce_account_projects_endpoint', $product_page, 'projects_endpoint_content', 7, 1);
 	}
 
 	/**
