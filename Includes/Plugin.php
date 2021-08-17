@@ -131,40 +131,46 @@ class Plugin
 	{
 		$product_page = new PpiProductPage($this->get_plugin_name(), $this->get_version());
 
+		// Load styles, scripts, and custom templates
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts', 6);
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
+		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 
 		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
 		$this->loader->add_action('ppi_file_upload_params_div', $product_page, 'ppi_output_file_params', 7, 1);
 		$this->loader->add_action('ppi_variant_info_div', $product_page, 'ppi_output_variant_info', 7, 1);
 		$this->loader->add_action('ppi_redirection_info_div', $product_page, 'ppi_output_redirection_info', 7, 1);
-		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
-		$this->loader->add_action('woocommerce_available_variation', $product_page, 'add_unit_data_to_variation_object', 11, 3);
 
+		// Ajax: when a new variation is selected
 		$this->loader->add_action('wp_ajax_get_product_variation_data', $product_page, 'get_product_variation_data');
 		$this->loader->add_action('wp_ajax_nopriv_get_product_variation_data', $product_page, 'get_product_variation_data');
-
+		// Ajax: when content is uploaded
 		$this->loader->add_action('wp_ajax_upload_content_file', $product_page, 'upload_content_file');
 		$this->loader->add_action('wp_ajax_nopriv_upload_content_file', $product_page, 'upload_content_file');
+		// Ajax: unused?
 		$this->loader->add_action('wp_ajax_display_variant_info', $product_page, 'display_variant_info');
 		$this->loader->add_action('wp_ajax_nopriv_display_variant_info', $product_page, 'display_variant_info');
+		// Ajax: when adding to cart
 		$this->loader->add_action('wp_ajax_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
 		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
+		// Ajax: project page actions
 		$this->loader->add_action('wp_ajax_handle_project_action', $product_page, 'handle_project_action');
 		$this->loader->add_action('wp_ajax_nopriv_handle_project_action', $product_page, 'handle_project_action');
+
+		// Price customizations
 		$this->loader->add_action('woocommerce_add_to_cart_validation', $product_page, 'readImaxelProjectOnReturnFromEditor', 10, 5);
-
-		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 2);
+		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 3);
 		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_custom_data_to_order_line_item', 10, 4);
-
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjustItemPriceForAddedPages', 10);
 		$this->loader->add_action('woocommerce_widget_cart_item_quantity', $product_page, 'adjustMiniCartItemPrice', 10, 3);
+		$this->loader->add_action('woocommerce_available_variation', $product_page, 'add_unit_data_to_variation_object', 11, 3);
 
 		$this->loader->add_action('ppi_display_order_tracking_information', $product_page, 'ppi_output_order_tracking_information', 7, 1);
 
+		// Project page: on hold
 		// $this->loader->add_action('woocommerce_account_menu_items', $product_page, 'add_projects_menu_item', 7, 1);
 		// $this->loader->add_action('init', $product_page, 'register_projects_endpoint', 7, 1);
 		// $this->loader->add_action('woocommerce_account_projects_endpoint', $product_page, 'projects_endpoint_content', 7, 1);
