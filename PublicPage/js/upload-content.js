@@ -157,7 +157,9 @@
             ).text();
             const currencySymbol = pricetext.replace(/[0-9]./g, '');
             const price = parseFloat(pricetext.replace(currencySymbol, ''));
-            const newPrice = price + pages * pricePerPage;
+            const supplement = pages * pricePerPage;
+            const newPrice = (price + supplement).toFixed(2);
+
             $(
                 'div.woocommerce-variation-price span.woocommerce-Price-amount'
             ).text(currencySymbol + newPrice);
