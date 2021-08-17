@@ -33,12 +33,12 @@
             const data = {
                 variant: variationId,
                 content: contentFileId,
-                action: 'get_imaxel_redirection',
-                _ajax_nonce: ppi_imaxel_redirection_object.nonce,
+                action: 'ppi_add_to_cart',
+                _ajax_nonce: ppi_add_to_cart_object.nonce,
             };
 
             $.ajax({
-                url: ppi_imaxel_redirection_object.ajax_url,
+                url: ppi_add_to_cart_object.ajax_url,
                 method: 'GET',
                 data: data,
                 cache: false,

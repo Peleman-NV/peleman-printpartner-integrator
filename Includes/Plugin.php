@@ -153,15 +153,16 @@ class Plugin
 		$this->loader->add_action('wp_ajax_display_variant_info', $product_page, 'display_variant_info');
 		$this->loader->add_action('wp_ajax_nopriv_display_variant_info', $product_page, 'display_variant_info');
 		// Ajax: when adding to cart
-		$this->loader->add_action('wp_ajax_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
-		$this->loader->add_action('wp_ajax_nopriv_get_imaxel_redirection', $product_page, 'get_imaxel_redirection');
+		$this->loader->add_action('wp_ajax_ppi_add_to_cart', $product_page, 'ppi_add_to_cart');
+		$this->loader->add_action('wp_ajax_nopriv_ppi_add_to_cart', $product_page, 'ppi_add_to_cart');
 		// Ajax: project page actions
 		$this->loader->add_action('wp_ajax_handle_project_action', $product_page, 'handle_project_action');
 		$this->loader->add_action('wp_ajax_nopriv_handle_project_action', $product_page, 'handle_project_action');
 
 		// Price customizations
 		$this->loader->add_action('woocommerce_add_to_cart_validation', $product_page, 'readImaxelProjectOnReturnFromEditor', 10, 5);
-		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 3);
+		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_imaxel_project_id_to_cart_items', 10, 3);
+		//$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_updated_primaxel_project_id_to_cart_items', 10, 3);
 		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_custom_data_to_order_line_item', 10, 4);
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjustItemPriceForAddedPages', 10);

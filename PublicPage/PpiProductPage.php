@@ -87,10 +87,10 @@ class PpiProductPage
 		wp_enqueue_script('ppi-ajax-add-to-cart', plugins_url('js/add-to-cart.js', __FILE__), array('jquery'), rand(0, 2000), true);
 		wp_localize_script(
 			'ppi-ajax-add-to-cart',
-			'ppi_imaxel_redirection_object',
+			'ppi_add_to_cart_object',
 			array(
 				'ajax_url' => admin_url('admin-ajax.php'),
-				'nonce' => wp_create_nonce('imaxel_redirection_nonce')
+				'nonce' => wp_create_nonce('ppi_add_to_cart_nonce')
 			)
 		);
 
@@ -279,9 +279,9 @@ class PpiProductPage
 	/**
 	 * Get the Imaxel URL and save the user project to the database
 	 */
-	public function get_imaxel_redirection()
+	public function ppi_add_to_cart()
 	{
-		// if (!check_ajax_referer('imaxel_redirection_nonce', '_ajax_nonce')) {
+		// if (!check_ajax_referer('ppi_add_to_cart_nonce', '_ajax_nonce')) {
 		// 	$response['status'] = 'error';
 		// 	$response['message'] = __('Could not verify the origin of this request.', PPI_TEXT_DOMAIN);
 		// 	$this->returnResponse($response);
@@ -588,7 +588,7 @@ class PpiProductPage
 	/**
 	 * Add project ID to cart data
 	 */
-	public function add_custom_data_to_cart_items($cart_item_data, $product_id, $variation_id)
+	public function add_imaxel_project_id_to_cart_items($cart_item_data, $product_id, $variation_id)
 	{
 		if (!isset($_GET['project'])) return $cart_item_data;
 
