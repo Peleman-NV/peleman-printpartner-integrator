@@ -587,7 +587,7 @@ class PpiProductPage
 	/**
 	 * Add project ID to cart data
 	 */
-	public function add_custom_data_to_cart_items($cart_item_data, $product_id)
+	public function add_custom_data_to_cart_items($cart_item_data, $product_id, $variation_id)
 	{
 		if (!isset($_GET['project'])) return $cart_item_data;
 
