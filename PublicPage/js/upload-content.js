@@ -51,6 +51,10 @@
                     console.log(response);
                     $('#upload-info').html(response.message);
                     if (response.status === 'success') {
+                        updatePrice(
+                            response.file.pages,
+                            response.file.price_per_page
+                        );
                         // enable add to cart button
                         $('.single_add_to_cart_button').removeClass(
                             'ppi-disabled'
@@ -139,6 +143,24 @@
                 url.indexOf('//') + 2,
                 url.indexOf('.com') + 4
             );
+        }
+
+        /**
+         * Updates the price for the user after uploading a content file
+         *
+         * @param {number} pages
+         * @param {number} pricePerPage
+         */
+        function updatePrice(pages, pricePerPage) {
+            const pricetext = $(
+                'div.woocommerce-variation-price span.woocommerce-Price-amount'
+            ).text();
+            const currencySymbol = pricetext.replace(/[0-9]./g, '');
+            const price = parseFloat(pricetext.replace(currencySymbol, ''));
+            const newPrice = price + pages * pricePerPage;
+            $(
+                'div.woocommerce-variation-price span.woocommerce-Price-amount'
+            ).text(currencySymbol + newPrice);
         }
     });
 })(jQuery);

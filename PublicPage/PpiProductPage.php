@@ -477,6 +477,7 @@ class PpiProductPage
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
+		$response['file']['price_per_page'] = $variant['price_per_page'];
 
 		$this->returnResponse($response);
 	}
