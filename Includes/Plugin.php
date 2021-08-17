@@ -137,8 +137,8 @@ class Plugin
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 
-		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
 		$this->loader->add_action('ppi_file_upload_params_div', $product_page, 'ppi_output_file_params', 7, 1);
+		$this->loader->add_action('ppi_file_upload_output_form', $product_page, 'ppi_output_form', 7, 1);
 		$this->loader->add_action('ppi_variant_info_div', $product_page, 'ppi_output_variant_info', 7, 1);
 		$this->loader->add_action('ppi_redirection_info_div', $product_page, 'ppi_output_redirection_info', 7, 1);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
@@ -168,6 +168,7 @@ class Plugin
 		$this->loader->add_action('woocommerce_widget_cart_item_quantity', $product_page, 'adjustMiniCartItemPrice', 10, 3);
 		$this->loader->add_action('woocommerce_available_variation', $product_page, 'add_unit_data_to_variation_object', 11, 3);
 
+		// User order page: display tracking info
 		$this->loader->add_action('ppi_display_order_tracking_information', $product_page, 'ppi_output_order_tracking_information', 7, 1);
 
 		// Project page: on hold

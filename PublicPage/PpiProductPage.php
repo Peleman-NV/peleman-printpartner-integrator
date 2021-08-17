@@ -106,7 +106,33 @@ class PpiProductPage
 	}
 
 	/**
-	 * Outputs the params div
+	 * Override the Woocommerce templates with the plugin templates
+	 *
+	 * @param string $template      Default template file path.
+	 * @param string $template_name Template file slug.
+	 * @param string $template_path Template file name.
+	 *
+	 * @return string The new Template file path.
+	 */
+	public function ppi_override_wc_templates($template, $template_name, $template_path)
+	{
+		if ('simple.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/simple.php';
+		}
+		if ('variation.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation.php';
+		}
+		if ('variation-add-to-cart-button.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation-add-to-cart-button.php';
+		}
+		if ('order-details-customer.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/order/order-details-customer.php';
+		}
+		return $template;
+	}
+
+	/**
+	 * Outputs the upload params div
 	 */
 	public function ppi_output_file_params()
 	{
@@ -191,6 +217,20 @@ class PpiProductPage
 	}
 
 	/**
+	 * Changes the Add to cart button text
+	 */
+	public function ppi_change_add_to_cart_text_for_imaxel_products()
+	{
+		global $product;
+		$product_id = $product->get_id();
+		$wc_product = wc_get_product($product_id);
+
+		if ($wc_product->get_meta('customizable_product') == 'yes') {
+			add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_peleman_product'), 10, 2);
+		}
+	}
+
+	/**
 	 * Returns content parameters for a chosen variant
 	 */
 	private function getVariantContentParameters($variant_id)
@@ -249,6 +289,7 @@ class PpiProductPage
 
 		$variant_id = $_GET['variant'];
 		$content_file_id = $_GET['content'];
+		$user_id = get_current_user_id();
 
 		// if no variant Id present, return
 		if ($variant_id === null) {
@@ -260,6 +301,7 @@ class PpiProductPage
 
 		// if not customizable, no need to call Imaxel
 		if ($response['isCustomizable'] === 'no') {
+			$this->insertProject($user_id, null, $variant_id, $content_file_id);
 			$response['status'] = "success";
 			$this->returnResponse($response);
 		}
@@ -273,7 +315,6 @@ class PpiProductPage
 		}
 
 		$project_id = $imaxel_response['project_id'];
-		$user_id = get_current_user_id();
 		$this->insertProject($user_id, $project_id, $variant_id, $content_file_id);
 
 		$response['url'] = $imaxel_response['url'];
@@ -286,32 +327,6 @@ class PpiProductPage
 	}
 
 	/**
-	 * Override the Woocommerce templates with the plugin templates
-	 *
-	 * @param string $template      Default template file path.
-	 * @param string $template_name Template file slug.
-	 * @param string $template_path Template file name.
-	 *
-	 * @return string The new Template file path.
-	 */
-	public function ppi_override_wc_templates($template, $template_name, $template_path)
-	{
-		if ('simple.php' === basename($template)) {
-			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/simple.php';
-		}
-		if ('variation.php' === basename($template)) {
-			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation.php';
-		}
-		if ('variation-add-to-cart-button.php' === basename($template)) {
-			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/variation-add-to-cart-button.php';
-		}
-		if ('order-details-customer.php' === basename($template)) {
-			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/order/order-details-customer.php';
-		}
-		return $template;
-	}
-
-	/**
 	 * Output tracking information
 	 */
 	public function ppi_output_order_tracking_information($order)
@@ -321,20 +336,6 @@ class PpiProductPage
 
 		foreach ($decodedTrackingData as $trackingObject) {
 			echo '<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
-		}
-	}
-
-	/**
-	 * Changes the Add to cart button text
-	 */
-	public function ppi_change_add_to_cart_text_for_imaxel_products()
-	{
-		global $product;
-		$product_id = $product->get_id();
-		$wc_product = wc_get_product($product_id);
-
-		if ($wc_product->get_meta('customizable_product') == 'yes') {
-			add_filter('woocommerce_product_single_add_to_cart_text', array($this, 'ppi_change_add_to_cart_text_for_peleman_product'), 10, 2);
 		}
 	}
 
