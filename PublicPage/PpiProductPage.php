@@ -301,12 +301,17 @@ class PpiProductPage
 
 		// if not customizable, no need to call Imaxel
 		if ($response['isCustomizable'] === 'no') {
-			$this->insertProject($user_id, null, $variant_id, $content_file_id);
+			$projectDetails = [
+				'user_id' => $user_id,
+				'product_id' => $variant_id,
+				'content_filename' => $content_file_id,
+			];
+			$this->insertOrUpdateProject($projectDetails);
 			$response['status'] = "success";
 			$this->returnResponse($response);
 		}
 
-		$imaxel_response = $this->getImaxelData($variant_id);
+		$imaxel_response = $this->getImaxelData($variant_id, $content_file_id);
 		if ($imaxel_response['status'] == "error") {
 			$response['status'] = 'error';
 			$response['information'] = $imaxel_response['information'];
@@ -315,7 +320,13 @@ class PpiProductPage
 		}
 
 		$project_id = $imaxel_response['project_id'];
-		$this->insertProject($user_id, $project_id, $variant_id, $content_file_id);
+		$projectDetails = [
+			'user_id' => $user_id,
+			'product_id' => $variant_id,
+			'project_id' => $project_id,
+			'content_filename' => $content_file_id,
+		];
+		$this->insertOrUpdateProject($projectDetails);
 
 		$response['url'] = $imaxel_response['url'];
 		$response['project-id'] = $project_id;
@@ -478,7 +489,28 @@ class PpiProductPage
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
-		$response['file']['price_per_page'] = $variant['price_per_page'];
+
+		$variantProduct = wc_get_product($variant_id);
+		$variantPriceVatExcl = wc_get_price_excluding_tax($variantProduct);
+		$variantPriceVatIncl = wc_get_price_including_tax($variantProduct);
+		$priceSupplementVatIncl = doubleval($variant['price_per_page']);
+		$calculatedVatRate = round(($variantPriceVatIncl / $variantPriceVatExcl - 1) * 100, 0);
+		$priceSupplementVatExcl = round($priceSupplementVatIncl * $pages / (1  + ($calculatedVatRate / 100)), 2);
+		$newPriceVatExcl = $priceSupplementVatExcl + $variantPriceVatExcl;
+		$newPriceVatIncl = $newPriceVatExcl * (1 + ($calculatedVatRate / 100));
+		$response['file']['price_vat_excl'] = $newPriceVatExcl;
+		$response['file']['price_vat_incl'] = $newPriceVatIncl;
+
+		// add price excl Vat to DB, which is later used to update the cart prices
+		$projectDetails = [
+			'user_id' => $user_id,
+			'product_id' => $variant_id,
+			'content_filename' => $contentFileId,
+			'content_pages' => $pages,
+			'price_vat_excl' => $newPriceVatExcl,
+		];
+
+		$this->insertOrUpdateProject($projectDetails);
 
 		$this->returnResponse($response);
 	}
@@ -496,7 +528,7 @@ class PpiProductPage
 	/**
 	 * Generate a project ID and Imaxel URL
 	 */
-	private function getImaxelData($variant_id)
+	private function getImaxelData($variant_id, $content_file_id = NULL)
 	{
 		$variant_id = $_POST['variant_id'] ?? $variant_id;
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
@@ -524,7 +556,7 @@ class PpiProductPage
 		$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
 		$siteUrl = get_site_url() . '/' . $lang;
 
-		$editorUrl = $imaxel->get_editor_url($project_id, $backUrl, $lang, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id);
+		$editorUrl = $imaxel->get_editor_url($project_id, $backUrl, $lang, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id . '&content_file_id=' . $content_file_id ?? '');
 
 		return array(
 			'status' => $status,
@@ -537,19 +569,42 @@ class PpiProductPage
 	/**
 	 * Inserts project into database
 	 *
-	 * @param Int $user_id
-	 * @param Int $project_id
-	 * @param Int $product_id
+	 * @param array $paramArray
+	 * @arrayKeys:
+	 * 		user_id
+	 * 		project_id
+	 * 		product_id
+	 * 		content_filename
+	 * 		content_pages
+	 * 		price_vat_excl
 	 */
-	private function insertProject($user_id, $project_id, $product_id, $content_filename = NULL, $pages = NULL)
+	private function insertOrUpdateProject($paramArray)
 	{
 		global $wpdb;
 		$table_name = PPI_USER_PROJECTS_TABLE;
-		$date = new \DateTime;
-		$defaultName = 'Project (' . $date->format('d/m/Y') . ')';
-		$query = array('user_id' => $user_id, 'project_id' => $project_id, 'product_id' => $product_id, 'content_filename' => $content_filename, 'content_pages' => $pages, 'name' => $defaultName);
 
-		$wpdb->insert($table_name, $query);
+		// Project ID / Content file ID exists?  Only search if not empty
+		$query = "SELECT id FROM {$table_name} WHERE ";
+
+		if (!empty($paramArray['project_id'])) {
+			$whereClause[] = "project_id = '{$paramArray['project_id']}' ";
+		}
+		if (!empty($paramArray['content_filename'])) {
+			$whereClause[] = "content_filename = '{$paramArray['content_filename']}' ";
+		}
+		$result = $wpdb->get_row($query . implode(' or ', $whereClause) . ';');
+
+		$query = [];
+		if (is_null($result)) {
+			$date = new \DateTime;
+			$defaultName = 'Project (' . $date->format('d/m/Y') . ')';
+			$paramArray['name'] = $defaultName;
+			$query = $paramArray;
+			$wpdb->insert($table_name, $query);
+		} else {
+			$existingRowId = $result->id;
+			$wpdb->update($table_name, $paramArray, ['id' => $existingRowId]);
+		}
 	}
 
 	/**
@@ -586,17 +641,36 @@ class PpiProductPage
 	}
 
 	/**
-	 * Add project ID to cart data
+	 * Add custom data like 
+	 * 	-project ID,
+	 *  -content ID,
+	 *  -...
+	 * to cart data when adding product to cart
 	 */
-	public function add_imaxel_project_id_to_cart_items($cart_item_data, $product_id, $variation_id)
+	public function add_custom_data_to_cart_items($cart_item_data, $product_id, $variation_id)
 	{
-		if (!isset($_GET['project'])) return $cart_item_data;
-
-		$projectId = esc_attr($_GET['project']);
-		$cart_item_data["_ppi_imaxel_project_id"] = $projectId;
-
 		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ": added projectID {$projectId} to cart" . PHP_EOL, 3,  $this->logFile);
+		// when adding to cart, request is POST
+		// add price to cart item object
+		if (isset($_POST['content_file_id']) && !empty($_POST['content_file_id'])) {
+			$content_file_id = $_POST['content_file_id'];
+			$cart_item_data['_content_file_id'] = $content_file_id;
+			error_log($now->format('c') . ": added file upload id {$content_file_id} to cart" . PHP_EOL, 3,  $this->logFile);
+		}
+
+		// when returning from imaxel, request is GET
+		// add price to cart item object
+		if (isset($_GET['content_file_id']) && !empty($_GET['content_file_id'])) {
+			$content_file_id = $_GET['content_file_id'];
+			$cart_item_data["_content_file_id"] = $content_file_id;
+			error_log($now->format('c') . ": added file upload id {$content_file_id} to cart" . PHP_EOL, 3,  $this->logFile);
+		}
+		// add imaxel project id to cart item object
+		if (isset($_GET['project']) && !empty($_GET['project'])) {
+			$projectId = esc_attr($_GET['project']);
+			$cart_item_data["_ppi_imaxel_project_id"] = $projectId;
+			error_log($now->format('c') . ": added projectID {$projectId} to cart" . PHP_EOL, 3,  $this->logFile);
+		}
 
 		return $cart_item_data;
 	}
@@ -681,6 +755,11 @@ class PpiProductPage
 				if (isset($cartUnitPrice) && !empty($cartUnitPrice)) {
 					$cartItem['data']->set_price($cartUnitPrice);
 				}
+				// content upload price adjustment
+				if (isset($cartItem['_content_file_id'])) {
+					$updatedPrice = $this->getUpdatedPriceForContentUpload($cartItem['_content_file_id']);
+					$cartItem['data']->set_price($updatedPrice);
+				}
 			}
 			// for simple products
 			if ($cartItem['variation_id'] === 0) {
@@ -694,6 +773,15 @@ class PpiProductPage
 		}
 
 		return $cart;
+	}
+
+	private function getUpdatedPriceForContentUpload($contentFileId)
+	{
+		global $wpdb;
+		$table_name = PPI_USER_PROJECTS_TABLE;
+		$result = $wpdb->get_row("SELECT price_vat_excl FROM {$table_name} WHERE content_filename = '{$contentFileId}';");
+
+		return $result->price_vat_excl;
 	}
 
 	private function getNrOfContentPages($projectId)
@@ -739,26 +827,6 @@ class PpiProductPage
 		return count($sheets) * 2;
 	}
 
-	public function add_projects_menu_item($items)
-	{
-		$logout = $items['customer-logout'];
-		unset($items['customer-logout']);
-		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
-		$items['customer-logout'] = $logout;
-
-		return $items;
-	}
-
-	public function register_projects_endpoint()
-	{
-		add_rewrite_endpoint('projects', EP_PAGES);
-	}
-
-	public function projects_endpoint_content()
-	{
-		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
-	}
-
 	public function add_unit_data_to_variation_object($array, $instance, $variation)
 	{
 		$cartPrice = get_post_meta($array['variation_id'], 'cart_price', true);
@@ -789,4 +857,27 @@ class PpiProductPage
 		}
 		return $output;
 	}
+
+	/*
+	// User project pages
+	public function add_projects_menu_item($items)
+	{
+		$logout = $items['customer-logout'];
+		unset($items['customer-logout']);
+		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
+		$items['customer-logout'] = $logout;
+
+		return $items;
+	}
+
+	public function register_projects_endpoint()
+	{
+		add_rewrite_endpoint('projects', EP_PAGES);
+	}
+
+	public function projects_endpoint_content()
+	{
+		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
+	}
+	*/
 }

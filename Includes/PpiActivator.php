@@ -36,6 +36,7 @@ class PpiActivator
         product_id int(11) NOT NULL,
         content_filename tinytext DEFAULT NULL,
         content_pages int(11) DEFAULT NULL,
+		price_vat_excl decimal(10,2) DEFAULT NULL,
         ordered int(11) DEFAULT 0,
         created datetime DEFAULT CURRENT_TIMESTAMP,
         updated datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
