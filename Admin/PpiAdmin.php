@@ -323,25 +323,28 @@ class PpiAdmin
 			'value' => $product_id != null ? get_post_meta($product_id, 'custom_add_to_cart_label', true) : ""
 		));
 
-		woocommerce_wp_text_input(array(
-			'id' => 'cart_price',
-			'class' => 'short',
-			'label' => 'Unit purchase price',
-			'type' => 'number',
-			'desc_tip'    => true,
-			'description' => __('Unit purchase price (these items are as units, not individually', 'woocommerce'),
-			'value' => $product_id != null ? get_post_meta($product_id, 'cart_price', true) : ""
-		));
+		$product = wc_get_product($product_id);
+		if ($product->is_type('simple')) {
+			woocommerce_wp_text_input(array(
+				'id' => 'cart_price',
+				'class' => 'short',
+				'label' => 'Unit purchase price',
+				'type' => 'number',
+				'desc_tip'    => true,
+				'description' => __('Unit purchase price (these items are as units, not individually', 'woocommerce'),
+				'value' => $product_id != null ? get_post_meta($product_id, 'cart_price', true) : ""
+			));
 
-		woocommerce_wp_text_input(array(
-			'id' => 'cart_units',
-			'class' => 'short',
-			'label' => 'Unit amount',
-			'type' => 'number',
-			'desc_tip'    => true,
-			'description' => __('Number of items per unit', 'woocommerce'),
-			'value' => $product_id != null ? get_post_meta($product_id, 'cart_units', true) : ""
-		));
+			woocommerce_wp_text_input(array(
+				'id' => 'cart_units',
+				'class' => 'short',
+				'label' => 'Unit amount',
+				'type' => 'number',
+				'desc_tip'    => true,
+				'description' => __('Number of items per unit', 'woocommerce'),
+				'value' => $product_id != null ? get_post_meta($product_id, 'cart_units', true) : ""
+			));
+		}
 	}
 
 	/**
