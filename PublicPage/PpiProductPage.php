@@ -730,7 +730,7 @@ class PpiProductPage
 		}
 	}
 
-	public function adjustItemPriceForAddedPages($cart)
+	public function adjust_cart_item_price($cart)
 	{
 		foreach ($cart->get_cart() as $cartItem) {
 			// for variable products
@@ -841,19 +841,68 @@ class PpiProductPage
 		return $array;
 	}
 
+	/**
+	 * Updates the mini cart price for a cart item
+	 * 
+	 * Beware: these changes only show after adding a new product (wtf?!)
+	 * Cases: 
+	 * 	content file upload
+	 * 	TODO: Imaxel product with pages - get nr of pages (this may already be in place for the cart page)
+	 * 	TODO: Imaxel photo print products - get nr of photos
+	 *
+	 * @param string $price
+	 * @param array $cart_item
+	 * @param string $cart_item_key
+	 * @return string
+	 */
+	public function adjust_mini_cart_item_price($price, $cart_item, $cart_item_key)
+	{
+		// content file price adjustment
+		$contentFileId = $cart_item['_content_file_id'];
+		if (isset($contentFileId) && !empty($contentFileId)) {
+			$taxRate = $this->calculateTaxRate($cart_item['line_subtotal'], $cart_item['line_subtotal_tax']);
+
+			$quantity = $cart_item['quantity'];
+			$updatedPrice = round($this->getUpdatedPriceForContentUpload($contentFileId) * (1 + $taxRate / 100), 2);
+			$price =
+				'<span class="quantity">'
+				. $quantity
+				. ' &times; <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">&euro;</span>'
+				. $updatedPrice
+				. '</bdi></span></span>';
+		}
+
+		return $price;
+	}
+
+	/**
+	 * Given a price and taxes, this calculates the tax rate to one decimal place
+	 *
+	 * @param double $itemPrice
+	 * @param double $itemTax
+	 * @return double
+	 */
+	private function calculateTaxRate($itemPrice, $itemTax)
+	{
+		return round(($itemTax / $itemPrice) * 100, 1);
+	}
+
+	/**
+	 * In the spirit of honesty, I don't know what this does, or why it's here.
+	 * The action it hooks into, 'woocommerce_widget_cart_item_quantity', is commented out.
+	 */
 	public function adjustMiniCartItemPrice($output, $cart_item, $cart_item_key)
 	{
+		// other price adjustments
 		if ($cart_item['variation_id'] === 0) {
 			$productId = $cart_item['product_id'];
 		} else {
 			$productId = $cart_item['variation_id'];
 		}
-
 		$product = wc_get_product($productId);
 		$cartItemPrice = $product->get_meta('cart_price');
-
 		if (isset($cartItemPrice) && !empty($cartItemPrice)) {
-			return '<span class="quantity">' . sprintf('%s &times; %s%s', $cart_item['quantity'], get_woocommerce_currency_symbol(), $cartItemPrice) . '</span>';
+			$output =  '<span class="quantity">' . sprintf('%s &times; %s%s', $cart_item['quantity'], get_woocommerce_currency_symbol(), $cartItemPrice) . '</span>';
 		}
 		return $output;
 	}
@@ -866,10 +915,10 @@ class PpiProductPage
 		unset($items['customer-logout']);
 		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
 		$items['customer-logout'] = $logout;
-
+		
 		return $items;
 	}
-
+	
 	public function register_projects_endpoint()
 	{
 		add_rewrite_endpoint('projects', EP_PAGES);
