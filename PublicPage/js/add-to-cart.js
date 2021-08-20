@@ -22,6 +22,7 @@
         );
 
         function blockDefaultAddToCartBehavior(e) {
+            $('#ppi-loading').removeClass('ppi-hidden');
             e.preventDefault();
             const variationId = $("[name='variation_id']").val();
             const contentFileId = $("[name='content_file_id']").val();
