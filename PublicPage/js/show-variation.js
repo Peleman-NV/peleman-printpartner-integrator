@@ -210,12 +210,18 @@
 
         function enableAddToCartBtn(addToCartLabel) {
             $('.single_add_to_cart_button').removeClass('ppi-disabled');
-            $('.single_add_to_cart_button').html('<span id="ppi-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>' + addToCartLabel);
+            $('.single_add_to_cart_button').html(
+                '<span id="ppi-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>' +
+                    addToCartLabel
+            );
         }
 
         function disableAddToCartBtn(addToCartLabel) {
             $('.single_add_to_cart_button').addClass('ppi-disabled');
-            $('.single_add_to_cart_button').html('<span id="ppi-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>' + addToCartLabel);
+            $('.single_add_to_cart_button').html(
+                '<span id="ppi-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>' +
+                    addToCartLabel
+            );
         }
 
         function setAddToCartLabel() {
@@ -259,15 +265,24 @@
 
         function showUnitPrice(unitPriceInformationObject) {
             $('.cart-unit-block').removeClass('ppi-hidden');
+
             $('.individual-price-text').html(
                 unitPriceInformationObject.singularPriceText + ' '
             );
+            $('.individual-price-block span.price').html(
+                unitPriceInformationObject.singularPrice +
+                    '<small class="woocommerce-price-suffix"> ' +
+                    unitPriceInformationObject.inclVat +
+                    '</small>'
+            );
+
             $('.unit-price-text').html(
                 unitPriceInformationObject.unitPriceText + ' '
             );
             $('.cart-unit-block span.price').html(
                 unitPriceInformationObject.priceText +
                     '<small class="woocommerce-price-suffix"> ' +
+                    unitPriceInformationObject.inclVat +
                     unitPriceInformationObject.unitText +
                     '</small>'
             );

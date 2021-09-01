@@ -7,10 +7,19 @@ global $product;
 
 	<div class="woocommerce-variation-description">{{{ data.variation.variation_description }}}</div>
 	<div class="woocommerce-variation-availability">{{{ data.variation.availability_html }}}</div>
-	<div class="woocommerce-variation-price"><span class="individual-price-text"></span>{{{ data.variation.price_html }}}</div>
+
+	<div class="woocommerce-variation-price individual-price-block">
+		<span class="individual-price-text"></span>
+		<span class="price">
+			$nsbp
+			<small class="woocommerce-price-suffix">Incl. VAT</small>
+		</span>
+	</div>
+	
 	<div class="woocommerce-variation-price extra-margin cart-unit-block ppi-hidden">
 		<span class="unit-price-text"></span>
 		<span class="price">
+			$nsbp
 			<small class="woocommerce-price-suffix">Incl. VAT</small>
 		</span>
 	</div>

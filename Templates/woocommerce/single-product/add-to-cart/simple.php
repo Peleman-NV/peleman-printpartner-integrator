@@ -11,22 +11,24 @@ echo wc_get_stock_html($product); // WPCS: XSS ok.
 
 $cartPrice = $product->get_meta('cart_price');
 $cartUnits = $product->get_meta('cart_units');
+
 if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cartUnits) && $cartUnits > 1) {
-	$vatMultiplier = 1;
-	$tax_rates = WC_Tax::get_rates($product->get_tax_class());
-	if (!empty($tax_rates)) {
-		$tax_rate = reset($tax_rates);
-		$vatMultiplier = 1 + ($tax_rate['rate'] / 100);
-	}
-	$priceInclVat = $cartPrice * $vatMultiplier;
-	echo '<div class="woocommerce-variation-price extra-margin">';
-	esc_html_e('Purchase unit price', PPI_TEXT_DOMAIN);
-	echo '<span class="price"> ';
-	echo get_woocommerce_currency_symbol();
-	echo $priceInclVat;
-	echo '<small class="woocommerce-price-suffix">' . esc_html_e('Incl. VAT', PPI_TEXT_DOMAIN) .  '(' . $cartUnits . ' pieces)</small>';
-	echo '</span>';
-	echo '</div>';
+	$inclVatText = __('Incl. VAT', PPI_TEXT_DOMAIN);
+	$individualPriceLabel = __('Individual price', PPI_TEXT_DOMAIN);
+	$unitPriceLabel = __('Purchase unit price', PPI_TEXT_DOMAIN);
+	$individualPriceDiv = '<div class="woocommerce-variation-price">'
+		. $individualPriceLabel
+		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($product->get_price(), 2) . ' ' . '<small class="woocommerce-price-suffix">'
+		. $inclVatText
+		. '</small></span></div>';
+	$unitPriceDiv = '<div class="woocommerce-variation-price extra-margin">'
+		. $unitPriceLabel
+		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($cartPrice, 2) . ' ' . '<small class="woocommerce-price-suffix">'
+		. $inclVatText
+		. ' (' . $cartUnits . ' pieces)</small></span><div>';
+
+	echo $individualPriceDiv;
+	echo $unitPriceDiv;
 }
 
 if ($product->is_in_stock()) : ?>
