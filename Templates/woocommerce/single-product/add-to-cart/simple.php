@@ -25,7 +25,7 @@ if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cart
 		. $unitPriceLabel
 		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($cartPrice, 2) . ' ' . '<small class="woocommerce-price-suffix">'
 		. $inclVatText
-		. ' (' . $cartUnits . ' pieces)</small></span><div>';
+		. ' (' . $cartUnits . ' pieces)</small></span></div>';
 
 	echo $individualPriceDiv;
 	echo $unitPriceDiv;
