@@ -2,7 +2,9 @@
     ('use strict');
     $(function () {
         $('.project-line .actions button').on('click', handleProjectAction);
-        $('.project-line .actions .ppi-btn-disabled').hover(displayAlreadyOrderedWarning);
+        $('.project-line .actions .ppi-btn-disabled').hover(
+            displayAlreadyOrderedWarning
+        );
         $('#close-modal').on('click', closeModal);
         $('#project-name').on('keyup', e => {
             $('#project-name').removeClass('ppi-input-invalid');
@@ -14,11 +16,14 @@
         function displayAlreadyOrderedWarning(e) {
             e.preventDefault();
             $(this).siblings('.ordered').toggle();
-
         }
 
         function showModal(element) {
-            const currentName = element.parent().parent().children('#project-name').html();
+            const currentName = element
+                .parent()
+                .parent()
+                .children('#project-name')
+                .html();
             console.log(currentName);
             $('.modal').css('display', 'flex');
             $('#overlay').css('display', 'block');
@@ -53,22 +58,31 @@
                     $('#overlay').css('display', 'none');
                 });
             } else if (action === 'add-project-to-cart') {
-                    variantId = $(this).parent().parent().children('#variant-id').data('variantId');
-                    performAjaxCall(action, projectId, null, variantId);
+                variantId = $(this)
+                    .parent()
+                    .parent()
+                    .children('#variant-id')
+                    .data('variantId');
+                performAjaxCall(action, projectId, null, variantId);
             } else {
                 const projectId = $(this).parent().parent().attr('id');
                 performAjaxCall(action, projectId);
             }
         }
 
-        function performAjaxCall(projectAction, projectId, name = null, variantId = null) {
+        function performAjaxCall(
+            projectAction,
+            projectId,
+            name = null,
+            variantId = null
+        ) {
             const data = {
                 projectAction: projectAction,
                 projectId: projectId,
                 variantId: variantId,
                 name: name,
                 action: 'handle_project_action',
-                _ajax_nonce: ppi_project_action_object.nonce,
+                // _ajax_nonce: ppi_project_action_object.nonce,
             };
 
             $.ajax({

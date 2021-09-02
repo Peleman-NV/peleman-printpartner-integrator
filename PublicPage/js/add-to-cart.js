@@ -35,7 +35,7 @@
                 variant: variationId,
                 content: contentFileId,
                 action: 'ppi_add_to_cart',
-                _ajax_nonce: ppi_add_to_cart_object.nonce,
+                // _ajax_nonce: ppi_add_to_cart_object.nonce,
             };
 
             $.ajax({

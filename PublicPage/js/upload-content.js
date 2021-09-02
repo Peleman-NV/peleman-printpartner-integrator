@@ -32,7 +32,7 @@
             formData.append('action', 'upload_content_file');
             formData.append('file', file);
             formData.append('variant_id', variationId);
-            formData.append('_ajax_nonce', ppi_upload_content_object.nonce);
+            // formData.append('_ajax_nonce', ppi_upload_content_object.nonce);
 
             // autmatically submit form on change event
             $('#file-upload').submit();
