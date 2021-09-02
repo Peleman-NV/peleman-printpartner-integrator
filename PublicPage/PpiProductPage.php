@@ -264,16 +264,18 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
-		$cartPrice = $product_variant->get_meta('cart_price');
-		$individualPrice = $product_variant->get_price();
+		$cartPriceExcl = $product_variant->get_meta('cart_price');
+		$individualPriceExcl = $product_variant->get_price();
+		$wcCountries = new \WC_Countries();
+		$exclVat = $wcCountries->ex_tax_or_vat();
 
 		$response['unitPriceObject'] = [
-			'unitPriceExists' => (isset($cartPrice) && empty($cartPrice)) ? false : true,
+			'unitPriceExists' => ($cartPriceExcl !== '') ? true : false,
 			'singularPriceText' => __('Individual price', PPI_TEXT_DOMAIN),
-			'singularPrice' => get_woocommerce_currency_symbol() . $individualPrice,
+			'singularPrice' => get_woocommerce_currency_symbol() . $individualPriceExcl,
 			'unitPriceText' => __('Purchase unit price', PPI_TEXT_DOMAIN),
-			'inclVat' => __('Incl. VAT', PPI_TEXT_DOMAIN),
-			'priceText' => get_woocommerce_currency_symbol() . $cartPrice,
+			'exclVat' => $exclVat,
+			'priceText' => get_woocommerce_currency_symbol() . $cartPriceExcl,
 			'unitText' => ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
 		];
 

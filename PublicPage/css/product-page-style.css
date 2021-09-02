@@ -126,13 +126,6 @@
     }
 }
 
-/* WC style override */
-.woocommerce-variation-price {
+.remove-margin {
     margin-bottom: 0 !important;
-    font-style: italic;
-    font-weight: 700;
-}
-
-.extra-margin {
-    margin-bottom: 20px !important;
 }

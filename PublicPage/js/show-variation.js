@@ -56,9 +56,7 @@
                 success: function (response) {
                     console.log(response);
                     if (response.status === 'success') {
-                        if (response.unitPriceObject.unitPriceExists === true) {
-                            showUnitPrice(response.unitPriceObject);
-                        }
+                        showUnitPrice(response.unitPriceObject);
                         buttonText =
                             response.buttonText ?? fallbackAddToCartLabel;
                         if (
@@ -264,28 +262,45 @@
         }
 
         function showUnitPrice(unitPriceInformationObject) {
-            $('.cart-unit-block').removeClass('ppi-hidden');
+            if (unitPriceInformationObject.unitPriceExists === true) {
+                $(
+                    '.single-product-top .entry-summary form.cart .individual-price-block'
+                ).addClass('remove-margin');
+                $('.cart-unit-block').removeClass('ppi-hidden');
 
-            $('.individual-price-text').html(
-                unitPriceInformationObject.singularPriceText + ' '
-            );
-            $('.individual-price-block span.price').html(
-                unitPriceInformationObject.singularPrice +
-                    '<small class="woocommerce-price-suffix"> ' +
-                    unitPriceInformationObject.inclVat +
-                    '</small>'
-            );
+                $('.individual-price-text').html(
+                    unitPriceInformationObject.singularPriceText + ' '
+                );
+                $('.individual-price-block span.price').html(
+                    unitPriceInformationObject.singularPrice +
+                        '<small class="woocommerce-price-suffix"> ' +
+                        unitPriceInformationObject.exclVat +
+                        '</small>'
+                );
 
-            $('.unit-price-text').html(
-                unitPriceInformationObject.unitPriceText + ' '
-            );
-            $('.cart-unit-block span.price').html(
-                unitPriceInformationObject.priceText +
-                    '<small class="woocommerce-price-suffix"> ' +
-                    unitPriceInformationObject.inclVat +
-                    unitPriceInformationObject.unitText +
-                    '</small>'
-            );
+                $('.unit-price-text').html(
+                    unitPriceInformationObject.unitPriceText + ' '
+                );
+                $('.cart-unit-block span.price').html(
+                    unitPriceInformationObject.priceText +
+                        '<small class="woocommerce-price-suffix"> ' +
+                        unitPriceInformationObject.exclVat +
+                        unitPriceInformationObject.unitText +
+                        '</small>'
+                );
+            } else {
+                // $('.individual-price-block').remove();
+                $('.cart-unit-block').remove();
+                $('.individual-price-text').html(
+                    unitPriceInformationObject.singularPriceText + ' '
+                );
+                $('.individual-price-block span.price').html(
+                    unitPriceInformationObject.singularPrice +
+                        '<small class="woocommerce-price-suffix"> ' +
+                        unitPriceInformationObject.exclVat +
+                        '</small>'
+                );
+            }
         }
 
         function resetUnitPrice() {
