@@ -165,7 +165,6 @@ class Plugin
 		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_custom_data_to_order_line_item', 10, 4);
 		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjust_cart_item_price', 10);
-		//$this->loader->add_action('woocommerce_widget_cart_item_quantity', $product_page, 'adjustMiniCartItemPrice', 10, 3);
 		$this->loader->add_action('woocommerce_widget_cart_item_quantity', $product_page, 'adjust_mini_cart_item_price', 10, 3);
 		$this->loader->add_action('woocommerce_available_variation', $product_page, 'add_unit_data_to_variation_object', 11, 3);
 
