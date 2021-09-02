@@ -13,26 +13,22 @@ $cartPrice = $product->get_meta('cart_price');
 $cartUnits = $product->get_meta('cart_units');
 
 if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cartUnits) && $cartUnits > 1) {
-	$tax_rates = WC_Tax::get_rates($product->get_tax_class());
-	if (!empty($tax_rates)) {
-		$tax_rate = reset($tax_rates);
-		$vatMultiplier = 1 + ($tax_rate['rate'] / 100);
-	}
-	$invidivualPriceIncl = $product->get_price() * $vatMultiplier;
-	$cartPriceIncl = $cartPrice * $vatMultiplier;
+	$invidivualPriceExcl = $product->get_price();
+	$cartPriceIncl = $cartPrice;
 
-	$inclVatText = __('Incl. VAT', PPI_TEXT_DOMAIN);
+	$wcCountries = new \WC_Countries();
+	$exclVatText = $wcCountries->ex_tax_or_vat();
 	$individualPriceLabel = __('Individual price', PPI_TEXT_DOMAIN);
 	$unitPriceLabel = __('Purchase unit price', PPI_TEXT_DOMAIN);
 	$individualPriceDiv = '<div class="woocommerce-variation-price">'
 		. $individualPriceLabel
-		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($invidivualPriceIncl, 2) . ' ' . '<small class="woocommerce-price-suffix">'
-		. $inclVatText
+		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($invidivualPriceExcl, 2) . ' ' . '<small class="woocommerce-price-suffix">'
+		. $exclVatText
 		. '</small></span></div>';
 	$unitPriceDiv = '<div class="woocommerce-variation-price extra-margin">'
 		. $unitPriceLabel
 		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($cartPriceIncl, 2) . ' ' . '<small class="woocommerce-price-suffix">'
-		. $inclVatText
+		. $exclVatText
 		. ' (' . $cartUnits . ' pieces)</small></span></div>';
 
 	echo $individualPriceDiv;
