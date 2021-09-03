@@ -63,17 +63,11 @@ class PpiAPI
 	private function getProcessingOrders()
 	{
 		global $wpdb;
-		$ordersWithStatusProcessing = $wpdb->get_results("SELECT p.ID as ID, pm.meta_value as date_paid from {$wpdb->prefix}posts p INNER JOIN {$wpdb->prefix}postmeta pm on p.ID = pm.post_id  WHERE post_type = 'shop_order' AND post_status = 'wc-processing' AND pm.meta_key = '_date_paid';");
+		$ordersWithStatusProcessing = $wpdb->get_results("SELECT p.ID as ID from {$wpdb->prefix}posts p INNER JOIN {$wpdb->prefix}postmeta pm on p.ID = pm.post_id  WHERE post_type = 'shop_order' AND post_status = 'wc-processing' GROUP BY ID");
 
 		if (empty($ordersWithStatusProcessing)) {
 			wp_send_json(['message' => 'No order with status "processing".'], 200);
 			die();
-		}
-
-		foreach ($ordersWithStatusProcessing as $order) {
-			$date = new \DateTime();
-			$date->setTimestamp($order->date_paid)->setTimezone(new \DateTimeZone('Europe/Brussels'));
-			$order->date_paid = $date->format('Y-m-d H:i:s');
 		}
 
 		wp_send_json($ordersWithStatusProcessing, 200);
