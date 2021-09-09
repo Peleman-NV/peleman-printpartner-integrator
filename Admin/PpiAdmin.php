@@ -185,7 +185,7 @@ class PpiAdmin
 			'label' => 'Unit purchase price',
 			'type' => 'number',
 			'desc_tip'    => true,
-			'description' => __('Unit purchase price (these items are as units, not individually', 'woocommerce'),
+			'description' => __('These items are sold as units, not individually', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'cart_price', true)
 		));
 
@@ -199,8 +199,17 @@ class PpiAdmin
 			'value' => get_post_meta($variationId, 'cart_units', true)
 		));
 
+		woocommerce_wp_text_input(array(
+			'id' => 'unit_code[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-first',
+			'label' => 'Unit code',
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('The unit code of this item', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'unit_code', true)
+		));
+
 		$pdf_upload_required = get_post_meta($variationId, 'pdf_upload_required', true);
-		//$pdf_upload_required = get_post_meta($parentId, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
 
 		woocommerce_wp_checkbox(array(
@@ -280,6 +289,7 @@ class PpiAdmin
 		$base_number_of_pages = $_POST['base_number_of_pages'][$i];
 		$cart_price = $_POST['cart_price'][$i];
 		$cart_units = $_POST['cart_units'][$i];
+		$unit_code = $_POST['unit_code'][$i];
 
 		if (isset($f2d_sku_components)) update_post_meta($variation_id, 'f2d_sku_components', esc_attr($f2d_sku_components));
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
@@ -294,6 +304,7 @@ class PpiAdmin
 		if (isset($base_number_of_pages)) update_post_meta($variation_id, 'base_number_of_pages', esc_attr($base_number_of_pages));
 		if (isset($cart_price)) update_post_meta($variation_id, 'cart_price', esc_attr($cart_price));
 		if (isset($cart_units)) update_post_meta($variation_id, 'cart_units', esc_attr($cart_units));
+		if (isset($unit_code)) update_post_meta($variation_id, 'unit_code', esc_attr($unit_code));
 	}
 
 	/**
@@ -331,7 +342,7 @@ class PpiAdmin
 				'label' => 'Unit purchase price',
 				'type' => 'number',
 				'desc_tip'    => true,
-				'description' => __('Unit purchase price (these items are as units, not individually', 'woocommerce'),
+				'description' => __('These items are sold as units, not individually', 'woocommerce'),
 				'value' => $product_id != null ? get_post_meta($product_id, 'cart_price', true) : ""
 			));
 
@@ -343,6 +354,16 @@ class PpiAdmin
 				'desc_tip'    => true,
 				'description' => __('Number of items per unit', 'woocommerce'),
 				'value' => $product_id != null ? get_post_meta($product_id, 'cart_units', true) : ""
+			));
+
+			woocommerce_wp_text_input(array(
+				'id' => 'unit_code',
+				'class' => 'short',
+				'label' => 'Unit code',
+				'type' => 'text',
+				'desc_tip'    => true,
+				'description' => __('The unit code of this item', 'woocommerce'),
+				'value' => $product_id != null ? get_post_meta($product_id, 'unit_code', true) : ""
 			));
 		}
 	}
@@ -357,6 +378,9 @@ class PpiAdmin
 
 		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
 		if (isset($customizable_product)) update_post_meta($post_id, 'customizable_product', $customizable_product);
+		if (isset($_POST['cart_price'])) update_post_meta($post_id, 'cart_price', $_POST['cart_price']);
+		if (isset($_POST['cart_units'])) update_post_meta($post_id, 'cart_units', $_POST['cart_units']);
+		if (isset($_POST['unit_code'])) update_post_meta($post_id, 'unit_code', $_POST['unit_code']);
 	}
 
 	/**	
