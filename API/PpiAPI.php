@@ -136,7 +136,10 @@ class PpiAPI
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
 			if ($isFileReady === false) wp_send_json(['error' => "Files not ready for order id {$orderId}"], 404);
-			$imaxel_files[$imaxelProjectId] = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
+			$imaxel_files[$imaxelProjectId] = [
+				'fileLink' => get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}",
+				'fileName' => $fileName
+			];
 		}
 
 		try {
@@ -162,12 +165,11 @@ class PpiAPI
 					if ($meta_data->key === '_ppi_imaxel_project_id') {
 						$imaxelProjectId = $meta_data->value;
 						$result = $this->projectHasContentUpload($imaxelProjectId);
-
 						// if content was uploaded by user
-						if ($result->content_pages !== null) {
+						if ($result->content_pages !== null && !empty($result->content_pages) && $result->content_pages > 0) {
 							$lineItem->number_of_pages = $result->content_pages;
 						}
-						if ($result->content_filename !== null) {
+						if ($result->content_filename !== null && !empty($result->content_filename)) {
 							$lineItem->files[] = [
 								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
 								'file_size_in_bytes' => filesize(realpath(PPI_UPLOAD_DIR . '/' . $result->content_filename)),
@@ -175,8 +177,8 @@ class PpiAPI
 							];
 						}
 						$lineItem->files[] = [
-							'file_name' => $imaxel_files[$meta_data->value],
-							'file_size_in_bytes' => filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)),
+							'file_name' => $imaxel_files[$meta_data->value]['fileLink'],
+							'file_size_in_bytes' => filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $imaxel_files[$meta_data->value]['fileName'])),
 							'type' => 'Imaxel'
 						];
 					}
