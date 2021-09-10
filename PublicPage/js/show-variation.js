@@ -262,38 +262,27 @@
         }
 
         function showUnitPrice(bundleObject) {
+            $('.cart-unit-block').addClass('ppi-hidden');
+            $('.individual-price-text').html(
+                bundleObject.individualPriceLabel + ' '
+            );
+            $('.individual-price-block span.price').html(
+                bundleObject.individualPriceWithCurrencySymbol +
+                    '<small class="woocommerce-price-suffix"> ' +
+                    bundleObject.individualPriceSuffix +
+                    '</small>'
+            );
+
             if (bundleObject.bundlePriceExists === true) {
+                $('.cart-unit-block').removeClass('ppi-hidden');
                 $(
                     '.single-product-top .entry-summary form.cart .individual-price-block'
                 ).addClass('remove-margin');
-                $('.cart-unit-block').removeClass('ppi-hidden');
-
-                $('.individual-price-text').html(
-                    bundleObject.individualPriceLabel + ' '
-                );
-                $('.individual-price-block span.price').html(
-                    bundleObject.individualPriceWithCurrencySymbol +
-                        '<small class="woocommerce-price-suffix"> ' +
-                        bundleObject.individualPriceSuffix +
-                        '</small>'
-                );
-
                 $('.unit-price-text').html(bundleObject.bundlePriceLabel + ' ');
                 $('.cart-unit-block span.price').html(
-                    bundleObject.individualPriceWithCurrencySymbol +
+                    bundleObject.bundlePriceWithCurrencySymbol +
                         '<small class="woocommerce-price-suffix"> ' +
                         bundleObject.bundlePriceSuffix +
-                        '</small>'
-                );
-            } else {
-                $('.cart-unit-block').remove();
-                $('.individual-price-text').html(
-                    bundleObject.individualPriceLabel + ' '
-                );
-                $('.individual-price-block span.price').html(
-                    bundleObject.individualPriceWithCurrencySymbol +
-                        '<small class="woocommerce-price-suffix"> ' +
-                        bundleObject.individualPriceSuffix +
                         '</small>'
                 );
             }
