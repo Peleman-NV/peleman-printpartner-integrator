@@ -264,19 +264,22 @@ class PpiProductPage
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
-		$cartPriceExcl = $product_variant->get_meta('cart_price');
-		$individualPriceExcl = $product_variant->get_price();
-		$wcCountries = new \WC_Countries();
-		$exclVat = $wcCountries->ex_tax_or_vat();
 
-		$response['unitPriceObject'] = [
-			'unitPriceExists' => ($cartPriceExcl !== '') ? true : false,
-			'singularPriceText' => __('Individual price', PPI_TEXT_DOMAIN),
-			'singularPrice' => get_woocommerce_currency_symbol() . $individualPriceExcl,
-			'unitPriceText' => __('Purchase unit price', PPI_TEXT_DOMAIN),
-			'exclVat' => $exclVat,
-			'priceText' => get_woocommerce_currency_symbol() . $cartPriceExcl,
-			'unitText' => ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
+		$bundlePrice = $product_variant->get_meta('cart_price'); // excl.VAT
+		$showPricesWithVat = get_option('woocommerce_prices_include_tax') === 'yes' ? true : false;
+		$individualPrice = $showPricesWithVat ? wc_get_price_including_tax($product_variant) : wc_get_price_excluding_tax($product_variant);
+		$wcCountries = new \WC_Countries();
+		$priceSuffix = $wcCountries->ex_tax_or_vat();
+
+		$response['bundleObject'] = [
+			'showPricesWithVat' => $showPricesWithVat,
+			'bundlePriceExists' => ($bundlePrice !== '') ? true : false,
+			'bundlePriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . $bundlePrice,
+			'bundlePriceLabel' => __('Purchase unit price', PPI_TEXT_DOMAIN),
+			'bundlePriceSuffix' => $priceSuffix . ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
+			'individualPriceLabel' => __('Individual price', PPI_TEXT_DOMAIN),
+			'individualPriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . $individualPrice,
+			'individualPriceSuffix' => $priceSuffix,
 		];
 
 		$this->returnResponse($response);

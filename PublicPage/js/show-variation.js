@@ -56,7 +56,7 @@
                 success: function (response) {
                     console.log(response);
                     if (response.status === 'success') {
-                        showUnitPrice(response.unitPriceObject);
+                        showUnitPrice(response.bundleObject);
                         buttonText =
                             response.buttonText ?? fallbackAddToCartLabel;
                         if (
@@ -261,43 +261,39 @@
             return 'en';
         }
 
-        function showUnitPrice(unitPriceInformationObject) {
-            if (unitPriceInformationObject.unitPriceExists === true) {
+        function showUnitPrice(bundleObject) {
+            if (bundleObject.bundlePriceExists === true) {
                 $(
                     '.single-product-top .entry-summary form.cart .individual-price-block'
                 ).addClass('remove-margin');
                 $('.cart-unit-block').removeClass('ppi-hidden');
 
                 $('.individual-price-text').html(
-                    unitPriceInformationObject.singularPriceText + ' '
+                    bundleObject.individualPriceLabel + ' '
                 );
                 $('.individual-price-block span.price').html(
-                    unitPriceInformationObject.singularPrice +
+                    bundleObject.individualPriceWithCurrencySymbol +
                         '<small class="woocommerce-price-suffix"> ' +
-                        unitPriceInformationObject.exclVat +
+                        bundleObject.individualPriceSuffix +
                         '</small>'
                 );
 
-                $('.unit-price-text').html(
-                    unitPriceInformationObject.unitPriceText + ' '
-                );
+                $('.unit-price-text').html(bundleObject.bundlePriceLabel + ' ');
                 $('.cart-unit-block span.price').html(
-                    unitPriceInformationObject.priceText +
+                    bundleObject.individualPriceWithCurrencySymbol +
                         '<small class="woocommerce-price-suffix"> ' +
-                        unitPriceInformationObject.exclVat +
-                        unitPriceInformationObject.unitText +
+                        bundleObject.bundlePriceSuffix +
                         '</small>'
                 );
             } else {
-                // $('.individual-price-block').remove();
                 $('.cart-unit-block').remove();
                 $('.individual-price-text').html(
-                    unitPriceInformationObject.singularPriceText + ' '
+                    bundleObject.individualPriceLabel + ' '
                 );
                 $('.individual-price-block span.price').html(
-                    unitPriceInformationObject.singularPrice +
+                    bundleObject.individualPriceWithCurrencySymbol +
                         '<small class="woocommerce-price-suffix"> ' +
-                        unitPriceInformationObject.exclVat +
+                        bundleObject.individualPriceSuffix +
                         '</small>'
                 );
             }
