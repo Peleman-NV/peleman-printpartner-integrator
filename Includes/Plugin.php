@@ -133,7 +133,7 @@ class Plugin
 
 		// Load styles, scripts, and custom templates
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_styles');
-		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts', 6);
+		//$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_scripts', 6);
 		$this->loader->add_action('wp_enqueue_scripts', $product_page, 'enqueue_ajax', 5);
 		$this->loader->add_action('woocommerce_locate_template', $product_page, 'ppi_override_wc_templates', 10, 3);
 

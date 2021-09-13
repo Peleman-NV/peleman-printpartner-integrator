@@ -9,32 +9,6 @@ if (!$product->is_purchasable()) {
 }
 echo wc_get_stock_html($product); // WPCS: XSS ok.
 
-$cartPrice = $product->get_meta('cart_price');
-$cartUnits = $product->get_meta('cart_units');
-
-if (isset($cartPrice) && !empty($cartPrice) && isset($cartUnits) && !empty($cartUnits) && $cartUnits > 1) {
-	$invidivualPriceExcl = $product->get_price();
-	$cartPriceIncl = $cartPrice;
-
-	$wcCountries = new \WC_Countries();
-	$exclVatText = $wcCountries->ex_tax_or_vat();
-	$individualPriceLabel = __('Individual price', PPI_TEXT_DOMAIN);
-	$unitPriceLabel = __('Purchase unit price', PPI_TEXT_DOMAIN);
-	$individualPriceDiv = '<div class="woocommerce-variation-price">'
-		. $individualPriceLabel
-		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($invidivualPriceExcl, 2) . ' ' . '<small class="woocommerce-price-suffix">'
-		. $exclVatText
-		. '</small></span></div>';
-	$unitPriceDiv = '<div class="woocommerce-variation-price extra-margin">'
-		. $unitPriceLabel
-		. ' <span class="price">' . get_woocommerce_currency_symbol() . number_format($cartPriceIncl, 2) . ' ' . '<small class="woocommerce-price-suffix">'
-		. $exclVatText
-		. ' (' . $cartUnits . ' pieces)</small></span></div>';
-
-	echo $individualPriceDiv;
-	echo $unitPriceDiv;
-}
-
 if ($product->is_in_stock()) : ?>
 
 	<?php do_action('woocommerce_before_add_to_cart_form'); ?>

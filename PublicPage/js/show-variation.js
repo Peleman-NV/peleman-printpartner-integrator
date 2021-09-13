@@ -21,7 +21,7 @@
  * An additional aspect is displaying the per piece and per unit prices for each variable
  */
 
-(function ($) {
+ (function ($) {
     ('use strict');
     $(function () {
         let buttonText = setAddToCartLabel();
@@ -262,29 +262,22 @@
         }
 
         function showUnitPrice(bundleObject) {
-            $('.cart-unit-block').addClass('ppi-hidden');
-            $('.individual-price-text').html(
-                bundleObject.individualPriceLabel + ' '
-            );
-            $('.individual-price-block span.price').html(
-                bundleObject.individualPriceWithCurrencySymbol +
-                    '<small class="woocommerce-price-suffix"> ' +
-                    bundleObject.individualPriceSuffix +
-                    '</small>'
-            );
+            const { bundlePriceExists, bundlePriceWithCurrencySymbol, bundlePriceSuffix, individualPriceWithCurrencySymbol, individualPriceSuffix } = bundleObject;
 
-            if (bundleObject.bundlePriceExists === true) {
-                $('.cart-unit-block').removeClass('ppi-hidden');
-                $(
-                    '.single-product-top .entry-summary form.cart .individual-price-block'
-                ).addClass('remove-margin');
-                $('.unit-price-text').html(bundleObject.bundlePriceLabel + ' ');
-                $('.cart-unit-block span.price').html(
-                    bundleObject.bundlePriceWithCurrencySymbol +
-                        '<small class="woocommerce-price-suffix"> ' +
-                        bundleObject.bundlePriceSuffix +
-                        '</small>'
-                );
+            // hide & clear individual price
+            $('.individual-price').addClass('ppi-hidden');
+            if (!bundlePriceExists) {
+                // display individual price in add-to-cart-price span
+                $('.add-to-cart-price span.price-amount').html('<span>' + individualPriceWithCurrencySymbol + ' ' + individualPriceSuffix + '</span>');
+            } else {
+                /**
+                 * unhide individual price span
+                 * display individual price in individual price span
+                 * display bundle price in add-to-cart-price span
+                 */
+                $('.individual-price').removeClass('ppi-hidden');
+                $('.add-to-cart-price span.price-amount').html('<span>' + bundlePriceWithCurrencySymbol + ' ' + bundlePriceSuffix  + '</span>');
+                $('.individual-price span.price-amount').html('<span>' + individualPriceWithCurrencySymbol + ' ' + individualPriceSuffix + '</span>');
             }
         }
 

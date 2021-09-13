@@ -116,6 +116,9 @@ class PpiProductPage
 	 */
 	public function ppi_override_wc_templates($template, $template_name, $template_path)
 	{
+		if ('meta.php' === basename($template)) {
+			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/meta.php';
+		}
 		if ('simple.php' === basename($template)) {
 			$template = trailingslashit(plugin_dir_path(__FILE__)) . '../Templates/woocommerce/single-product/add-to-cart/simple.php';
 		}
@@ -274,11 +277,9 @@ class PpiProductPage
 		$response['bundleObject'] = [
 			'showPricesWithVat' => $showPricesWithVat,
 			'bundlePriceExists' => ($bundlePrice !== '') ? true : false,
-			'bundlePriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . $bundlePrice,
-			'bundlePriceLabel' => __('Purchase unit price', PPI_TEXT_DOMAIN),
+			'bundlePriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . number_format($bundlePrice, 2),
 			'bundlePriceSuffix' => $priceSuffix . ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
-			'individualPriceLabel' => __('Individual price', PPI_TEXT_DOMAIN),
-			'individualPriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . $individualPrice,
+			'individualPriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . number_format($individualPrice, 2),
 			'individualPriceSuffix' => $priceSuffix,
 		];
 

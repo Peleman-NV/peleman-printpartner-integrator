@@ -129,3 +129,9 @@
 .remove-margin {
     margin-bottom: 0 !important;
 }
+
+/* style override*/
+.sku_wrapper .add-to-cart-price,
+.sku_wrapper .individual-price {
+    font-size: 1.5em !important;
+}
