@@ -220,8 +220,9 @@ class PpiAPI
 		if ($order->get_status() !== 'processing') {
 			$response['status'] = 'error';
 			$response['message'] = 'Order status is not processing';
-			$response['order_status'] = $order->get_status();
-			$statusCode = 400;
+			$response['current_order_status'] = $order->get_status();
+			$response['order_id'] = $orderId;
+			$statusCode = 409;
 			wp_send_json($response, $statusCode);
 			die();
 		}
