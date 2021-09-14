@@ -262,22 +262,20 @@
         }
 
         function showUnitPrice(bundleObject) {
-            const { bundlePriceExists, bundlePriceWithCurrencySymbol, bundlePriceSuffix, individualPriceWithCurrencySymbol, individualPriceSuffix } = bundleObject;
+            const { bundlePriceExists, bundlePriceWithCurrencySymbol, priceSuffix, bundleSuffix, individualPriceWithCurrencySymbol } = bundleObject;
 
-            // hide & clear individual price
+            // hide individual price
             $('.individual-price').addClass('ppi-hidden');
             if (!bundlePriceExists) {
-                // display individual price in add-to-cart-price span
-                $('.add-to-cart-price span.price-amount').html('<span>' + individualPriceWithCurrencySymbol + ' ' + individualPriceSuffix + '</span>');
+                $('.add-to-cart-price span.price-amount').html(individualPriceWithCurrencySymbol);
+                $('.add-to-cart-price span.woocommerce-price-suffix').html(priceSuffix);
             } else {
-                /**
-                 * unhide individual price span
-                 * display individual price in individual price span
-                 * display bundle price in add-to-cart-price span
-                 */
                 $('.individual-price').removeClass('ppi-hidden');
-                $('.add-to-cart-price span.price-amount').html('<span>' + bundlePriceWithCurrencySymbol + ' ' + bundlePriceSuffix  + '</span>');
-                $('.individual-price span.price-amount').html('<span>' + individualPriceWithCurrencySymbol + ' ' + individualPriceSuffix + '</span>');
+                $('.add-to-cart-price span.price-amount').html(bundlePriceWithCurrencySymbol);
+                $('.add-to-cart-price span.woocommerce-price-suffix').html(priceSuffix + '<span class="bundle-suffix">' + bundleSuffix + '</span>');
+                
+                $('.individual-price span.price-amount').html(individualPriceWithCurrencySymbol);
+                $('.individual-price span.woocommerce-price-suffix').html(priceSuffix);
             }
         }
 

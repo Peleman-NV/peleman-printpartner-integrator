@@ -7,28 +7,17 @@ global $product;
 
 if ($isSimpleProduct = $product->is_type('simple')) {
     $showPricesWithVat = get_option('woocommerce_prices_include_tax') === 'yes' ? true : false;
+    $priceSuffix = $product->get_price_suffix();
+
     $individualPrice = $showPricesWithVat ? wc_get_price_including_tax($product) : wc_get_price_excluding_tax($product);
-    $wcCountries = new \WC_Countries();
-    $priceSuffix = $wcCountries->ex_tax_or_vat();
-    $individualPriceWithCurrencySymbol = get_woocommerce_currency_symbol()
-        . number_format($individualPrice, 2)
-        . ' '
-        . $priceSuffix;
+    $individualPriceWithCurrencySymbol = get_woocommerce_currency_symbol() . number_format($individualPrice, 2);
 
     $bundlePrice = $product->get_meta('cart_price');
     $bundleUnits = $product->get_meta('cart_units');
 
     if ($isBundleProduct = isset($bundlePrice) && !empty($bundlePrice) && isset($bundleUnits) && !empty($bundleUnits) && $bundleUnits > 1) {
-
-        $bundlePriceWithCurrencySymbol =  get_woocommerce_currency_symbol()
-            . number_format($bundlePrice, 2)
-            . ' '
-            . $priceSuffix
-            . ' ('
-            . $bundleUnits
-            . ' '
-            . __('pieces', PPI_TEXT_DOMAIN)
-            . ')';
+        $bundlePriceWithCurrencySymbol =  get_woocommerce_currency_symbol() . number_format($bundlePrice, 2);
+        $bundleLabel = ' (' . $bundleUnits . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')';
     }
 }
 ?>
@@ -40,8 +29,14 @@ if ($isSimpleProduct = $product->is_type('simple')) {
             <span class="label">
                 <?php echo __('price', PPI_TEXT_DOMAIN) . ': '; ?>
             </span>
-            <span class="price-amount">
+            <span class="price-amount woocommerce-Price-amount amount">
                 <?= $isSimpleProduct && $isBundleProduct ? $bundlePriceWithCurrencySymbol : $individualPriceWithCurrencySymbol; ?>
+            </span>
+            <span class="woocommerce-price-suffix">
+                <?php
+                echo $priceSuffix;
+                echo $isSimpleProduct && $isBundleProduct ? '<span class="bundle-suffix">' . $bundleLabel . '</span>' : '';
+                ?>
             </span>
         </span>
         <br>
@@ -49,8 +44,11 @@ if ($isSimpleProduct = $product->is_type('simple')) {
             <span class="label">
                 <?php echo __('Individual price', PPI_TEXT_DOMAIN) . ': '; ?>
             </span>
-            <span class="price-amount">
+            <span class="price-amount woocommerce-Price-amount amount">
                 <?= $isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''; ?>
+            </span>
+            <span class="woocommerce-price-suffix">
+                <?= $priceSuffix; ?>
             </span>
         </span>
     </span>

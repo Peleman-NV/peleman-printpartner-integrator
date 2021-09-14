@@ -271,16 +271,14 @@ class PpiProductPage
 		$bundlePrice = $product_variant->get_meta('cart_price'); // excl.VAT
 		$showPricesWithVat = get_option('woocommerce_prices_include_tax') === 'yes' ? true : false;
 		$individualPrice = $showPricesWithVat ? wc_get_price_including_tax($product_variant) : wc_get_price_excluding_tax($product_variant);
-		$wcCountries = new \WC_Countries();
-		$priceSuffix = $wcCountries->ex_tax_or_vat();
 
 		$response['bundleObject'] = [
 			'showPricesWithVat' => $showPricesWithVat,
 			'bundlePriceExists' => ($bundlePrice !== '') ? true : false,
 			'bundlePriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . number_format($bundlePrice, 2),
-			'bundlePriceSuffix' => $priceSuffix . ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
+			'priceSuffix' => $product_variant->get_price_suffix(),
+			'bundleSuffix' => ' (' . $product_variant->get_meta('cart_units') . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')',
 			'individualPriceWithCurrencySymbol' => get_woocommerce_currency_symbol() . number_format($individualPrice, 2),
-			'individualPriceSuffix' => $priceSuffix,
 		];
 
 		$this->returnResponse($response);

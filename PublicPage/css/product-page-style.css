@@ -131,7 +131,21 @@
 }
 
 /* style override*/
-.sku_wrapper .add-to-cart-price,
-.sku_wrapper .individual-price {
-    font-size: 1.5em !important;
+.individual-price,
+.add-to-cart-price {
+    font-size: 20px;
+}
+.individual-price .price-amount,
+.add-to-cart-price .price-amount {
+    color: #3f3f3f;
+    font-weight: bold;
+}
+
+.individual-price span.woocommerce-price-suffix,
+.add-to-cart-price span.woocommerce-price-suffix {
+    color: #757575 !important;
+}
+
+.bundle-suffix {
+    font-size: 80% !important;
 }
