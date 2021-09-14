@@ -25,6 +25,18 @@ if ($isSimpleProduct = $product->is_type('simple')) {
 <div class="product_meta">
     <?php do_action('woocommerce_product_meta_start'); ?>
     <span class="sku_wrapper">
+        <span class="individual-price <?= !$isBundleProduct ? 'ppi-hidden' : ''; ?>">
+            <span class="label">
+                <?php echo __('Individual price', PPI_TEXT_DOMAIN) . ': '; ?>
+            </span>
+            <span class="price-amount woocommerce-Price-amount amount">
+                <?= $isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''; ?>
+            </span>
+            <span class="woocommerce-price-suffix">
+                <?= $priceSuffix; ?>
+            </span>
+        </span>
+        <br>
         <span class="add-to-cart-price">
             <span class="label">
                 <?php echo __('price', PPI_TEXT_DOMAIN) . ': '; ?>
@@ -37,18 +49,6 @@ if ($isSimpleProduct = $product->is_type('simple')) {
                 echo $priceSuffix;
                 echo $isSimpleProduct && $isBundleProduct ? '<span class="bundle-suffix">' . $bundleLabel . '</span>' : '';
                 ?>
-            </span>
-        </span>
-        <br>
-        <span class="individual-price <?= !$isBundleProduct ? 'ppi-hidden' : ''; ?>">
-            <span class="label">
-                <?php echo __('Individual price', PPI_TEXT_DOMAIN) . ': '; ?>
-            </span>
-            <span class="price-amount woocommerce-Price-amount amount">
-                <?= $isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''; ?>
-            </span>
-            <span class="woocommerce-price-suffix">
-                <?= $priceSuffix; ?>
             </span>
         </span>
     </span>
