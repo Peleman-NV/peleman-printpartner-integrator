@@ -269,7 +269,7 @@ class PpiProductPage
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
 
 		$bundlePrice = $product_variant->get_meta('cart_price'); // excl.VAT
-		$showPricesWithVat = get_option('woocommerce_prices_include_tax') === 'yes' ? true : false;
+		$showPricesWithVat = get_option('woocommerce_tax_display_shop') === 'incl' ? true : false;
 		$individualPrice = $showPricesWithVat ? wc_get_price_including_tax($product_variant) : wc_get_price_excluding_tax($product_variant);
 
 		$response['bundleObject'] = [
