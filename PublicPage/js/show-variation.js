@@ -21,7 +21,7 @@
  * An additional aspect is displaying the per piece and per unit prices for each variable
  */
 
- (function ($) {
+(function ($) {
     ('use strict');
     $(function () {
         let buttonText = setAddToCartLabel();
@@ -262,20 +262,41 @@
         }
 
         function showUnitPrice(bundleObject) {
-            const { bundlePriceExists, bundlePriceWithCurrencySymbol, priceSuffix, bundleSuffix, individualPriceWithCurrencySymbol } = bundleObject;
+            const {
+                bundlePriceExists,
+                bundlePriceWithCurrencySymbol,
+                priceSuffix,
+                bundleSuffix,
+                individualPriceWithCurrencySymbol,
+            } = bundleObject;
 
             // hide individual price
             $('.individual-price').addClass('ppi-hidden');
             if (!bundlePriceExists) {
-                $('.add-to-cart-price span.price-amount').html(individualPriceWithCurrencySymbol);
-                $('.add-to-cart-price span.woocommerce-price-suffix').html(priceSuffix);
+                $('.add-to-cart-price span.price-amount').html(
+                    individualPriceWithCurrencySymbol
+                );
+                $('.add-to-cart-price span.woocommerce-price-suffix').html(
+                    priceSuffix
+                );
             } else {
                 $('.individual-price').removeClass('ppi-hidden');
-                $('.add-to-cart-price span.price-amount').html(bundlePriceWithCurrencySymbol);
-                $('.add-to-cart-price span.woocommerce-price-suffix').html(priceSuffix + '<span class="bundle-suffix">' + bundleSuffix + '</span>');
-                
-                $('.individual-price span.price-amount').html(individualPriceWithCurrencySymbol);
-                $('.individual-price span.woocommerce-price-suffix').html(priceSuffix);
+                $('.add-to-cart-price span.price-amount').html(
+                    bundlePriceWithCurrencySymbol
+                );
+                $('.add-to-cart-price span.woocommerce-price-suffix').html(
+                    priceSuffix +
+                        '<span class="bundle-suffix">' +
+                        bundleSuffix +
+                        '</span>'
+                );
+
+                $('.individual-price span.price-amount').html(
+                    individualPriceWithCurrencySymbol
+                );
+                $('.individual-price span.woocommerce-price-suffix').html(
+                    priceSuffix
+                );
             }
         }
 
