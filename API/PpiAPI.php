@@ -3,7 +3,6 @@
 namespace PelemanPrintpartnerIntegrator\API;
 
 use Automattic\WooCommerce\Client;
-use PelemanPrintpartnerIntegrator\Services\ImaxelService;
 
 class PpiAPI
 {
