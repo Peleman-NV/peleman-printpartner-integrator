@@ -4,6 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 global $product;
+$callUsToPurchase = $product->get_meta('call_to_order') === 'yes';
 
 if ($isSimpleProduct = $product->is_type('simple')) {
     $showPricesWithVat = get_option('woocommerce_prices_include_tax') === 'yes' ? true : false;
@@ -22,10 +23,15 @@ if ($isSimpleProduct = $product->is_type('simple')) {
 }
 ?>
 
+<div id="call-us-btn" class="ppi-hidden">
+    <a href="tel:+3238893241" class="button" style="background-color: #f7631e !important; padding-top: 20px !important; padding-bottom: 20px !important;">Call us for a quote at +32 3 889 32 41</a>
+</div>
 <div class="product_meta">
     <?php do_action('woocommerce_product_meta_start'); ?>
-    <?php if ($isSimpleProduct && $individualPrice != '' || !$isSimpleProduct) : ?>
+
+    <?php if (!$callUsToPurchase && ($isSimpleProduct && $individualPrice != '') || !$isSimpleProduct) : ?>
         <span class="sku_wrapper">
+            <span id="call-us-price" class="label ppi-hidden">Price: call us for a quote at +32 3 889 32 41</span>
             <span class="individual-price <?= !$isBundleProduct ? 'ppi-hidden' : ''; ?>">
                 <span class="label">
                     <?php echo __('Individual price', PPI_TEXT_DOMAIN) . ': '; ?>
@@ -37,7 +43,6 @@ if ($isSimpleProduct = $product->is_type('simple')) {
                     <?= $priceSuffix; ?>
                 </span>
             </span>
-            <br>
             <span class="add-to-cart-price">
                 <span class="label">
                     <?php echo __('price', PPI_TEXT_DOMAIN) . ': '; ?>

@@ -62,7 +62,8 @@ class PpiAdmin
 	 */
 	public function enqueue_styles()
 	{
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/style.css', array(), $this->version, 'all');
+		$randomVersionNumber = rand(0, 1000);
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/style.css', array(), $randomVersionNumber, 'all');
 	}
 
 	/**
@@ -70,7 +71,8 @@ class PpiAdmin
 	 */
 	public function enqueue_scripts()
 	{
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/admin-ui.js', array('jquery'), $this->version, true);
+		$randomVersionNumber = rand(0, 1000);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/admin-ui.js', array('jquery'), $randomVersionNumber, true);
 	}
 
 	/**
@@ -209,11 +211,22 @@ class PpiAdmin
 			'value' => get_post_meta($variationId, 'unit_code', true)
 		));
 
+		$call_to_order = get_post_meta($variationId, 'call_to_order', true);
+		woocommerce_wp_checkbox(array(
+			'id' => 'call_to_order[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-full',
+			'label'       => __('Call us to order', 'woocommerce'),
+			'description' => __('Remove add to cart button and display "Call us to order"', 'woocommerce'),
+			'desc_tip'    => true,
+			'value' => $call_to_order,
+		));
+
 		$pdf_upload_required = get_post_meta($variationId, 'pdf_upload_required', true);
 		$pdf_fields_readonly = $pdf_upload_required == "no" || empty($pdf_upload_required) ? array('readonly' => 'readonly') : '';
 
 		woocommerce_wp_checkbox(array(
 			'id' => 'pdf_upload_required[' . $loop . ']',
+			'class' => 'checkbox pdf_required',
 			'wrapper_class' => 'form-row form-row-full',
 			'label'       => __('PDF content required?', 'woocommerce'),
 			'description' => __('Check to require a PDF upload', 'woocommerce'),
@@ -280,6 +293,7 @@ class PpiAdmin
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
 		$custom_variant_add_to_cart_label = $_POST['custom_variation_add_to_cart_label'][$i];
+		$call_to_order = isset($_POST['call_to_order']) ? 'yes' : 'no';
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
 		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
 		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
@@ -295,6 +309,7 @@ class PpiAdmin
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
 		if (isset($custom_variant_add_to_cart_label)) update_post_meta($variation_id, 'custom_variation_add_to_cart_label', esc_attr($custom_variant_add_to_cart_label));
+		if (isset($call_to_order)) update_post_meta($variation_id, 'call_to_order', $call_to_order);
 		if (isset($pdf_upload_required)) update_post_meta($variation_id, 'pdf_upload_required', $pdf_upload_required);
 		if (isset($pdf_width_mm)) update_post_meta($variation_id, 'pdf_width_mm', esc_attr($pdf_width_mm));
 		if (isset($pdf_height_mm)) update_post_meta($variation_id, 'pdf_height_mm', esc_attr($pdf_height_mm));
@@ -314,7 +329,6 @@ class PpiAdmin
 	{
 		$product_id = (isset($_GET['post']) && $_GET['post'] != '') ? $_GET['post'] : '';
 		$customizable_product = get_post_meta($product_id, 'customizable_product', true);
-
 		woocommerce_wp_checkbox(array(
 			'id' => 'customizable_product',
 			'label'       => __('Customizable product?', 'woocommerce'),
@@ -322,6 +336,18 @@ class PpiAdmin
 			'desc_tip'    => true,
 			'value' => $customizable_product,
 		));
+
+		$product = wc_get_product($product_id);
+		if ($product->get_type() === 'simple') {
+			$call_to_order = get_post_meta($product_id, 'call_to_order', true);
+			woocommerce_wp_checkbox(array(
+				'id' => 'call_to_order',
+				'label'       => __('Call us to order', 'woocommerce'),
+				'description' => __('Remove add to cart button and display "Call us to order"', 'woocommerce'),
+				'desc_tip'    => true,
+				'value' => $call_to_order,
+			));
+		}
 
 		woocommerce_wp_text_input(array(
 			'id' => 'custom_add_to_cart_label',
@@ -375,9 +401,11 @@ class PpiAdmin
 	{
 		$custom_add_to_cart_label = $_POST['custom_add_to_cart_label'];
 		$customizable_product = isset($_POST['customizable_product']) ? 'yes' : 'no';
+		$call_to_order = isset($_POST['call_to_order']) ? 'yes' : 'no';
 
 		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
 		if (isset($customizable_product)) update_post_meta($post_id, 'customizable_product', $customizable_product);
+		if (isset($call_to_order)) update_post_meta($post_id, 'call_to_order', $call_to_order);
 		if (isset($_POST['cart_price'])) update_post_meta($post_id, 'cart_price', $_POST['cart_price']);
 		if (isset($_POST['cart_units'])) update_post_meta($post_id, 'cart_units', $_POST['cart_units']);
 		if (isset($_POST['unit_code'])) update_post_meta($post_id, 'unit_code', $_POST['unit_code']);

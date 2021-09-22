@@ -1,7 +1,7 @@
 (function ($) {
     'use strict';
     $(document).on('woocommerce_variations_loaded', function (event) {
-        $('.ppi-options-group .checkbox').on('click', e => {
+        $('.ppi-options-group .pdf_required').on('click', e => {
             const inputArray = $(e.target)
                 .parent()
                 .siblings()

@@ -134,7 +134,9 @@
 .individual-price,
 .add-to-cart-price {
     font-size: 20px;
+    display: block;
 }
+
 .individual-price .price-amount,
 .add-to-cart-price .price-amount {
     color: #3f3f3f;

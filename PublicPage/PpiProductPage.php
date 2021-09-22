@@ -265,6 +265,7 @@ class PpiProductPage
 		$response['variant'] = $variant_id;
 		$response['inStock'] = $product_variant->is_in_stock();
 		$response['isCustomizable'] = $parent_product->get_meta('customizable_product');
+		$response['callUsToOrder'] = $product_variant->get_meta('call_to_order') === 'yes' ? true : false;
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
 
@@ -655,7 +656,7 @@ class PpiProductPage
 	 *  -...
 	 * to cart data when adding product to cart
 	 */
-	public function add_custom_data_to_cart_items($cart_item_data, $product_id, $variation_id)
+	public function addCustomDataToCartItems($cart_item_data, $product_id, $variation_id)
 	{
 		$now =  new DateTime('NOW');
 		// when adding to cart, request is POST
@@ -686,21 +687,38 @@ class PpiProductPage
 	/**
 	 * Add project ID to order line item 
 	 */
-	public function add_custom_data_to_order_line_item($item, $cart_item_key, $values, $order)
+	public function addCustomDataToOrderLineItem($item, $cartItemKey, $values, $order)
 	{
 		$imaxelProjectId = 0;
 		if (isset($values['_ppi_imaxel_project_id'])) {
 			$imaxelProjectId = $values['_ppi_imaxel_project_id'];
 			$item->add_meta_data('_ppi_imaxel_project_id', $imaxelProjectId, true);
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
 		}
 		if ($imaxelProjectId !== 0) {
 			$uploadedContent = $this->projectHasContentUpload($imaxelProjectId);
 			if ($uploadedContent !== null) {
 				$item->add_meta_data('_content_filename', $uploadedContent->content_filename, true);
 			}
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": added contentfile information to order line item" . PHP_EOL, 3,  $this->logFile);
 		}
-		$now =  new DateTime('NOW');
-		error_log($now->format('c') . ": added projectID {$imaxelProjectId} to order line item" . PHP_EOL, 3,  $this->logFile);
+
+		// adding unit information
+		if ($values['variation_id'] === 0) {
+			$itemId = $values['product_id'];
+		} else {
+			$itemId = $values['variation_id'];
+		}
+		$orderItem = wc_get_product($itemId);
+		if (!empty($orderItem->get_meta('cart_price'))) {
+			$item->add_meta_data('_cart_price', $orderItem->get_meta('cart_price'), true);
+			$item->add_meta_data('_cart_units', $orderItem->get_meta('cart_units'), true);
+			$item->add_meta_data('_unit_code', $orderItem->get_meta('unit_code'), true);
+			$now =  new DateTime('NOW');
+			error_log($now->format('c') . ": added bundle information to order line item" . PHP_EOL, 3,  $this->logFile);
+		}
 	}
 
 	private function projectHasContentUpload($projectId)
@@ -716,7 +734,7 @@ class PpiProductPage
 	/**
 	 * Get imaxel project files
 	 */
-	public function createImaxelOrder($orderId, $currentStatus, $newStatus, $order)
+	public function onOrderProcessing($orderId, $currentStatus, $newStatus, $order)
 	{
 		if ($newStatus !== 'processing') return;
 		$now =  new DateTime('NOW');
@@ -911,6 +929,33 @@ class PpiProductPage
 	private function calculateTaxRate($itemPrice, $itemTax)
 	{
 		return round(($itemTax / $itemPrice) * 100, 1);
+	}
+
+	function displayCallUsTextForSimpleProductsWithoutPrice($price, $product)
+	{
+		$isCallToPurchaseProduct = $product->get_meta('call_to_order') === 'yes';
+		if ($product->is_type('simple') && $isCallToPurchaseProduct) {
+			return '<span class="woocommerce-Price-amount amount">Call us for a quote at +32 3 889 32 41<span>';
+		}
+
+		return $price;
+	}
+
+	public function displayCallUsButtonForSimpleProductsWithoutPrice()
+	{
+		global $product;
+
+		$isCallToPurchaseProduct = $product->get_meta('call_to_order') === 'yes';
+		if ($product->is_type('simple') && $isCallToPurchaseProduct) {
+			remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
+			add_action(
+				'woocommerce_single_product_summary',
+				function () {
+					echo '<a href="tel:+3238893241" class="button" style="background-color: #f7631e !important; padding-top: 20px !important; padding-bottom: 20px !important;">Call us for a quote at +32 3 889 32 41</a>';
+				},
+				30
+			);
+		}
 	}
 
 	/*

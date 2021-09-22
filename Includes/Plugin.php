@@ -142,6 +142,9 @@ class Plugin
 		$this->loader->add_action('ppi_variant_info_div', $product_page, 'ppi_output_variant_info', 7, 1);
 		$this->loader->add_action('ppi_redirection_info_div', $product_page, 'ppi_output_redirection_info', 7, 1);
 		$this->loader->add_action('woocommerce_single_variation', $product_page, 'ppi_change_add_to_cart_text_for_imaxel_products', 10);
+		// Call us to order 
+		$this->loader->add_action('woocommerce_get_price_html', $product_page, 'displayCallUsTextForSimpleProductsWithoutPrice', 8, 2);
+		$this->loader->add_action('woocommerce_single_product_summary', $product_page, 'displayCallUsButtonForSimpleProductsWithoutPrice', 8);
 
 		// Ajax: when a new variation is selected
 		$this->loader->add_action('wp_ajax_get_product_variation_data', $product_page, 'get_product_variation_data');
@@ -159,11 +162,11 @@ class Plugin
 		$this->loader->add_action('wp_ajax_handle_project_action', $product_page, 'handle_project_action');
 		$this->loader->add_action('wp_ajax_nopriv_handle_project_action', $product_page, 'handle_project_action');
 
-		// Price and cart customizations
+		// Price, cart, and order customizations
 		$this->loader->add_action('woocommerce_add_to_cart_validation', $product_page, 'readImaxelProjectOnReturnFromEditor', 10, 5);
-		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'add_custom_data_to_cart_items', 10, 3);
-		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'add_custom_data_to_order_line_item', 10, 4);
-		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'createImaxelOrder', 10, 4);
+		$this->loader->add_action('woocommerce_add_cart_item_data', $product_page, 'addCustomDataToCartItems', 10, 3);
+		$this->loader->add_action('woocommerce_checkout_create_order_line_item', $product_page, 'addCustomDataToOrderLineItem', 10, 4);
+		$this->loader->add_action('woocommerce_order_status_changed', $product_page, 'onOrderProcessing', 10, 4);
 		$this->loader->add_action('woocommerce_before_calculate_totals', $product_page, 'adjust_cart_item_price', 10);
 		$this->loader->add_action('woocommerce_widget_cart_item_quantity', $product_page, 'adjust_mini_cart_item_price', 10, 3);
 		$this->loader->add_action('woocommerce_available_variation', $product_page, 'add_unit_data_to_variation_object', 11, 3);

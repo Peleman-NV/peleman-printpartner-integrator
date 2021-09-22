@@ -26,10 +26,9 @@
     $(function () {
         let buttonText = setAddToCartLabel();
         // Event: when a variation is selected
-        $('.variations_form').on('show_variation', e => {
-            const variationId = $("[name='variation_id']").val();
+        $('.variations_form').on('show_variation', (event, variation) => {
             initRefreshVariantElements();
-            getProductVariationData(variationId);
+            getProductVariationData(variation.variation_id);
         });
 
         // Event: when a new variation is chosen
@@ -56,52 +55,56 @@
                 success: function (response) {
                     console.log(response);
                     if (response.status === 'success') {
-                        showUnitPrice(response.bundleObject);
-                        buttonText =
-                            response.buttonText ?? fallbackAddToCartLabel;
-                        if (
-                            response.isCustomizable === 'no' ||
-                            response.isCustomizable === ''
-                        ) {
-                            /**
-                             * no upload & not customizable:
-                             * show custom add to cart button text and enable
-                             */
+                        if (response.callUsToOrder) {
+                            showCallUsTextAndButton();
+                        } else {
+                            showUnitPrice(response.bundleObject);
+                            buttonText =
+                                response.buttonText ?? fallbackAddToCartLabel;
                             if (
-                                response.requiresPDFUpload === 'no' ||
-                                response.requiresPDFUpload === ''
+                                response.isCustomizable === 'no' ||
+                                response.isCustomizable === ''
                             ) {
-                                enableAddToCartBtn(buttonText);
+                                /**
+                                 * no upload & not customizable:
+                                 * show custom add to cart button text and enable
+                                 */
+                                if (
+                                    response.requiresPDFUpload === 'no' ||
+                                    response.requiresPDFUpload === ''
+                                ) {
+                                    enableAddToCartBtn(buttonText);
+                                }
+                                /**
+                                 * upload & not customizable:
+                                 * display upload block
+                                 * show custom add to cart button text and disable
+                                 */
+                                if (response.requiresPDFUpload === 'yes') {
+                                    disableAddToCartBtn(buttonText);
+                                    displayUploadElements(response);
+                                }
                             }
-                            /**
-                             * upload & not customizable:
-                             * display upload block
-                             * show custom add to cart button text and disable
-                             */
-                            if (response.requiresPDFUpload === 'yes') {
-                                disableAddToCartBtn(buttonText);
-                                displayUploadElements(response);
-                            }
-                        }
-                        if (response.isCustomizable === 'yes') {
-                            /**
-                             * no upload & customizable:
-                             * show custom add to cart button text and enable
-                             */
-                            if (
-                                response.requiresPDFUpload === 'no' ||
-                                response.requiresPDFUpload === ''
-                            ) {
-                                enableAddToCartBtn(buttonText);
-                            }
-                            /**
-                             * upload & customizable:
-                             * display upload block
-                             * show custom add to cart button text and disable
-                             */
-                            if (response.requiresPDFUpload === 'yes') {
-                                disableAddToCartBtn(buttonText);
-                                displayUploadElements(response);
+                            if (response.isCustomizable === 'yes') {
+                                /**
+                                 * no upload & customizable:
+                                 * show custom add to cart button text and enable
+                                 */
+                                if (
+                                    response.requiresPDFUpload === 'no' ||
+                                    response.requiresPDFUpload === ''
+                                ) {
+                                    enableAddToCartBtn(buttonText);
+                                }
+                                /**
+                                 * upload & customizable:
+                                 * display upload block
+                                 * show custom add to cart button text and disable
+                                 */
+                                if (response.requiresPDFUpload === 'yes') {
+                                    disableAddToCartBtn(buttonText);
+                                    displayUploadElements(response);
+                                }
                             }
                             /**
                              * If the variant isn't in stock, all the above doesn't matter
@@ -148,6 +151,10 @@
             $('.ppi-upload-form').addClass('ppi-hidden');
             // hide upload parameters block
             $('.ppi-upload-parameters').addClass('ppi-hidden');
+            // unhide price div
+            $('.summary p.price').show();
+            // remove call us text
+            $('p').remove('#call-us');
         }
 
         /**
@@ -259,6 +266,13 @@
                 }
             }
             return 'en';
+        }
+
+        function showCallUsTextAndButton() {
+            $('.summary p.price').hide();
+            $('.summary h1.product_title.entry-title').after(
+                '<p id="call-us" class="price"><span class="woocommerce-Price-amount amount">Call us for a quote at +32 3 889 32 41<span></p>'
+            );
         }
 
         function showUnitPrice(bundleObject) {
