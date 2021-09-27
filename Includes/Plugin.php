@@ -110,6 +110,10 @@ class Plugin
 		$this->loader->add_action('woocommerce_process_product_meta', $plugin_admin, 'ppi_persist_custom_parent_attributes', 11, 3);
 		$this->loader->add_action('woocommerce_product_after_variable_attributes', $plugin_admin, 'ppi_add_custom_fields_to_variable_products', 11, 3);
 		$this->loader->add_action('woocommerce_save_product_variation', $plugin_admin, 'ppi_persist_custom_field_variations', 11, 2);
+		$this->loader->add_action('manage_edit-shop_order_columns', $plugin_admin, 'ppiAddTrackingDataColumnToOrderOverview', 11, 1);
+		$this->loader->add_action('manage_edit-shop_order_columns', $plugin_admin, 'ppiAddTrackingDataColumnToOrderOverview', 11, 1);
+		$this->loader->add_action('manage_shop_order_posts_custom_column', $plugin_admin, 'ppiAddTrackingDataToOrderOverview', 11, 1);
+
 
 		$this->loader->add_action('woocommerce_order_item_display_meta_key', $plugin_admin, 'displayCustomMetaDataKey', 10, 3);
 		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayCustomMetaDataValue', 10, 3);

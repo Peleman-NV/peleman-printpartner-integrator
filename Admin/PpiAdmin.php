@@ -678,4 +678,27 @@ class PpiAdmin
 			echo '<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
 		}
 	}
+
+	public function ppiAddTrackingDataColumnToOrderOverview($columns)
+	{
+		$columns['tracking'] = 'Tracking numbers';
+
+		return $columns;
+	}
+
+	public function ppiAddTrackingDataToOrderOverview($column)
+	{
+		global $post;
+
+		$order = wc_get_order($post->ID);
+		$trackingData = json_decode($order->get_meta('f2d_tracking_data'), true);
+
+		$trackingNumbers = array_map(function ($e) {
+			return $e['number'];
+		}, $trackingData);
+
+		if ($column == 'tracking') {
+			echo implode(',', $trackingNumbers);
+		}
+	}
 }
