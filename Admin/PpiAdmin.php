@@ -693,6 +693,8 @@ class PpiAdmin
 		$order = wc_get_order($post->ID);
 		$trackingData = json_decode($order->get_meta('f2d_tracking_data'), true);
 
+		if (empty($trackingData)) return;
+
 		$trackingNumbers = array_map(function ($e) {
 			return $e['number'];
 		}, $trackingData);
