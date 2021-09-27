@@ -700,7 +700,7 @@ class PpiAdmin
 		}, $trackingData);
 
 		if ($column == 'tracking') {
-			echo implode(',', $trackingNumbers);
+			echo trim(implode(',', $trackingNumbers), ',');
 		}
 	}
 }
