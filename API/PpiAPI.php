@@ -199,7 +199,7 @@ class PpiAPI
 		if (!$order) {
 			$response['status'] = 'error';
 			$response['message'] = 'No order found';
-			$statusCode = 400;
+			$statusCode = 404;
 			wp_send_json($response, $statusCode);
 			die();
 		}
@@ -225,7 +225,7 @@ class PpiAPI
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['message'] = $th->getMessage();
-			$statusCode = 400;
+			$statusCode = 500;
 			wp_send_json($response, $statusCode);
 			die();
 		}
@@ -242,7 +242,7 @@ class PpiAPI
 		if (!$order) {
 			$response['status'] = 'error';
 			$response['message'] = 'No order found';
-			$statusCode = 400;
+			$statusCode = 404;
 			wp_send_json($response, $statusCode);
 			die();
 		}
@@ -279,7 +279,7 @@ class PpiAPI
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['message'] = $th->getMessage();
-			$statusCode = 400;
+			$statusCode = 500;
 			wp_send_json($response, $statusCode);
 			die();
 		}
