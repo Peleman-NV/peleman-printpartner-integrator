@@ -183,6 +183,18 @@ class PpiAPI
 						];
 					}
 				}
+				// adding unit information
+				if ($variationId === 0) {
+					$itemId = $lineItem->product_id;
+				} else {
+					$itemId = $variationId;
+				}
+				$item = wc_get_product($itemId);
+				if (!empty($item->get_meta('cart_price'))) {
+					wc_update_order_item_meta($lineItem->id, '_cart_price', $item->get_meta('cart_price'));
+					wc_update_order_item_meta($lineItem->id, '_cart_units', $item->get_meta('cart_units'));
+					wc_update_order_item_meta($lineItem->id, '_unit_code', $item->get_meta('unit_code'));
+				}
 			}
 			wp_send_json($orderObject, 200);
 		} catch (\Throwable $th) {
