@@ -188,7 +188,7 @@ class PpiAPI
 						}
 						if ($result->content_filename !== null && !empty($result->content_filename)) {
 							$lineItem->files[] = [
-								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
+								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content/' . $result->content_filename . '/content.pdf',
 								'file_size_in_bytes' => filesize(realpath(PPI_UPLOAD_DIR . '/' . $result->content_filename)),
 								'type' => 'Content'
 							];
