@@ -114,11 +114,9 @@ class Plugin
 		$this->loader->add_action('manage_edit-shop_order_columns', $plugin_admin, 'ppiAddTrackingDataColumnToOrderOverview', 11, 1);
 		$this->loader->add_action('manage_shop_order_posts_custom_column', $plugin_admin, 'ppiAddTrackingDataToOrderOverview', 11, 1);
 
-
 		$this->loader->add_action('woocommerce_order_item_display_meta_key', $plugin_admin, 'displayCustomMetaDataKey', 10, 3);
 		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayCustomMetaDataValue', 10, 3);
 
-		$this->loader->add_action('rest_api_init', $plugin_admin, 'registerCheckPendingOrdersEndpoint');
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
 
 		$this->loader->add_action('admin_post_read_imaxel_project', $plugin_admin, 'read_imaxel_project');
@@ -191,6 +189,7 @@ class Plugin
 	{
 		$plugin_api = new PpiAPI($this->get_plugin_name(), $this->get_version());
 
+		$this->loader->add_action('rest_api_init', $plugin_api, 'registerCheckPendingOrdersEndpoint');
 		$this->loader->add_action('rest_api_init', $plugin_api, 'registerGetOrderEndpoint');
 		$this->loader->add_action('rest_api_init', $plugin_api, 'registerCompleteOrderEndpoint');
 		$this->loader->add_action('rest_api_init', $plugin_api, 'registerAddTrackingToOrderEndpoint');

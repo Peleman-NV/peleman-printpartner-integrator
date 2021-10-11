@@ -3,8 +3,6 @@
 namespace PelemanPrintpartnerIntegrator\Admin;
 
 use PelemanPrintpartnerIntegrator\Services\ImaxelService;
-use DateTime;
-use ZipArchive;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -25,9 +23,6 @@ use ZipArchive;
  */
 class PpiAdmin
 {
-	private $logFile = PPI_LOG_DIR . '/imaxelFileDownloader.txt';
-	private $shop;
-
 	/**
 	 * The ID of this plugin.
 	 *
@@ -54,7 +49,6 @@ class PpiAdmin
 	{
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		$this->shop = get_option('ppi-imaxel-shop-code');
 	}
 
 	/**
@@ -411,188 +405,6 @@ class PpiAdmin
 		if (isset($_POST['unit_code'])) update_post_meta($post_id, 'unit_code', $_POST['unit_code']);
 	}
 
-	/**	
-	 * Register check pending orders endpoint
-	 * This API route is called by the cronjob every 1-3 minutes to:
-	 * - check where any Imaxel orders are pending
-	 * - if so, download the files and mark the order as downloaded
-	 * In dev this route has to be called manually
-	 */
-	public function registerCheckPendingOrdersEndpoint()
-	{
-		register_rest_route('ppi/v1', '/pendingorders', array(
-			'methods' => 'GET',
-			'callback' => array($this, 'checkPendingOrders'),
-			'permission_callback' => '__return_true'
-		));
-	}
-
-	public function checkPendingOrders()
-	{
-		$imaxel = new ImaxelService();
-		$response = $imaxel->get_pending_orders();
-		$pendingOrders = json_decode($response['body']);
-
-		if (count($pendingOrders) === 0) {
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': No pending orders' . PHP_EOL, 3,  $this->logFile);
-			wp_send_json(array('response' => 'No pending orders'), 200);
-		}
-
-		$response = [];
-		$projects = [];
-
-		foreach ($pendingOrders as $order) {
-			$orderId = $order->id;
-			$shop = $order->checkout->shop->code;
-			$projectId = $order->jobs[0]->project->id;
-			$product = $order->jobs[0]->product->variants[0]->name->default;
-			$wooCommerceOrderId = str_replace('WC order ID: ', '', $order->notes);
-			// extract file URLs from files key
-			$filesCollection = array_map(function ($files) {
-				return $files->url;
-			}, $order->files);
-
-			if ($shop !== $this->shop) {
-				$projects[$projectId] = [
-					'Shop' => $shop,
-					'Project ID' => $projectId,
-					'Imaxel order ID' => $orderId,
-					'WooCommerce order ID' => $wooCommerceOrderId,
-					'Processed' => 'no'
-				];
-				$now =  new DateTime('NOW');
-				error_log($now->format('c') . ': order ' . $orderId . ' (project ' . $projectId . ') not for this shop' . PHP_EOL, 3,  $this->logFile);
-				continue;
-			}
-
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': downloading ' . count($filesCollection) . ' files for project ' . $projectId . PHP_EOL, 3,  $this->logFile);
-
-			$this->downloadFiles($filesCollection, $projectId, $wooCommerceOrderId);
-
-			$projects[$projectId] = [
-				'Shop' => $shop,
-				'Product' => $product,
-				'Project ID' => $projectId,
-				'Imaxel order ID' => $orderId,
-				'WooCommerce order ID' => $wooCommerceOrderId,
-				'files' => count($filesCollection),
-				'Processed' => 'yes'
-			];
-
-			$imaxel->mark_order_as_downloaded($orderId);
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': marked WC order ' . $wooCommerceOrderId . ' (Imaxel order: ' . $orderId . ') as downloaded.' . PHP_EOL, 3,  $this->logFile);
-		}
-
-		$response['result'] = 'Processed ' . count($pendingOrders) . ' orders';
-		$response['orderData'] = $projects;
-		wp_send_json($response, 200);
-	}
-
-	private function downloadFiles($files, $projectId, $orderId)
-	{
-		$downloadFolder = PPI_IMAXEL_FILES_DIR . "/{$projectId}";
-		$this->createOrderFolder($downloadFolder);
-
-		$fileName = 0;
-		$downloadedFiles = [];
-		foreach ($files as $file) {
-			$ext = substr($file, strrpos($file, '.'));
-			$fileName = str_pad($fileName, 5, '0', STR_PAD_LEFT);
-			$fullPath = "{$downloadFolder}/{$fileName}{$ext}";
-			$downloadedFiles[] = $fullPath;
-			file_put_contents($fullPath, file_get_contents($file));
-
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': downloaded file ' . $file . PHP_EOL, 3,  $this->logFile);
-
-			$fileName++;
-		}
-		$this->zipAllFiles($projectId, $orderId, $downloadFolder, $downloadedFiles);
-
-		return true;
-	}
-
-	private function zipAllFiles($projectId, $orderId, $downloadFolder, $files)
-	{
-		$zip = new ZipArchive();
-		$zip->open("{$downloadFolder}/{$orderId}-{$projectId}.zip", ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-		foreach ($files as $file) {
-			$zip->addFile($file, basename($file));
-		}
-
-		// check for content files
-		if ($this->projectHasContentUpload($projectId !== false)) {
-			$contentFiles = $this->getContentFile($projectId);
-			foreach ($contentFiles as $file) {
-				if (!$zip->addFile($file, basename($file))) {
-				};
-			}
-		}
-		$zip->close();
-
-		// delete all files after they've been zipped
-		foreach ($files as $file) {
-			unlink($file);
-		}
-	}
-
-	private function projectHasContentUpload($projectId)
-	{
-		global $wpdb;
-		$table_name = PPI_USER_PROJECTS_TABLE;
-		$result =  $wpdb->get_results("SELECT content_filename FROM {$table_name} WHERE project_id = {$projectId}");
-
-		if ($result === null) return false;
-		return $result[0]->content_filename;
-	}
-
-	private function createOrderFolder($downloadFolder)
-	{
-		// if folder exist, clear all files, else create folder
-		if (file_exists($downloadFolder)) {
-			$now =  new DateTime('NOW');
-			error_log($now->format('c') . ': folder exists' . PHP_EOL, 3,  $this->logFile);
-			$files = glob($downloadFolder . '\*');
-
-			if (!empty($files)) {
-				$now =  new DateTime('NOW');
-				error_log($now->format('c') . ': deleted files' . PHP_EOL, 3,  $this->logFile);
-				foreach ($files as $file) {
-					if (is_file($file)) {
-						unlink($file);
-					}
-				}
-			}
-
-			return [
-				'status' => 'success',
-				'message' => 'folder exists - cleared files'
-			];
-		} else {
-			if (mkdir($downloadFolder, 0777)) {
-				$now =  new DateTime('NOW');
-				error_log($now->format('c') . ': created folder' . PHP_EOL, 3,  $this->logFile);
-
-				return [
-					'status' => 'success',
-					'message' => 'created folder'
-				];
-			} else {
-				$now =  new DateTime('NOW');
-				error_log($now->format('c') . ': folder not created' . PHP_EOL, 3,  $this->logFile);
-
-				wp_send_json([
-					'status' => 'error',
-					'message' => 'folder not created'
-				]);
-			}
-		}
-	}
-
 	public function displayCustomMetaDataKey($display_key, $meta, $item)
 	{
 		$currentPage = basename(get_permalink());
@@ -625,18 +437,6 @@ class PpiAdmin
 		}
 
 		return $value;
-	}
-
-	private function getContentFile($projectId)
-	{
-		$files = array_slice(scandir(PPI_UPLOAD_DIR . '/' . $projectId), 2);
-
-		$fullPathFiles = [];
-		foreach ($files as $file) {
-			$fullPathFiles[] = PPI_UPLOAD_DIR . '/' . $projectId . '/' . $file;
-		}
-
-		return $fullPathFiles;
 	}
 
 	/**
