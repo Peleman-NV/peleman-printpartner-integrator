@@ -70,8 +70,24 @@ class PpiAPI
 			die();
 		}
 
-		wp_send_json($ordersWithStatusProcessing, 200);
+		$ordersResponse = array_map(function ($e) {
+			return $this->getOrderData($e->ID);
+		}, $ordersWithStatusProcessing);
+
+		wp_send_json($ordersResponse, 200);
 		die();
+	}
+
+	private function getOrderData($orderId)
+	{
+		$order = wc_get_order($orderId);
+
+		return [
+			'ID' => $orderId,
+			'order_created' => $order->get_date_created()->date("Y-m-d H:i:s"),
+			'billing_company' => $order->get_billing_company(),
+			'billing_customer' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()
+		];
 	}
 
 	/**	
