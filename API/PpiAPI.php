@@ -85,6 +85,7 @@ class PpiAPI
 		return [
 			'ID' => $orderId,
 			'order_created' => $order->get_date_created()->date("Y-m-d H:i:s"),
+			'order_total' => $order->get_total(),
 			'billing_company' => $order->get_billing_company(),
 			'billing_customer' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()
 		];
@@ -187,7 +188,7 @@ class PpiAPI
 						}
 						if ($result->content_filename !== null && !empty($result->content_filename)) {
 							$lineItem->files[] = [
-								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content/' . $result->content_filename . '/content.pdf',
+								'file_name' => get_site_url() . '/wp-content/uploads/ppi/content' . $result->content_filename,
 								'file_size_in_bytes' => filesize(realpath(PPI_UPLOAD_DIR . '/' . $result->content_filename)),
 								'type' => 'Content'
 							];
@@ -227,7 +228,7 @@ class PpiAPI
 		if (!$order) {
 			$response['status'] = 'error';
 			$response['message'] = 'No order found';
-			$statusCode = 404;
+			$statusCode = 400;
 			wp_send_json($response, $statusCode);
 			die();
 		}
@@ -270,7 +271,7 @@ class PpiAPI
 		if (!$order) {
 			$response['status'] = 'error';
 			$response['message'] = 'No order found';
-			$statusCode = 404;
+			$statusCode = 400;
 			wp_send_json($response, $statusCode);
 			die();
 		}
@@ -307,7 +308,7 @@ class PpiAPI
 		} catch (\Throwable $th) {
 			$response['status'] = 'error';
 			$response['message'] = $th->getMessage();
-			$statusCode = 500;
+			$statusCode = 400;
 			wp_send_json($response, $statusCode);
 			die();
 		}
