@@ -421,19 +421,30 @@ class PpiAPI
 
 	public function completeOrder($request)
 	{
+		$now =  new \DateTime('NOW', new \DateTimeZone('Europe/Brussels'));
+		error_log($now->format('c') . ' ' . print_r('POST param: ' . $request['order'], true) . PHP_EOL, 3, __DIR__ . '/completeOrderLog.txt');
+
 		$orderId = $request['order'];
 		$order = wc_get_order($orderId);
 		$response['order'] = $orderId;
 
+		$now =  new \DateTime('NOW', new \DateTimeZone('Europe/Brussels'));
+		error_log($now->format('c') . ' ' . print_r('Woocommerce order ID: ' . $order->get_id(), true) . PHP_EOL, 3, __DIR__ . '/completeOrderLog.txt');
+
 		if (!$order) {
+			$now =  new \DateTime('NOW', new \DateTimeZone('Europe/Brussels'));
+			error_log($now->format('c') . ' ' . print_r('Order ' . $orderId . ' not found - sending 400', true) . PHP_EOL, 3, __DIR__ . '/completeOrderLog.txt');
 			$response['status'] = 'error';
 			$response['message'] = 'No order found';
 			$statusCode = 400;
 			wp_send_json($response, $statusCode);
 			die();
 		}
+		$wcOrderId = $order->get_id();
 
 		if ($order->get_status() !== 'processing') {
+			$now =  new \DateTime('NOW', new \DateTimeZone('Europe/Brussels'));
+			error_log($now->format('c') . ' ' . print_r('409 - Status order ' . $wcOrderId . ' not \'processing\' (currently \'' . $order->get_status() . '\')', true) . PHP_EOL, 3, __DIR__ . '/completeOrderLog.txt');
 			$response['status'] = 'error';
 			$response['message'] = 'Order status is not processing';
 			$response['current_order_status'] = $order->get_status();
@@ -443,18 +454,20 @@ class PpiAPI
 			die();
 		}
 
-		try {
-			$order->set_status('completed');
-			$order->save();
+		if ($order->update_status('completed', 'Updated by F2D', '') === false) {
+			$now =  new \DateTime('NOW', new \DateTimeZone('Europe/Brussels'));
+			error_log($now->format('c') . ' ' . print_r('500 - set order ' . $wcOrderId . ' status to completed failed', true) . PHP_EOL, 3, __DIR__ . '/completeOrderLog.txt');
+			$response['message'] = 'set order ' . $wcOrderId . ' status to \'completed\' failed';
+			$response['status'] = 'error';
+			$statusCode = 500;
+			wp_send_json($response, $statusCode);
+			die();
+		} else {
+			$now =  new \DateTime('NOW', new \DateTimeZone('Europe/Brussels'));
+			error_log($now->format('c') . ' ' . print_r('200 - set order ' . $wcOrderId . ' status to completed is successful', true) . PHP_EOL, 3, __DIR__ . '/completeOrderLog.txt');
 			$response['status'] = 'success';
 			$response['message'] = 'order status changed from \'processing\' to \'completed\'';
 			$statusCode = 200;
-			wp_send_json($response, $statusCode);
-			die();
-		} catch (\Throwable $th) {
-			$response['status'] = 'error';
-			$response['message'] = $th->getMessage();
-			$statusCode = 500;
 			wp_send_json($response, $statusCode);
 			die();
 		}
