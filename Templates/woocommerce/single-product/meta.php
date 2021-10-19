@@ -60,13 +60,26 @@ if ($isSimpleProduct = $product->is_type('simple')) {
         </span>
     <?php endif; ?>
 
-    <?php if (wc_product_sku_enabled() && ($product->get_sku() || $product->is_type('variable'))) : ?>
+    <?php
+    $articleCode = $product->get_meta('f2d_artcd');
+    ?>
+    <!-- Simple product: display article code instead of SKU -->
+    <?php if ($isSimpleProduct && !empty($articleCode)) : ?>
         <span class="sku_wrapper">
             <span class="label">
-                <?php esc_html_e('SKU:', 'woocommerce'); ?>
+                <?php esc_html_e('Article code:', PPI_TEXT_DOMAIN); ?>
             </span>
             <span class="sku">
-                <?php echo ($sku = $product->get_sku()) ? $sku : esc_html__('N/A', 'woocommerce'); ?>
+                <?php echo $articleCode; ?>
+            </span>
+        </span>
+    <?php endif; ?>
+
+    <!-- Variable product: display article code placeholder to be filled with the magic of JavaScript! -->
+    <?php if (!$isSimpleProduct) : ?>
+        <span class="sku_wrapper article-code-container">
+            <span class="label article-code-label">
+                <?php esc_html_e('Article code:', PPI_TEXT_DOMAIN); ?>
             </span>
         </span>
     <?php endif; ?>

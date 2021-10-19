@@ -268,6 +268,7 @@ class PpiProductPage
 		$response['callUsToOrder'] = $product_variant->get_meta('call_to_order') === 'yes' ? true : false;
 		$response['requiresPDFUpload'] = $product_variant->get_meta('pdf_upload_required');
 		$response['buttonText'] = $this->get_add_to_cart_label($variant_id);
+		$response['f2dArtCode'] = $product_variant->get_meta('f2d_artcd');
 
 		$bundlePrice = $product_variant->get_meta('cart_price'); // excl.VAT
 		$showPricesWithVat = get_option('woocommerce_tax_display_shop') === 'incl' ? true : false;

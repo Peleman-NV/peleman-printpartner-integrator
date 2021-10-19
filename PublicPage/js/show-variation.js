@@ -36,6 +36,7 @@
             hideUploadElements();
             disableAddToCartBtn(buttonText);
             resetUnitPrice();
+            hideArticleCodeElement();
         });
 
         function getProductVariationData(variationId) {
@@ -61,6 +62,9 @@
                             showUnitPrice(response.bundleObject);
                             buttonText =
                                 response.buttonText ?? fallbackAddToCartLabel;
+                            if (response.f2dArtCode) {
+                                displayArticleCode(response.f2dArtCode);
+                            }
                             if (
                                 response.isCustomizable === 'no' ||
                                 response.isCustomizable === ''
@@ -151,10 +155,24 @@
             $('.ppi-upload-form').addClass('ppi-hidden');
             // hide upload parameters block
             $('.ppi-upload-parameters').addClass('ppi-hidden');
-            // unhide price div
+
+            $('.single_variation_wrap').show();
             $('.summary p.price').show();
-            // remove call us text
+            $('.add-to-cart-price').show();
             $('p').remove('#call-us');
+            $('#call-us-btn').addClass('ppi-hidden');
+            $('#call-us-price').addClass('ppi-hidden');
+
+            // article code
+            $('span.article-code-container').addClass('ppi-hidden');
+        }
+
+        function displayArticleCode(articleCode) {
+            $('.article-code').remove();
+            $('span.label.article-code-label').after(
+                '<span class="article-code">' + articleCode + '</span>'
+            );
+            $('span.article-code-container').removeClass('ppi-hidden');
         }
 
         /**
@@ -269,7 +287,11 @@
         }
 
         function showCallUsTextAndButton() {
+            $('.single_variation_wrap').hide();
             $('.summary p.price').hide();
+            $('.add-to-cart-price').hide();
+            $('#call-us-btn').removeClass('ppi-hidden');
+            $('#call-us-price').removeClass('ppi-hidden');
             $('.summary h1.product_title.entry-title').after(
                 '<p id="call-us" class="price"><span class="woocommerce-Price-amount amount">Call us for a quote at +32 3 889 32 41<span></p>'
             );
@@ -317,6 +339,10 @@
         function resetUnitPrice() {
             $('.cart-unit-block').addClass('ppi-hidden');
             $('.individual-price-text').html();
+        }
+
+        function hideArticleCodeElement() {
+            $('span.article-code-container').addClass('ppi-hidden');
         }
     });
 })(jQuery);
