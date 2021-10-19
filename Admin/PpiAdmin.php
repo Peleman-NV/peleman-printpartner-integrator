@@ -19,7 +19,7 @@ use PelemanPrintpartnerIntegrator\Services\ImaxelService;
  *
  * @package    Peleman_Printpartner_Integrator
  * @subpackage Peleman_Printpartner_Integrator/admin
- * @author     Noë Baeten, Jason Goossens, Chris Schippers <None>
+ * @author     Noë Baeten, Jason Goossens, Chris Schippers
  */
 class PpiAdmin
 {
@@ -115,12 +115,22 @@ class PpiAdmin
 
 		woocommerce_wp_text_input(array(
 			'id' => 'f2d_sku_components[' . $loop . ']',
-			'wrapper_class' => 'form-row form-row-full',
+			'wrapper_class' => 'form-row form-row-first',
 			'label' => 'Fly2Data SKU data',
 			'type' => 'text',
 			'desc_tip'    => true,
 			'description' => __('F2D components that make up a variation', 'woocommerce'),
 			'value' => get_post_meta($variationId, 'f2d_sku_components', true)
+		));
+
+		woocommerce_wp_text_input(array(
+			'id' => 'f2d_artcd[' . $loop . ']',
+			'wrapper_class' => 'form-row form-row-last',
+			'label' => 'Fly2Data article code',
+			'type' => 'text',
+			'desc_tip'    => true,
+			'description' => __('F2D article code', 'woocommerce'),
+			'value' => get_post_meta($variationId, 'f2d_artcd', true)
 		));
 
 		woocommerce_wp_text_input(array(
@@ -284,6 +294,7 @@ class PpiAdmin
 	public function ppi_persist_custom_field_variations($variation_id, $i)
 	{
 		$f2d_sku_components = $_POST['f2d_sku_components'][$i];
+		$f2d_artcd = $_POST['f2d_artcd'][$i];
 		$template_id = $_POST['template_id'][$i];
 		$variant_code = $_POST['variant_code'][$i];
 		$custom_variant_add_to_cart_label = $_POST['custom_variation_add_to_cart_label'][$i];
@@ -300,6 +311,7 @@ class PpiAdmin
 		$unit_code = $_POST['unit_code'][$i];
 
 		if (isset($f2d_sku_components)) update_post_meta($variation_id, 'f2d_sku_components', esc_attr($f2d_sku_components));
+		if (isset($f2d_artcd)) update_post_meta($variation_id, 'f2d_artcd', esc_attr($f2d_artcd));
 		if (isset($template_id)) update_post_meta($variation_id, 'template_id', esc_attr($template_id));
 		if (isset($variant_code)) update_post_meta($variation_id, 'variant_code', esc_attr($variant_code));
 		if (isset($custom_variant_add_to_cart_label)) update_post_meta($variation_id, 'custom_variation_add_to_cart_label', esc_attr($custom_variant_add_to_cart_label));
@@ -385,6 +397,16 @@ class PpiAdmin
 				'description' => __('The unit code of this item', 'woocommerce'),
 				'value' => $product_id != null ? get_post_meta($product_id, 'unit_code', true) : ""
 			));
+
+			woocommerce_wp_text_input(array(
+				'id' => 'f2d_artcd',
+				'class' => 'short',
+				'label' => 'F2D article code',
+				'type' => 'text',
+				'desc_tip'    => true,
+				'description' => __('F2D article code', 'woocommerce'),
+				'value' => $product_id != null ? get_post_meta($product_id, 'f2d_artcd', true) : ""
+			));
 		}
 	}
 
@@ -403,6 +425,7 @@ class PpiAdmin
 		if (isset($_POST['cart_price'])) update_post_meta($post_id, 'cart_price', $_POST['cart_price']);
 		if (isset($_POST['cart_units'])) update_post_meta($post_id, 'cart_units', $_POST['cart_units']);
 		if (isset($_POST['unit_code'])) update_post_meta($post_id, 'unit_code', $_POST['unit_code']);
+		if (isset($_POST['f2d_artcd'])) update_post_meta($post_id, 'f2d_artcd', $_POST['f2d_artcd']);
 	}
 
 	public function displayCustomMetaDataKey($display_key, $meta, $item)
