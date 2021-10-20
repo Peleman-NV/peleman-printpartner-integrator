@@ -475,31 +475,6 @@ class PpiAdmin
 	}
 
 	/**
-	 * Show one or all orders
-	 */
-	public function read_imaxel_project()
-	{
-		$projectId = $_POST['project_id'];
-
-		if (isset($projectId) && $projectId != '') {
-			$imaxel = new ImaxelService();
-			$projectJson = json_decode($imaxel->read_project($projectId)['body'], JSON_UNESCAPED_SLASHES);
-
-			$pages = array_filter($projectJson['design']['pages'], function ($el) {
-				return $el['partName'] === 'pages';
-			});
-			$projectInfo = [
-				'project_url' => $imaxel->get_editor_url($projectId, 'en', $_SERVER['HTTP_REFERER'], $_SERVER['HTTP_REFERER']),
-				'inner_sheets' => count($pages),
-				'inner_pages' => count($pages) * 2,
-				'project_json' => $projectJson
-			];
-		}
-
-		wp_send_json($projectInfo);
-	}
-
-	/**
 	 * Displays custom tracking information
 	 *
 	 * @param object $order

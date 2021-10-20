@@ -120,8 +120,6 @@ class Plugin
 
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
 		$this->loader->add_action('woocommerce_admin_order_data_after_billing_address', $plugin_admin, 'displayFly2DataCustomerNumberDiv', 10, 1);
-
-		$this->loader->add_action('admin_post_read_imaxel_project', $plugin_admin, 'read_imaxel_project');
 	}
 
 	/**
