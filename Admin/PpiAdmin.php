@@ -597,7 +597,7 @@ class PpiAdmin
 	{
 		$f2dCustomerNumber = get_user_meta($user->get('ID'), 'f2d_custnr', true);
 		$output = '<h2>Fly2Data</h2>'
-			. '<table class="form-table" id="fieldset-billing">'
+			. '<table class="form-table">'
 			. '<tbody><tr>'
 			. '<th>'
 			. '<label for="f2d_custnr">F2D customer number</label>'
