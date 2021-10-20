@@ -364,6 +364,9 @@ class PpiAPI
 			$endpoint = 'orders/' . $orderId;
 			$orderObject = (object) $api->get($endpoint);
 
+			// add F2D customer number
+			$f2d_customer_number = get_user_meta($order->get_user_id(), 'f2d_custnr', true);
+			$orderObject->f2d_customer_number = $f2d_customer_number;
 			// add order language
 			$order = wc_get_order($orderId);
 			$orderLanguage  = $order->get_meta('wpml_language');
