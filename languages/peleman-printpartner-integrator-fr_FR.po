@@ -69,3 +69,6 @@ msgstr "pièces"
 
 msgid "Incl. VAT"
 msgstr "TTC"
+
+msgid "Article code:"
+msgstr "Code de l'article:"

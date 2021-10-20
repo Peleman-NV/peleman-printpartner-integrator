@@ -69,3 +69,6 @@ msgstr "piezas"
 
 msgid "Incl. VAT"
 msgstr "incluye IVA"
+
+msgid "Article code:"
+msgstr "Código del artículo:"

@@ -69,3 +69,6 @@ msgstr "stukken"
 
 msgid "Incl. VAT"
 msgstr "incl. BTW"
+
+msgid "Article code:"
+msgstr "Artikelcode:"

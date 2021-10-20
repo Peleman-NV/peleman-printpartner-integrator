@@ -70,3 +70,6 @@ msgstr ""
 
 msgid "Incl. VAT"
 msgstr ""
+
+msgid "Article code:"
+msgstr ""

@@ -69,3 +69,6 @@ msgstr "Stücke"
 
 msgid "Incl. VAT"
 msgstr "einschließlich MwSt"
+
+msgid "Article code:"
+msgstr "Artikelcode:"
