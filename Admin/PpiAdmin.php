@@ -586,4 +586,27 @@ class PpiAdmin
 		wp_send_json($response);
 		wp_die();
 	}
+
+	public function addMetaDataToUser($user)
+	{
+		$f2dCustomerNumber = get_user_meta($user->get('ID'), 'f2d_custnr', true);
+		$output = '<h2>Fly2Data</h2>'
+			. '<table class="form-table" id="fieldset-billing">'
+			. '<tbody><tr>'
+			. '<th>'
+			. '<label for="f2d_custnr">F2D customer number</label>'
+			. '</th>'
+			. '<td>'
+			. '<input type="text" name="f2d_custnr" id="f2d_custnr" value="' . $f2dCustomerNumber . '" class="regular-text">'
+			. '</tbody></table>';
+
+		echo $output;
+	}
+
+	public function saveMetaDataToUser($userId)
+	{
+		if (isset($_POST['f2d_custnr'])) {
+			update_user_meta($userId, 'f2d_custnr', $_POST['f2d_custnr']);
+		}
+	}
 }

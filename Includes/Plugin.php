@@ -120,6 +120,12 @@ class Plugin
 
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
 		$this->loader->add_action('woocommerce_admin_order_data_after_billing_address', $plugin_admin, 'displayFly2DataCustomerNumberDiv', 10, 1);
+
+		// add/edit data to admin user detail
+		$this->loader->add_action('show_user_profile', $plugin_admin, 'addMetaDataToUser', 10, 1);
+		$this->loader->add_action('edit_user_profile', $plugin_admin, 'addMetaDataToUser', 10, 1);
+		$this->loader->add_action('personal_options_update', $plugin_admin, 'saveMetaDataToUser', 10, 1);
+		$this->loader->add_action('edit_user_profile_update', $plugin_admin, 'saveMetaDataToUser', 10, 1);
 	}
 
 	/**
