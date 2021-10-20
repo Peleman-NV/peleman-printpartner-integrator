@@ -587,7 +587,13 @@ class PpiAdmin
 		wp_die();
 	}
 
-	public function addMetaDataToUser($user)
+	/**
+	 * Display custom user data in admin > user profile page
+	 *
+	 * @param object $user
+	 * @return void
+	 */
+	public function displayCustomDataInUserDetail($user)
 	{
 		$f2dCustomerNumber = get_user_meta($user->get('ID'), 'f2d_custnr', true);
 		$output = '<h2>Fly2Data</h2>'
@@ -603,7 +609,13 @@ class PpiAdmin
 		echo $output;
 	}
 
-	public function saveMetaDataToUser($userId)
+	/**
+	 * Save custom user data in admin > user profile page
+	 *
+	 * @param int $userId
+	 * @return void
+	 */
+	public function saveCustomDataInUserDetail($userId)
 	{
 		if (isset($_POST['f2d_custnr'])) {
 			update_user_meta($userId, 'f2d_custnr', $_POST['f2d_custnr']);
