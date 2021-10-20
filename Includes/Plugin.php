@@ -103,6 +103,7 @@ class Plugin
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts', 5);
+		$this->loader->add_action('wp_ajax_save_f2d_custnr', $plugin_admin, 'save_f2d_custnr', 5);
 
 		$this->loader->add_action('admin_menu', $plugin_admin, 'ppi_add_admin_menu');
 		$this->loader->add_action('admin_init', $plugin_admin, 'ppi_register_plugin_settings');
@@ -118,6 +119,7 @@ class Plugin
 		$this->loader->add_action('woocommerce_order_item_display_meta_value', $plugin_admin, 'displayCustomMetaDataValue', 10, 3);
 
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'displayTrackingInformation');
+		$this->loader->add_action('woocommerce_admin_order_data_after_billing_address', $plugin_admin, 'displayFly2DataCustomerNumberDiv', 10, 1);
 
 		$this->loader->add_action('admin_post_read_imaxel_project', $plugin_admin, 'read_imaxel_project');
 	}

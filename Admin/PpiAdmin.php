@@ -53,6 +53,7 @@ class PpiAdmin
 
 	/**
 	 * Register the stylesheets for the admin area.
+	 * We add an random number for the version for cache busting
 	 */
 	public function enqueue_styles()
 	{
@@ -62,11 +63,13 @@ class PpiAdmin
 
 	/**
 	 * Register the JavaScript for the admin area.
+	 * We add an random number for the version for cache busting
 	 */
 	public function enqueue_scripts()
 	{
 		$randomVersionNumber = rand(0, 1000);
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/admin-ui.js', array('jquery'), $randomVersionNumber, true);
+		wp_enqueue_script($this->plugin_name . 'product-ui', plugin_dir_url(__FILE__) . 'js/admin-ui.js', array('jquery'), $randomVersionNumber, true);
+		wp_enqueue_script($this->plugin_name . 'order-ui', plugin_dir_url(__FILE__) . 'js/order-ui.js', array('jquery'), $randomVersionNumber, true);
 	}
 
 	/**
@@ -99,10 +102,11 @@ class PpiAdmin
 	}
 
 	/**
-	 * Adds text inputs for the Imaxel template ID and PDF upload information to variable products
+	 * Adds text inputs.  Variable products can have Imaxel templates and PDF upload information to variable products
+	 * These are usually uploaded, but can be maintained via these inputs
 	 * 
-	 * @param Int       $loop An interator to give each input field a unique name
-	 * @param Array     $variation_data Information about the specific variation
+	 * @param int       $loop An interator to give each input field a unique name
+	 * @param array     $variation_data Information about the specific variation
 	 * @param WP_Post   $variation Information about the product variation
 	 */
 	public function ppi_add_custom_fields_to_variable_products($loop, $variation_data, $variation)
@@ -288,8 +292,8 @@ class PpiAdmin
 	/**
 	 * Persists custom input fields
 	 * 
-	 * @param Int  $loop An interator to give each input field a unique name
-	 * @param Int  $variation_id Id for the current variation
+	 * @param int  $loop An interator to give each input field a unique name
+	 * @param int  $variation_id Id for the current variation
 	 */
 	public function ppi_persist_custom_field_variations($variation_id, $i)
 	{
@@ -329,7 +333,7 @@ class PpiAdmin
 	}
 
 	/**
-	 * Adds text inputs for the general product attributes
+	 * Adds text inputs for the general product attributes, and the simple products
 	 */
 	public function ppi_add_custom_fields_to_parent_products()
 	{
@@ -411,7 +415,7 @@ class PpiAdmin
 	}
 
 	/**
-	 * Persists custom input fields on parent product
+	 * Persists general custom input fields
 	 */
 	public function ppi_persist_custom_parent_attributes($post_id)
 	{
@@ -441,6 +445,14 @@ class PpiAdmin
 		return $display_key;
 	}
 
+	/**
+	 * When orders have custom metadata (Imaxel project ID, content files, etc), this function displays it
+	 *
+	 * @param string $value
+	 * @param object $meta
+	 * @param object $item
+	 * @return string
+	 */
 	public function displayCustomMetaDataValue($value, $meta, $item)
 	{
 		if ($meta->key === '_ppi_imaxel_project_id') {
@@ -487,6 +499,12 @@ class PpiAdmin
 		wp_send_json($projectInfo);
 	}
 
+	/**
+	 * Displays custom tracking information
+	 *
+	 * @param object $order
+	 * @return void
+	 */
 	public function displayTrackingInformation($order)
 	{
 		$trackingData = $order->get_meta('f2d_tracking_data');
@@ -502,6 +520,12 @@ class PpiAdmin
 		}
 	}
 
+	/**
+	 * Adds tracking data section to an order details page
+	 *
+	 * @param array $columns
+	 * @return array
+	 */
 	public function ppiAddTrackingDataColumnToOrderOverview($columns)
 	{
 		$columns['tracking'] = 'Tracking numbers';
@@ -525,5 +549,66 @@ class PpiAdmin
 		if ($column == 'tracking') {
 			echo trim(implode(',', $trackingNumbers), ',');
 		}
+	}
+
+	/**
+	 * Displays a mini-form in the order detail page, under the billing details
+	 * This allows an administrator to save a Fly2Data customer number via JavaScript/ajax
+	 *
+	 * @param object $order
+	 * @return void
+	 */
+	public function displayFly2DataCustomerNumberDiv($order)
+	{
+		$currentF2dCustomerNumber = get_user_meta($order->get_user_id(), 'f2d_custnr', true);
+
+		$f2dCustomerNumberField = '<p class="form-field form-field-wide"></p>'
+			. '<label for="f2d_cust">F2D customer number:</label>'
+			. '<div>'
+			. '<input type="text" name="f2d_cust" id="f2d_cust" value="' . $currentF2dCustomerNumber . '"  style="display: inline !important;">'
+			. '<div style="display: inline !important;">'
+			. '<button id="save-f2d-custnr" class="button button-primary">'
+			. 'Save to WooCommerce user'
+			. '<span id="ppi-admin-loading" class="dashicons dashicons-update rotate ppi-hidden"></span>'
+			. '</button>'
+			. '</div>'
+			. '<div id="f2d-error" class="ppi-hidden"></div>'
+			. '</div>';
+
+		echo $f2dCustomerNumberField;
+	}
+
+	/**
+	 * The function that "order-ui.js" calls via ajax
+	 */
+	public function save_f2d_custnr()
+	{
+		$orderNumber = $_POST['orderNumber'];
+		$fly2DataCustomerNumber = $_POST['fly2DataCustomerNumber'];
+
+		$order = wc_get_order($orderNumber);
+		if (!$order) {
+			$response['status'] = 'error';
+			$response['message'] = 'No order found for ' . $orderNumber;
+			wp_send_json($response);
+			wp_die();
+		}
+
+		$orderUserId = $order->get_user_id();
+
+		try {
+			update_user_meta($orderUserId, 'f2d_custnr', $fly2DataCustomerNumber);
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = "Error saving {$fly2DataCustomerNumber} to user {$orderUserId}";
+			$response['error'] = $th->getMessage();
+			wp_send_json($response);
+			wp_die();
+		}
+
+		$response['status'] = 'success';
+		$response['user'] = $orderUserId;
+		wp_send_json($response);
+		wp_die();
 	}
 }

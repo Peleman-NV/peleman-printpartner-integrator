@@ -63,3 +63,50 @@
     flex: 0 0 auto;
     width: 33%;
 }
+
+#f2d-custnr-saved {
+    margin: 0 -3px 0 3px;
+    position: relative;
+    top: 4px;
+}
+#ppi-admin-loading {
+    margin: 0 -3px 0 3px;
+    position: relative;
+    top: 4px;
+    opacity: 1;
+    color: white;
+    animation: rotate-with-color 1.5s linear infinite;
+}
+
+.ppi-hidden {
+    display: none !important;
+}
+
+@keyframes rotate-with-color {
+    25% {
+        color: rgb(24, 53, 94);
+        transform: rotate(90deg);
+    }
+    50% {
+        color: rgb(24, 53, 94);
+        transform: rotate(180deg);
+    }
+    75% {
+        color: rgb(24, 53, 94);
+        transform: rotate(270deg);
+    }
+    100% {
+        color: white;
+        transform: rotate(360deg);
+    }
+}
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#f2d_error {
+    color: red;
+    font-size: small;
+}
