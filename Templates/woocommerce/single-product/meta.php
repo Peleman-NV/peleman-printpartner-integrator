@@ -84,6 +84,20 @@ if ($isSimpleProduct = $product->is_type('simple')) {
         </span>
     <?php endif; ?>
 
+    <!-- Display SKU if user is admin -->
+    <?php if (current_user_can('administrator')) : ?>
+        <?php if (wc_product_sku_enabled() && ($product->get_sku() || $product->is_type('variable'))) : ?>
+            <span class="sku_wrapper">
+                <span class="label">
+                    <?php esc_html_e('SKU:', 'woocommerce'); ?>
+                </span>
+                <span class="sku">
+                    <?php echo ($sku = $product->get_sku()) ? $sku : esc_html__('N/A', 'woocommerce'); ?>
+                </span>
+            </span>
+        <?php endif; ?>
+    <?php endif; ?>
+
     <?php
     echo wc_get_product_category_list(
         $product->get_id(),
