@@ -559,7 +559,7 @@ class PpiAdmin
 	public function save_f2d_custnr()
 	{
 		$orderNumber = $_POST['orderNumber'];
-		$fly2DataCustomerNumber = $_POST['fly2DataCustomerNumber'];
+		$fly2DataCustomerNumber = intval($_POST['fly2DataCustomerNumber']);
 
 		$order = wc_get_order($orderNumber);
 		if (!$order) {
@@ -603,7 +603,7 @@ class PpiAdmin
 			. '<label for="f2d_custnr">F2D customer number</label>'
 			. '</th>'
 			. '<td>'
-			. '<input type="text" name="f2d_custnr" id="f2d_custnr" value="' . $f2dCustomerNumber . '" class="regular-text">'
+			. '<input type="number" name="f2d_custnr" id="f2d_custnr" value="' . $f2dCustomerNumber . '" class="regular-text">'
 			. '</tbody></table>';
 
 		echo $output;
@@ -618,7 +618,7 @@ class PpiAdmin
 	public function saveCustomDataInUserDetail($userId)
 	{
 		if (isset($_POST['f2d_custnr'])) {
-			update_user_meta($userId, 'f2d_custnr', $_POST['f2d_custnr']);
+			update_user_meta($userId, 'f2d_custnr', intval($_POST['f2d_custnr']));
 		}
 	}
 }

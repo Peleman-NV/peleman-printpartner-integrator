@@ -9,9 +9,12 @@
         resetUI();
         const orderNumber = $('#post_ID').val();
         const fly2DataCustomerNumber = $('#f2d_cust').val();
+        const pattern = /[A-Za-z]/;
 
         if (fly2DataCustomerNumber === '') {
             displayWarning('F2D Customer number cannot be empty');
+        } else if (pattern.test(fly2DataCustomerNumber)) {
+            displayWarning('F2D Customer number can only contains digits');
         } else {
             showLoadingAnimation();
             const data = {
