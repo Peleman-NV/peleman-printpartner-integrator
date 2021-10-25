@@ -27,8 +27,6 @@
         let buttonText = setAddToCartLabel();
         // Event: when a variation is selected
         $(document).on('show_variation', (event, variation) => {
-            console.log('done');
-
             initRefreshVariantElements();
             getProductVariationData(variation.variation_id);
         });
