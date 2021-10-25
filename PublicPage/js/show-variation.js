@@ -26,13 +26,15 @@
     $(function () {
         let buttonText = setAddToCartLabel();
         // Event: when a variation is selected
-        $('.variations_form').on('show_variation', (event, variation) => {
+        $(document).on('show_variation', (event, variation) => {
+            console.log('done');
+
             initRefreshVariantElements();
             getProductVariationData(variation.variation_id);
         });
 
         // Event: when a new variation is chosen
-        $('.variations_form').on('hide_variation', e => {
+        $(document).on('hide_variation', e => {
             hideUploadElements();
             disableAddToCartBtn(buttonText);
             resetUnitPrice();
