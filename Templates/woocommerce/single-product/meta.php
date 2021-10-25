@@ -32,15 +32,15 @@ if ($isSimpleProduct = $product->is_type('simple')) {
     <?php if (!$callUsToPurchase && ($isSimpleProduct && $individualPrice != '') || !$isSimpleProduct) : ?>
         <span class="sku_wrapper">
             <span id="call-us-price" class="label ppi-hidden">Price: call us for a quote at +32 3 889 32 41</span>
-            <span class="individual-price <?= !$isBundleProduct ? 'ppi-hidden' : ''; ?>">
+            <span class="individual-price <?php echo !$isBundleProduct ? 'ppi-hidden' : ''; ?>">
                 <span class="label">
                     <?php echo __('Individual price', PPI_TEXT_DOMAIN) . ': '; ?>
                 </span>
                 <span class="price-amount woocommerce-Price-amount amount">
-                    <?= $isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''; ?>
+                    <?php echo $isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''; ?>
                 </span>
                 <span class="woocommerce-price-suffix">
-                    <?= $priceSuffix; ?>
+                    <?php echo $priceSuffix; ?>
                 </span>
             </span>
             <span class="add-to-cart-price">
@@ -48,7 +48,7 @@ if ($isSimpleProduct = $product->is_type('simple')) {
                     <?php echo __('price', PPI_TEXT_DOMAIN) . ': '; ?>
                 </span>
                 <span class="price-amount woocommerce-Price-amount amount">
-                    <?= $isSimpleProduct && $isBundleProduct ? $bundlePriceWithCurrencySymbol : $individualPriceWithCurrencySymbol; ?>
+                    <?php echo $isSimpleProduct && $isBundleProduct ? $bundlePriceWithCurrencySymbol : $individualPriceWithCurrencySymbol; ?>
                 </span>
                 <span class="woocommerce-price-suffix">
                     <?php
