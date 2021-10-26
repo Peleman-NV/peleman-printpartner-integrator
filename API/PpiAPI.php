@@ -121,6 +121,19 @@ class PpiAPI
 		));
 	}
 
+	/**	
+	 * Register add Fly2Data customer number to WP user meta
+	 */
+	public function registerAddCustomerMetaDataEndpoint()
+	{
+		register_rest_route('ppi/v1', '/user-meta', array(
+			'methods' => 'POST',
+			'callback' => array($this, 'addCustomerMetaData'),
+			'args' => array('order'),
+			'permission_callback' => '__return_true'
+		));
+	}
+
 	public function checkPendingOrders()
 	{
 		$imaxel = new ImaxelService();
@@ -513,6 +526,43 @@ class PpiAPI
 			$response['status'] = 'error';
 			$response['message'] = $th->getMessage();
 			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+	}
+
+	public function addCustomerMetaData($request)
+	{
+		$customerId = $request['customer_id'];
+		$metaDataKey = $request['usermeta_key'];
+		$metaDataValue = $request['usermeta_value'];
+		$user = get_user_by('id', $customerId);
+
+		if (gettype($metaDataValue) !== "integer") {
+			$response['status'] = 'error';
+			$response['message'] = "Value is not an int";
+			$statusCode = 400;
+			wp_send_json($response, $statusCode);
+			die();
+		} else if (gettype($user) !== 'object') {
+			$response['status'] = 'error';
+			$response['message'] = "Cannot find user with WordPress user with ID {$customerId}";
+			$statusCode = 409;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		try {
+			update_user_meta($customerId, $metaDataKey, $metaDataValue);
+			$response['status'] = 'success';
+			$response['message'] = "Update metadata key {$metaDataKey} with value {$metaDataValue}";
+			$statusCode = 200;
+			wp_send_json($response, $statusCode);
+			die();
+		} catch (\Throwable $th) {
+			$response['status'] = 'error';
+			$response['message'] = $th->getMessage();
+			$statusCode = 500;
 			wp_send_json($response, $statusCode);
 			die();
 		}
