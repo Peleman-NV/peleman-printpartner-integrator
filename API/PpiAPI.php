@@ -333,13 +333,18 @@ class PpiAPI
 	private function getOrderData($orderId)
 	{
 		$order = wc_get_order($orderId);
+		$f2dCustomerNumber = intval(get_user_meta($order->get_user_id(), 'f2d_custnr', true));
 
 		return [
 			'ID' => $orderId,
+			'f2d_custnr' => $f2dCustomerNumber !== 0 ? $f2dCustomerNumber : '',
 			'order_created' => $order->get_date_created()->date("Y-m-d H:i:s"),
 			'order_total' => $order->get_total(),
 			'billing_company' => $order->get_billing_company(),
-			'billing_customer' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()
+			'billing_customer' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+			'billing_country_code' => $order->get_billing_country(),
+			'shipping_country_code' => $order->get_shipping_country()
+
 		];
 	}
 
@@ -536,18 +541,20 @@ class PpiAPI
 		$customerId = $request['customer_id'];
 		$metaDataKey = $request['usermeta_key'];
 		$metaDataValue = $request['usermeta_value'];
-		$user = get_user_by('id', $customerId);
 
-		if (gettype($metaDataValue) !== "integer") {
-			$response['status'] = 'error';
-			$response['message'] = "Value is not an int";
-			$statusCode = 400;
-			wp_send_json($response, $statusCode);
-			die();
-		} else if (gettype($user) !== 'object') {
+		$user = get_user_by('id', $customerId);
+		if (gettype($user) !== 'object') {
 			$response['status'] = 'error';
 			$response['message'] = "Cannot find user with WordPress user with ID {$customerId}";
 			$statusCode = 409;
+			wp_send_json($response, $statusCode);
+			die();
+		}
+
+		if ($metaDataKey === 'f2d_custnr' && gettype($metaDataValue) !== 'integer') {
+			$response['status'] = 'error';
+			$response['message'] = "fd2_custnr must be an integer";
+			$statusCode = 400;
 			wp_send_json($response, $statusCode);
 			die();
 		}
