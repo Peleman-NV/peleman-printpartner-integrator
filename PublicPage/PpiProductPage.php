@@ -564,8 +564,9 @@ class PpiProductPage
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
 		$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
-		$siteUrl = get_site_url() . '/' . $lang;
-
+		$defaultLanguageCode = apply_filters('wpml_default_language', NULL);
+		$urlLanguageSuffix = $defaultLanguageCode !== $lang ? '/' . $lang : '';
+		$siteUrl = get_site_url() . $urlLanguageSuffix;
 		$editorUrl = $imaxel->get_editor_url($project_id, $backUrl, $lang, $siteUrl . '/?add-to-cart=' . $variant_id . '&project=' . $project_id . '&content_file_id=' . $content_file_id ?? '');
 
 		return array(
