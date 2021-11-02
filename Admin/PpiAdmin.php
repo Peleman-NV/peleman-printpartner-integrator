@@ -2,8 +2,6 @@
 
 namespace PelemanPrintpartnerIntegrator\Admin;
 
-use PelemanPrintpartnerIntegrator\Services\ImaxelService;
-
 /**
  * The admin-specific functionality of the plugin.
  * 
@@ -99,6 +97,7 @@ class PpiAdmin
 		register_setting('ppi_custom_settings', 'ppi-wc-key');
 		register_setting('ppi_custom_settings', 'ppi-wc-secret');
 		register_setting('ppi_custom_settings', 'ppi-order-id-prefix');
+		register_setting('ppi_custom_settings', 'ppi-is-b2b');
 	}
 
 	/**

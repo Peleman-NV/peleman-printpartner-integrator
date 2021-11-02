@@ -32,15 +32,15 @@ if ($isSimpleProduct = $product->is_type('simple')) {
     <?php if (!$callUsToPurchase && ($isSimpleProduct && $individualPrice != '') || !$isSimpleProduct) : ?>
         <span class="sku_wrapper">
             <span id="call-us-price" class="label ppi-hidden">Price: call us for a quote at +32 3 889 32 41</span>
-            <span class="individual-price <?php echo !$isBundleProduct ? 'ppi-hidden' : ''; ?>">
+            <span class="individual-price <?php echo _e(!$isBundleProduct ? 'ppi-hidden' : ''); ?>">
                 <span class="label">
                     <?php echo __('Individual price', PPI_TEXT_DOMAIN) . ': '; ?>
                 </span>
                 <span class="price-amount woocommerce-Price-amount amount">
-                    <?php echo $isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''; ?>
+                    <?php echo _e($isSimpleProduct && $isBundleProduct ? $individualPriceWithCurrencySymbol : ''); ?>
                 </span>
                 <span class="woocommerce-price-suffix">
-                    <?php echo $priceSuffix; ?>
+                    <?php echo _e($priceSuffix); ?>
                 </span>
             </span>
             <span class="add-to-cart-price">
@@ -48,12 +48,12 @@ if ($isSimpleProduct = $product->is_type('simple')) {
                     <?php echo __('price', PPI_TEXT_DOMAIN) . ': '; ?>
                 </span>
                 <span class="price-amount woocommerce-Price-amount amount">
-                    <?php echo $isSimpleProduct && $isBundleProduct ? $bundlePriceWithCurrencySymbol : $individualPriceWithCurrencySymbol; ?>
+                    <?php echo _e($isSimpleProduct && $isBundleProduct ? $bundlePriceWithCurrencySymbol : $individualPriceWithCurrencySymbol); ?>
                 </span>
                 <span class="woocommerce-price-suffix">
                     <?php
-                    echo $priceSuffix;
-                    echo $isSimpleProduct && $isBundleProduct ? '<span class="bundle-suffix">' . $bundleLabel . '</span>' : '';
+                    echo _e($priceSuffix);
+                    echo _e($isSimpleProduct && $isBundleProduct ? '<span class="bundle-suffix">' . $bundleLabel . '</span>' : '');
                     ?>
                 </span>
             </span>
@@ -70,7 +70,7 @@ if ($isSimpleProduct = $product->is_type('simple')) {
                 <?php esc_html_e('Article code:', PPI_TEXT_DOMAIN); ?>
             </span>
             <span class="sku">
-                <?php echo $articleCode; ?>
+                <?php echo _e($articleCode); ?>
             </span>
         </span>
     <?php endif; ?>
@@ -92,7 +92,7 @@ if ($isSimpleProduct = $product->is_type('simple')) {
                     <?php esc_html_e('SKU:', 'woocommerce'); ?>
                 </span>
                 <span class="sku">
-                    <?php echo ($sku = $product->get_sku()) ? $sku : esc_html__('N/A', 'woocommerce'); ?>
+                    <?php echo ($sku = $product->get_sku()) ? _e($sku) : esc_html__('N/A', 'woocommerce'); ?>
                 </span>
             </span>
         <?php endif; ?>

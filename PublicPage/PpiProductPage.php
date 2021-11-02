@@ -181,7 +181,7 @@ class PpiProductPage
 					<tbody>						
 				</table>
 				";
-		echo $paramsDiv;
+		echo _e($paramsDiv);
 	}
 
 	/**
@@ -196,7 +196,7 @@ class PpiProductPage
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
         </div>
 		<div id='upload-info'></div>";
-		echo $uploadDiv;
+		echo _e($uploadDiv);
 	}
 
 	/**
@@ -206,7 +206,7 @@ class PpiProductPage
 	public function ppi_output_variant_info()
 	{
 		$variantInfoDiv = "<div id='variant-info'></div>";
-		echo $variantInfoDiv;
+		echo _e($variantInfoDiv);
 	}
 
 	/**
@@ -216,7 +216,7 @@ class PpiProductPage
 	public function ppi_output_redirection_info()
 	{
 		$redirectionInfoDiv = "<div id='redirection-info'></div>";
-		echo $redirectionInfoDiv;
+		echo _e($redirectionInfoDiv);
 	}
 
 	/**
@@ -356,7 +356,7 @@ class PpiProductPage
 		$decodedTrackingData = json_decode($trackingData, true);
 
 		foreach ($decodedTrackingData as $trackingObject) {
-			echo '<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
+			echo _e('<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>');
 		}
 	}
 
@@ -953,33 +953,10 @@ class PpiProductPage
 			add_action(
 				'woocommerce_single_product_summary',
 				function () {
-					echo '<a href="tel:+3238893241" class="button" style="background-color: #f7631e !important; padding-top: 20px !important; padding-bottom: 20px !important;">Call us for a quote at +32 3 889 32 41</a>';
+					echo _e('<a href="tel:+3238893241" class="button" style="background-color: #f7631e !important; padding-top: 20px !important; padding-bottom: 20px !important;">Call us for a quote at +32 3 889 32 41</a>');
 				},
 				30
 			);
 		}
 	}
-
-	/*
-	// User project pages
-	public function add_projects_menu_item($items)
-	{
-		$logout = $items['customer-logout'];
-		unset($items['customer-logout']);
-		$items['projects'] = __('Projects', PPI_TEXT_DOMAIN);
-		$items['customer-logout'] = $logout;
-		
-		return $items;
-	}
-	
-	public function register_projects_endpoint()
-	{
-		add_rewrite_endpoint('projects', EP_PAGES);
-	}
-
-	public function projects_endpoint_content()
-	{
-		wc_get_template('/myaccount/projects.php', [], '', plugin_dir_path(__FILE__) . '../Templates/woocommerce');
-	}
-	*/
 }

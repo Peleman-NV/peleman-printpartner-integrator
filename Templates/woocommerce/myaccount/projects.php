@@ -115,16 +115,16 @@ function getProjectsForUser($userId)
         </thead>
         <tbody>
             <?php foreach ($userProjects as $project) : ?>
-                <tr class="project-line" id="<?php echo $project->project_id; ?>">
-                    <td id="project-name"><?php echo $project->name; ?></td>
-                    <td id="variant-id" data-variant-id="<?= $project->product_id; ?>">
+                <tr class="project-line" id="<?php echo _e($project->project_id); ?>">
+                    <td id="project-name"><?php echo _e($project->name); ?></td>
+                    <td id="variant-id" data-variant-id="<?php echo _e($project->product_id); ?>">
                         <?php $product = wc_get_product($project->product_id);
-                        echo '<a href="' . get_permalink($project->product_id) . '">' . $product->get_title() . '</a>';  ?>
+                        echo _e('<a href="' . get_permalink($project->product_id) . '">' . $product->get_title() . '</a>');  ?>
                     </td>
                     <td><?php $date = new DateTime($project->created);
-                        echo $date->format('Y-m-d'); ?></td>
+                        echo _e($date->format('Y-m-d')); ?></td>
                     <td class="actions">
-                        <button id="edit-project" class=" woocommerce-button button <?= $project->ordered ? 'ppi-btn-disabled' : '' ?>">Edit</button>
+                        <button id="edit-project" class=" woocommerce-button button <?php echo _e($project->ordered ? 'ppi-btn-disabled' : ''); ?>">Edit</button>
                         <?= $project->ordered ? '<div class="ordered">This project has already been ordered,<br>and cannot be modified.</div>' : '' ?>
                         <button id="rename-project" class=" woocommerce-button button">Rename</button>
                         <button id="add-project-to-cart" class="woocommerce-button button">Order</button>

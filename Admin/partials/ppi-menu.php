@@ -31,7 +31,7 @@
                 <label for="ppi-imaxel-private-key">Imaxel private key</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-imaxel-private-key" name="ppi-imaxel-private-key" value="<?= get_option('ppi-imaxel-private-key'); ?>" placeholder="Imaxel private key">
+                <input type="text" id="ppi-imaxel-private-key" name="ppi-imaxel-private-key" value="<?php echo esc_html(get_option('ppi-imaxel-private-key')); ?>" placeholder="Imaxel private key">
             </div>
         </div>
         <div class="form-row">
@@ -39,7 +39,7 @@
                 <label for="ppi-imaxel-public-key">Imaxel public key</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-imaxel-public-key" name="ppi-imaxel-public-key" value="<?= get_option('ppi-imaxel-public-key'); ?>" placeholder="Imaxel public key">
+                <input type="text" id="ppi-imaxel-public-key" name="ppi-imaxel-public-key" value="<?php echo esc_html(get_option('ppi-imaxel-public-key')); ?>" placeholder="Imaxel public key">
             </div>
         </div>
         <div class="form-row">
@@ -47,7 +47,7 @@
                 <label for="ppi-imaxel-shop-code">Imaxel shop code</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-imaxel-shop-code" name="ppi-imaxel-shop-code" value="<?= get_option('ppi-imaxel-shop-code'); ?>" placeholder="Imaxel Shop code">
+                <input type="text" id="ppi-imaxel-shop-code" name="ppi-imaxel-shop-code" value="<?php echo esc_html(get_option('ppi-imaxel-shop-code')); ?>" placeholder="Imaxel Shop code">
             </div>
         </div>
         <div class="form-row">
@@ -55,7 +55,7 @@
                 <label for="ppi-wc-key">WooCommerce key</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-wc-key" name="ppi-wc-key" value="<?= get_option('ppi-wc-key'); ?>" placeholder="WooCommerce key">
+                <input type="text" id="ppi-wc-key" name="ppi-wc-key" value="<?php echo esc_html(get_option('ppi-wc-key')); ?>" placeholder="WooCommerce key">
             </div>
         </div>
         <div class="form-row">
@@ -63,7 +63,7 @@
                 <label for="ppi-wc-secret">WooCommerce secret</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-wc-secret" name="ppi-wc-secret" value="<?= get_option('ppi-wc-secret'); ?>" placeholder="WooCommerce secret">
+                <input type="text" id="ppi-wc-secret" name="ppi-wc-secret" value="<?php echo esc_html(get_option('ppi-wc-secret')); ?>" placeholder="WooCommerce secret">
             </div>
         </div>
         <p>Here you define the custom label for all products. Each product can have its own custom label as well.</p>
@@ -72,7 +72,16 @@
                 <label for="ppi-custom-add-to-cart-label">Label</label>
             </div>
             <div class="grid-large-column">
-                <input type="text" id="ppi-custom-add-to-cart-label" name="ppi-custom-add-to-cart-label" value="<?= get_option('ppi-custom-add-to-cart-label'); ?>" placeholder="Eg: Personalise Your Product">
+                <input type="text" id="ppi-custom-add-to-cart-label" name="ppi-custom-add-to-cart-label" value="<?php echo esc_html(get_option('ppi-custom-add-to-cart-label')); ?>" placeholder="Eg: Personalise Your Product">
+            </div>
+        </div>
+        <p>Is this a B2B site? (important for price display, template overrides, etc)</p>
+        <div class="form-row">
+            <div class="grid-medium-column">
+                <label for="ppi-is-b2b">B2B site?</label>
+            </div>
+            <div class="grid-large-column">
+                <input type="checkbox" id="ppi-is-b2b" name="ppi-is-b2b" value="1" <?php checked(1, get_option('ppi-is-b2b')); ?>>
             </div>
         </div>
         <button type="submit" class="button button-primary">Save changes</button>
