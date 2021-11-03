@@ -3,6 +3,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+$isB2cSite = get_option('ppi-is-b2b');
+
 global $product;
 $callUsToPurchase = $product->get_meta('call_to_order') === 'yes';
 
@@ -16,9 +18,11 @@ if ($isSimpleProduct = $product->is_type('simple')) {
     $bundlePrice = $product->get_meta('cart_price');
     $bundleUnits = $product->get_meta('cart_units');
 
-    if ($isBundleProduct = isset($bundlePrice) && !empty($bundlePrice) && isset($bundleUnits) && !empty($bundleUnits) && $bundleUnits > 1) {
-        $bundlePriceWithCurrencySymbol =  get_woocommerce_currency_symbol() . number_format($bundlePrice, 2);
-        $bundleLabel = ' (' . $bundleUnits . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')';
+    if ($isB2cSite) {
+        if ($isBundleProduct = isset($bundlePrice) && !empty($bundlePrice) && isset($bundleUnits) && !empty($bundleUnits) && $bundleUnits > 1) {
+            $bundlePriceWithCurrencySymbol =  get_woocommerce_currency_symbol() . number_format($bundlePrice, 2);
+            $bundleLabel = ' (' . $bundleUnits . ' ' . __('pieces', PPI_TEXT_DOMAIN) . ')';
+        }
     }
 }
 ?>
