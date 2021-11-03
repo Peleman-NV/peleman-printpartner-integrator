@@ -21,6 +21,8 @@ namespace PelemanPrintpartnerIntegrator\Admin;
  */
 class PpiAdmin
 {
+	private $tempVar;
+
 	/**
 	 * The ID of this plugin.
 	 *
