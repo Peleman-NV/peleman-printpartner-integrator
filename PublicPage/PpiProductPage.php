@@ -302,7 +302,7 @@ class PpiProductPage
 		$user_id = get_current_user_id();
 
 		// if no variant Id present, return
-		if ($variant_id === null) {
+		if ($variant_id === null || empty($variant_id)) {
 			$response['status'] = "success";
 			$this->returnResponse($response);
 		}
@@ -540,7 +540,7 @@ class PpiProductPage
 	 */
 	private function getImaxelData($variant_id, $content_file_id = NULL)
 	{
-		$variant_id = sanitize_text_field($_POST['variant_id']) ?? $variant_id;
+		$variant_id = $_POST['variant_id'] ?? $variant_id;
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
