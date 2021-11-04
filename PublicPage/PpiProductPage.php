@@ -139,12 +139,12 @@ class PpiProductPage
 	 */
 	public function ppi_output_file_params()
 	{
-		$maxUploadFileSizeLabel = __('Maximum file upload size', PPI_TEXT_DOMAIN);
-		$pDFPageWidth = __('PDF page width', PPI_TEXT_DOMAIN);
-		$pDFPageHeight = __('PDF page height', PPI_TEXT_DOMAIN);
-		$minimumNumberOfPages = __('Minimum nr of pages', PPI_TEXT_DOMAIN);
-		$maximumNumberOfPages = __('Maximum nr of pages', PPI_TEXT_DOMAIN);
-		$pricePerPage = __('Price per page', PPI_TEXT_DOMAIN);
+		$maxUploadFileSizeLabel = esc_html__('Maximum file upload size', PPI_TEXT_DOMAIN);
+		$pDFPageWidth = esc_html__('PDF page width', PPI_TEXT_DOMAIN);
+		$pDFPageHeight = esc_html__('PDF page height', PPI_TEXT_DOMAIN);
+		$minimumNumberOfPages = esc_html__('Minimum nr of pages', PPI_TEXT_DOMAIN);
+		$maximumNumberOfPages = esc_html__('Maximum nr of pages', PPI_TEXT_DOMAIN);
+		$pricePerPage = esc_html__('Price per page', PPI_TEXT_DOMAIN);
 		$maxUploadFileSize = "100MB";
 
 		$paramsDiv = "
@@ -181,7 +181,7 @@ class PpiProductPage
 					<tbody>						
 				</table>
 				";
-		echo _e($paramsDiv);
+		echo $paramsDiv;
 	}
 
 	/**
@@ -189,14 +189,14 @@ class PpiProductPage
 	 */
 	public function ppi_output_form($variant)
 	{
-		$uploadButtonLabel = __('Click here to upload your PDF file', PPI_TEXT_DOMAIN);
+		$uploadButtonLabel = esc_html__('Click here to upload your PDF file', PPI_TEXT_DOMAIN);
 		$uploadDiv = "
         <div class='ppi-upload-form ppi-hidden'>
             <label class='upload-label upload-disabled' for='file-upload'>{$uploadButtonLabel}</label>
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
         </div>
 		<div id='upload-info'></div>";
-		echo _e($uploadDiv);
+		echo $uploadDiv;
 	}
 
 	/**
@@ -206,7 +206,7 @@ class PpiProductPage
 	public function ppi_output_variant_info()
 	{
 		$variantInfoDiv = "<div id='variant-info'></div>";
-		echo _e($variantInfoDiv);
+		echo $variantInfoDiv;
 	}
 
 	/**
@@ -216,7 +216,7 @@ class PpiProductPage
 	public function ppi_output_redirection_info()
 	{
 		$redirectionInfoDiv = "<div id='redirection-info'></div>";
-		echo _e($redirectionInfoDiv);
+		echo $redirectionInfoDiv;
 	}
 
 	/**
@@ -256,7 +256,7 @@ class PpiProductPage
 		// 	$this->returnResponse($response);
 		// }
 
-		$variant_id = $_GET['variant'];
+		$variant_id = sanitize_text_field($_GET['variant']);
 		$product_variant = wc_get_product($variant_id);
 		$parent_product = wc_get_product($product_variant->get_parent_id());
 
@@ -297,8 +297,8 @@ class PpiProductPage
 		// 	$this->returnResponse($response);
 		// }
 
-		$variant_id = $_GET['variant'];
-		$content_file_id = $_GET['content'];
+		$variant_id = sanitize_text_field($_GET['variant']);
+		$content_file_id = sanitize_text_field($_GET['content']);
 		$user_id = get_current_user_id();
 
 		// if no variant Id present, return
@@ -435,7 +435,7 @@ class PpiProductPage
 			$this->returnResponse($response);
 		}
 
-		$variant_id = $_POST['variant_id'];
+		$variant_id = sanitize_text_field($_POST['variant_id']);
 
 		// page & dimension validation
 		$variant = $this->getVariantContentParameters($variant_id);
@@ -540,7 +540,7 @@ class PpiProductPage
 	 */
 	private function getImaxelData($variant_id, $content_file_id = NULL)
 	{
-		$variant_id = $_POST['variant_id'] ?? $variant_id;
+		$variant_id = sanitize_text_field($_POST['variant_id']) ?? $variant_id;
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
@@ -664,7 +664,7 @@ class PpiProductPage
 		// when adding to cart, request is POST
 		// add price to cart item object
 		if (isset($_POST['content_file_id']) && !empty($_POST['content_file_id'])) {
-			$content_file_id = $_POST['content_file_id'];
+			$content_file_id = sanitize_text_field($_POST['content_file_id']);
 			$cart_item_data['_content_file_id'] = $content_file_id;
 			error_log($now->format('c') . ": added file upload id {$content_file_id} to cart" . PHP_EOL, 3,  $this->logFile);
 		}
@@ -672,13 +672,13 @@ class PpiProductPage
 		// when returning from imaxel, request is GET
 		// add price to cart item object
 		if (isset($_GET['content_file_id']) && !empty($_GET['content_file_id'])) {
-			$content_file_id = $_GET['content_file_id'];
+			$content_file_id = sanitize_text_field($_GET['content_file_id']);
 			$cart_item_data["_content_file_id"] = $content_file_id;
 			error_log($now->format('c') . ": added file upload id {$content_file_id} to cart" . PHP_EOL, 3,  $this->logFile);
 		}
 		// add imaxel project id to cart item object
 		if (isset($_GET['project']) && !empty($_GET['project'])) {
-			$projectId = esc_attr($_GET['project']);
+			$projectId = sanitize_text_field($_GET['project']);
 			$cart_item_data["_ppi_imaxel_project_id"] = $projectId;
 			error_log($now->format('c') . ": added projectID {$projectId} to cart" . PHP_EOL, 3,  $this->logFile);
 		}
@@ -824,7 +824,7 @@ class PpiProductPage
 	public function readImaxelProjectOnReturnFromEditor($passed, $product_id, $quantity, $variation_id = '', $variations = '')
 	{
 		if (isset($_GET['project']) && !empty($_GET['project'])) {
-			$imaxelProjectId = $_GET['project'];
+			$imaxelProjectId = sanitize_text_field($_GET['project']);
 			$imaxel = new ImaxelService();
 			$response = json_decode($imaxel->read_project($imaxelProjectId)['body'], true);
 

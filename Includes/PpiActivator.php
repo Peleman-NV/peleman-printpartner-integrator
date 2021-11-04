@@ -53,10 +53,10 @@ class PpiActivator
 	public static function init_plugin_folders()
 	{
 		$pluginDirectories = [
-			'uploadDirectory' => ABSPATH . 'wp-content/uploads/ppi/content',
-			'imaxelFilesDirectory' => ABSPATH . 'wp-content/uploads/ppi/imaxelfiles',
-			'thumbnailDirectory' => ABSPATH . 'wp-content/uploads/ppi/thumbnails',
-			'logDirectory' => ABSPATH . 'wp-content/uploads/ppi/logs',
+			'uploadDirectory' => WP_CONTENT_DIR . '/uploads/ppi/content',
+			'imaxelFilesDirectory' => WP_CONTENT_DIR . '/uploads/ppi/imaxelfiles',
+			'thumbnailDirectory' => WP_CONTENT_DIR . '/uploads/ppi/thumbnails',
+			'logDirectory' => WP_CONTENT_DIR . '/uploads/ppi/logs',
 		];
 
 		foreach ($pluginDirectories as $name => $dir) {

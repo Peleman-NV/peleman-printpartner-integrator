@@ -298,22 +298,22 @@ class PpiAdmin
 	 */
 	public function ppi_persist_custom_field_variations($variation_id, $i)
 	{
-		$f2d_sku_components = $_POST['f2d_sku_components'][$i];
-		$f2d_artcd = $_POST['f2d_artcd'][$i];
-		$template_id = $_POST['template_id'][$i];
-		$variant_code = $_POST['variant_code'][$i];
-		$custom_variant_add_to_cart_label = $_POST['custom_variation_add_to_cart_label'][$i];
+		$f2d_sku_components = sanitize_text_field($_POST['f2d_sku_components'][$i]);
+		$f2d_artcd = sanitize_text_field($_POST['f2d_artcd'][$i]);
+		$template_id = sanitize_text_field($_POST['template_id'][$i]);
+		$variant_code = sanitize_text_field($_POST['variant_code'][$i]);
+		$custom_variant_add_to_cart_label = sanitize_text_field($_POST['custom_variation_add_to_cart_label'][$i]);
 		$call_to_order = isset($_POST['call_to_order']) ? 'yes' : 'no';
 		$pdf_upload_required = isset($_POST['pdf_upload_required']) ? 'yes' : 'no';
-		$pdf_width_mm = $_POST['pdf_width_mm'][$i];
-		$pdf_height_mm = $_POST['pdf_height_mm'][$i];
-		$pdf_min_pages = $_POST['pdf_min_pages'][$i];
-		$pdf_max_pages = $_POST['pdf_max_pages'][$i];
-		$price_per_page = $_POST['price_per_page'][$i];
-		$base_number_of_pages = $_POST['base_number_of_pages'][$i];
-		$cart_price = $_POST['cart_price'][$i];
-		$cart_units = $_POST['cart_units'][$i];
-		$unit_code = $_POST['unit_code'][$i];
+		$pdf_width_mm = sanitize_text_field($_POST['pdf_width_mm'][$i]);
+		$pdf_height_mm = sanitize_text_field($_POST['pdf_height_mm'][$i]);
+		$pdf_min_pages = sanitize_text_field($_POST['pdf_min_pages'][$i]);
+		$pdf_max_pages = sanitize_text_field($_POST['pdf_max_pages'][$i]);
+		$price_per_page = sanitize_text_field($_POST['price_per_page'][$i]);
+		$base_number_of_pages = sanitize_text_field($_POST['base_number_of_pages'][$i]);
+		$cart_price = sanitize_text_field($_POST['cart_price'][$i]);
+		$cart_units = sanitize_text_field($_POST['cart_units'][$i]);
+		$unit_code = sanitize_text_field($_POST['unit_code'][$i]);
 
 		if (isset($f2d_sku_components)) update_post_meta($variation_id, 'f2d_sku_components', esc_attr($f2d_sku_components));
 		if (isset($f2d_artcd)) update_post_meta($variation_id, 'f2d_artcd', esc_attr($f2d_artcd));
@@ -338,7 +338,7 @@ class PpiAdmin
 	 */
 	public function ppi_add_custom_fields_to_parent_products()
 	{
-		$product_id = (isset($_GET['post']) && $_GET['post'] != '') ? $_GET['post'] : '';
+		$product_id = (isset($_GET['post']) && $_GET['post'] != '') ? sanitize_text_field($_GET['post']) : '';
 		$customizable_product = get_post_meta($product_id, 'customizable_product', true);
 		woocommerce_wp_checkbox(array(
 			'id' => 'customizable_product',
@@ -420,17 +420,17 @@ class PpiAdmin
 	 */
 	public function ppi_persist_custom_parent_attributes($post_id)
 	{
-		$custom_add_to_cart_label = $_POST['custom_add_to_cart_label'];
+		$custom_add_to_cart_label = sanitize_text_field($_POST['custom_add_to_cart_label']);
 		$customizable_product = isset($_POST['customizable_product']) ? 'yes' : 'no';
 		$call_to_order = isset($_POST['call_to_order']) ? 'yes' : 'no';
 
 		if (isset($custom_add_to_cart_label)) update_post_meta($post_id, 'custom_add_to_cart_label', esc_attr($custom_add_to_cart_label));
 		if (isset($customizable_product)) update_post_meta($post_id, 'customizable_product', $customizable_product);
 		if (isset($call_to_order)) update_post_meta($post_id, 'call_to_order', $call_to_order);
-		if (isset($_POST['cart_price'])) update_post_meta($post_id, 'cart_price', $_POST['cart_price']);
-		if (isset($_POST['cart_units'])) update_post_meta($post_id, 'cart_units', $_POST['cart_units']);
-		if (isset($_POST['unit_code'])) update_post_meta($post_id, 'unit_code', $_POST['unit_code']);
-		if (isset($_POST['f2d_artcd'])) update_post_meta($post_id, 'f2d_artcd', $_POST['f2d_artcd']);
+		if (isset($_POST['cart_price'])) update_post_meta($post_id, 'cart_price', sanitize_text_field($_POST['cart_price']));
+		if (isset($_POST['cart_units'])) update_post_meta($post_id, 'cart_units', sanitize_text_field($_POST['cart_units']));
+		if (isset($_POST['unit_code'])) update_post_meta($post_id, 'unit_code', sanitize_text_field($_POST['unit_code']));
+		if (isset($_POST['f2d_artcd'])) update_post_meta($post_id, 'f2d_artcd', sanitize_text_field($_POST['f2d_artcd']));
 	}
 
 	public function displayCustomMetaDataKey($display_key, $meta, $item)
@@ -460,7 +460,7 @@ class PpiAdmin
 			$orderId = $item->get_order_id();
 			$projectId = $item->get_meta('_ppi_imaxel_project_id');
 			$fileName = "{$projectId}/{$orderId}-{$projectId}.zip";
-			$url = get_site_url() . "/wp-content/uploads/ppi/imaxelfiles/{$fileName}";
+			$url = WP_CONTENT_URL . "/uploads/ppi/imaxelfiles/{$fileName}";
 			$isFileReady = is_file(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName));
 
 			if ($isFileReady) return '<a href="' . $url . '" download>' . $fileName . ' (' . round(filesize(realpath(PPI_IMAXEL_FILES_DIR . '/' . $fileName)) / 1024, 2) . ' kB)</a>';
@@ -468,7 +468,7 @@ class PpiAdmin
 		}
 		if ($meta->key === '_content_filename') {
 			$file = $item->get_meta('_content_filename');
-			$url = get_site_url() . '/wp-content/uploads/ppi/content/' . $file;
+			$url = WP_CONTENT_URL . '/uploads/ppi/content/' . $file;
 			return '<a href="' . $url . '" download>content-files (' . round(filesize(realpath(PPI_UPLOAD_DIR . '/' . $file)) / 1024, 2) . ' kB)</a>';
 		}
 
@@ -492,7 +492,7 @@ class PpiAdmin
 		$decodedTrackingData = json_decode($trackingData, true);
 
 		foreach ($decodedTrackingData as $trackingObject) {
-			echo '<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>';
+			echo '<a style="text-decoration: underline;" href="' . esc_html($trackingObject['url']) . '" target="blank">' . esc_html($trackingObject['number']) . '</a><br>';
 		}
 	}
 
@@ -523,7 +523,7 @@ class PpiAdmin
 		}, $trackingData);
 
 		if ($column == 'tracking') {
-			echo trim(implode(',', $trackingNumbers), ',');
+			echo esc_html(trim(implode(',', $trackingNumbers), ','));
 		}
 	}
 
@@ -536,7 +536,7 @@ class PpiAdmin
 	 */
 	public function displayFly2DataCustomerNumberDiv($order)
 	{
-		$currentF2dCustomerNumber = get_user_meta($order->get_user_id(), 'f2d_custnr', true);
+		$currentF2dCustomerNumber = esc_html(get_user_meta($order->get_user_id(), 'f2d_custnr', true));
 
 		$f2dCustomerNumberField = '<p class="form-field form-field-wide"></p>'
 			. '<label for="f2d_cust">F2D customer number:</label>'
@@ -559,8 +559,8 @@ class PpiAdmin
 	 */
 	public function save_f2d_custnr()
 	{
-		$orderNumber = $_POST['orderNumber'];
-		$fly2DataCustomerNumber = intval($_POST['fly2DataCustomerNumber']);
+		$orderNumber = sanitize_text_field($_POST['orderNumber']);
+		$fly2DataCustomerNumber = intval(sanitize_text_field($_POST['fly2DataCustomerNumber']));
 
 		$order = wc_get_order($orderNumber);
 		if (!$order) {
@@ -596,7 +596,7 @@ class PpiAdmin
 	 */
 	public function displayCustomDataInUserDetail($user)
 	{
-		$f2dCustomerNumber = get_user_meta($user->get('ID'), 'f2d_custnr', true);
+		$f2dCustomerNumber = esc_html(get_user_meta($user->get('ID'), 'f2d_custnr', true));
 		$output = '<h2>Fly2Data</h2>'
 			. '<table class="form-table">'
 			. '<tbody><tr>'
@@ -619,7 +619,7 @@ class PpiAdmin
 	public function saveCustomDataInUserDetail($userId)
 	{
 		if (isset($_POST['f2d_custnr'])) {
-			update_user_meta($userId, 'f2d_custnr', intval($_POST['f2d_custnr']));
+			update_user_meta($userId, 'f2d_custnr', intval(sanitize_text_field($_POST['f2d_custnr'])));
 		}
 	}
 }
