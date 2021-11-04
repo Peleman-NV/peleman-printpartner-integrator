@@ -721,6 +721,8 @@ class PpiProductPage
 			$now =  new DateTime('NOW');
 			error_log($now->format('c') . ": added bundle information to order line item" . PHP_EOL, 3,  $this->logFile);
 		}
+		$itemMetaData = get_post_meta($itemId);
+		$item->add_meta_data('product_meta_data', $itemMetaData, true);
 	}
 
 	private function projectHasContentUpload($projectId)
