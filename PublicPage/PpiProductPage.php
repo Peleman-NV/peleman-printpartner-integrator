@@ -356,7 +356,7 @@ class PpiProductPage
 		$decodedTrackingData = json_decode($trackingData, true);
 
 		foreach ($decodedTrackingData as $trackingObject) {
-			echo _e('<a style="text-decoration: underline;" href="' . $trackingObject['url'] . '" target="blank">' . $trackingObject['number'] . '</a><br>');
+			echo '<a style="text-decoration: underline;" href="' . sanitize_text_field($trackingObject['url']) . '" target="blank">' . sanitize_text_field($trackingObject['number']) . '</a><br>';
 		}
 	}
 
@@ -495,7 +495,7 @@ class PpiProductPage
 		$response['file']['name'] = $filename;
 		$response['file']['content_file_id'] = $contentFileId;
 		$response['file']['location'] = $newFilenameWithPath;
-		$response['file']['filesize'] = $_FILES['file']['size'];
+		$response['file']['filesize'] = sanitize_text_field($_FILES['file']['size']);
 		$response['file']['width'] = $dimensions['width'];
 		$response['file']['height'] = $dimensions['height'];
 		$response['file']['pages'] = $pages;
@@ -540,7 +540,10 @@ class PpiProductPage
 	 */
 	private function getImaxelData($variant_id, $content_file_id = NULL)
 	{
-		$variant_id = $_POST['variant_id'] ?? $variant_id;
+		if (!is_null($_POST['variant_id'])) {
+			$variant_id = sanitize_text_field($_POST['variant_id']);
+		}
+
 		$template_id =  wc_get_product($variant_id)->get_meta('template_id');
 		$variant_code = wc_get_product($variant_id)->get_meta('variant_code');
 
@@ -563,7 +566,7 @@ class PpiProductPage
 		$backUrl =  explode("?", get_permalink($variant_id), 2)[0];
 		$encoded_response = json_decode($create_project_response['body']);
 		$project_id = $encoded_response->id;
-		$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? $_COOKIE['wp-wpml_current_language'] : 'en';
+		$lang = isset($_COOKIE['wp-wpml_current_language']) && $_COOKIE['wp-wpml_current_language'] ? sanitize_text_field($_COOKIE['wp-wpml_current_language']) : 'en';
 		$defaultLanguageCode = apply_filters('wpml_default_language', NULL);
 		$urlLanguageSuffix = $defaultLanguageCode !== $lang ? '/' . $lang : '';
 		$siteUrl = get_site_url() . $urlLanguageSuffix;
