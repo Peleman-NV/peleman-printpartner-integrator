@@ -196,6 +196,7 @@ class PpiProductPage
             <input id='file-upload' type='file' accept='application/pdf' name='pdf_upload' style='display: none;'>
         </div>
 		<div id='upload-info'></div>";
+
 		echo $uploadDiv;
 	}
 
@@ -205,8 +206,7 @@ class PpiProductPage
 	 */
 	public function ppi_output_variant_info()
 	{
-		$variantInfoDiv = "<div id='variant-info'></div>";
-		echo $variantInfoDiv;
+		echo "<div id='variant-info'></div>";
 	}
 
 	/**
@@ -215,8 +215,7 @@ class PpiProductPage
 	 */
 	public function ppi_output_redirection_info()
 	{
-		$redirectionInfoDiv = "<div id='redirection-info'></div>";
-		echo $redirectionInfoDiv;
+		echo "<div id='redirection-info'></div>";
 	}
 
 	/**
