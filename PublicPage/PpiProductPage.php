@@ -904,7 +904,9 @@ class PpiProductPage
 			$price =
 				'<span class="quantity">'
 				. $quantity
-				. ' &times; <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">&euro;</span>'
+				. '&nbsp; X &nbsp;<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">'
+				. get_woocommerce_currency_symbol()
+				. '</span>&nbsp;'
 				. $cartItemPrice
 				. '</bdi></span></span>';
 		}
@@ -917,7 +919,9 @@ class PpiProductPage
 			$price =
 				'<span class="quantity">'
 				. $quantity
-				. ' &times; <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">&euro;</span>'
+				. '&nbsp; X &nbsp;<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">'
+				. get_woocommerce_currency_symbol()
+				. '</span>&nbsp;'
 				. $updatedPrice
 				. '</bdi></span></span>';
 		}
